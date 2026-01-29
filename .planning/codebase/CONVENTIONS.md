@@ -5,52 +5,54 @@
 ## Naming Patterns
 
 **Files:**
-- Components: PascalCase with `.tsx` extension (e.g., `layout.tsx`, `page.tsx`)
-- Configuration files: lowercase with extension (e.g., `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`)
+- Components: PascalCase (e.g., `layout.tsx`, `page.tsx`)
+- TypeScript files: camelCase or PascalCase depending on component/utility role
+- Configuration files: kebab-case or camelCase (e.g., `next.config.ts`, `eslint.config.mjs`)
 
 **Functions:**
-- Functional components: PascalCase (e.g., `Home`, `RootLayout`)
-- Exported functions: camelCase (e.g., `default` for functional components)
-- Constants: camelCase (e.g., `geistSans`, `geistMono`, `nextConfig`)
+- React component functions: PascalCase (e.g., `RootLayout`, `Home`)
+- Regular functions: camelCase
+- Export default used for page components in Next.js App Router
 
 **Variables:**
-- Local constants: camelCase (e.g., `geistSans`, `geistMono`)
-- React props: destructured with camelCase names
-- Component props interfaces: Readonly pattern with explicit type unions
+- Constants: camelCase or UPPER_SNAKE_CASE for CSS variables
+- Local variables: camelCase
+- CSS custom properties: kebab-case with `--` prefix (e.g., `--font-geist-sans`, `--background`)
 
 **Types:**
-- Metadata type: `Metadata` imported from Next.js typing (`import type { Metadata }`)
-- Type imports: prefixed with `type` keyword to ensure tree-shaking
+- TypeScript types and interfaces: PascalCase
+- Type imports use `type` keyword (e.g., `import type { Metadata } from "next"`)
+- Read-only types marked with `Readonly` (e.g., `Readonly<{ children: React.ReactNode }>`)
 
 ## Code Style
 
 **Formatting:**
-- File: `eslint.config.mjs` configuration
-- Uses Tailwind CSS for styling with utility classes
-- JSX attributes use double quotes for strings, template literals for dynamic values
-- Import organization and ordering handled by ESLint config
+- No explicit Prettier configuration file present
+- Relies on ESLint for linting with Next.js configuration
+- 2-space indentation (standard JavaScript/TypeScript default)
+- Quote style: double quotes for JSX attributes and imports
 
 **Linting:**
-- Tool: ESLint v9 (flat config format)
-- Configuration: `eslint.config.mjs` (uses flat config, not legacy `.eslintrc`)
-- Rules: Extends `eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`
-- Global ignores: `.next/`, `out/`, `build/`, `next-env.d.ts`
+- ESLint v9 with flat config format (`eslint.config.mjs`)
+- Extends: `eslint-config-next/core-web-vitals` and `eslint-config-next/typescript`
+- Configuration location: `/Users/arvind/Documents/Hackathons/Cloud9 x JetBrains 2026/synapse/eslint.config.mjs`
+- Ignores: `.next/**`, `out/**`, `build/**`, `next-env.d.ts`
 
 ## Import Organization
 
 **Order:**
-1. External packages (Next.js, React, third-party)
-2. Internal modules and stylesheets
-3. Type imports prefixed with `type` keyword
+1. External dependencies (`next`, `react`)
+2. Type imports (marked with `type` keyword)
+3. Internal modules and components
+4. Stylesheets (e.g., `./globals.css`)
 
 **Path Aliases:**
-- Configured in `tsconfig.json`
-- Alias: `@/*` maps to project root `./`
-- Usage allows for cleaner imports across the codebase
+- Configured in `tsconfig.json`: `@/*` maps to project root
+- Used to reference files from root: `@/...` prefix available but not actively used in current codebase
 
-**Examples from codebase:**
+**Example from codebase:**
 ```typescript
-import Image from "next/image";
+// app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -59,73 +61,68 @@ import "./globals.css";
 ## Error Handling
 
 **Patterns:**
-- No explicit error handling patterns observed in current codebase
-- Next.js error boundaries expected to be implemented following Next.js documentation
-- Server-side errors handled through Next.js error pages or middleware
+- No explicit error handling patterns detected in minimal codebase
+- React components export error boundary compatible structures
+- TypeScript strict mode enabled for compile-time type safety
 
 ## Logging
 
 **Framework:** Not configured
-- No logging library detected in dependencies
-- Logging would use native `console` methods if needed
-- No structured logging framework in place
+- No logging framework present (console not used in current code)
+- Standard approach would be console methods if needed
 
 ## Comments
 
 **When to Comment:**
-- Minimal commenting observed in source code
-- Comments used selectively for non-obvious logic
-- Code is expected to be self-documenting through clear naming
+- Minimal use in current codebase
+- Comments appear only in configuration files for clarity
+- Focus on self-documenting code with clear naming
 
 **JSDoc/TSDoc:**
-- Not required in current codebase
-- Type annotations preferred over JSDoc for documentation
-- Next.js metadata and configuration types are well-documented in imports
+- Not actively used in current codebase
+- TypeScript types provide inline documentation
 
 ## Function Design
 
-**Size:** Functional components kept focused on single responsibility (e.g., `Home`, `RootLayout`)
+**Size:** Small, focused functions
+- React components: Single responsibility principle
+- Example: `RootLayout` provides layout wrapper, `Home` provides page content
 
 **Parameters:**
-- Function parameters destructured for clarity
-- Props destructured in component signatures with explicit Readonly type unions
-- Example from `layout.tsx`:
-```typescript
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-```
+- Destructured props used in React components
+- Type annotations for all parameters and returns
+- Example: `{ children }: Readonly<{ children: React.ReactNode }>`
 
 **Return Values:**
 - Components return JSX elements
-- Explicit type annotations for metadata exports (e.g., `export const metadata: Metadata = {...}`)
+- Explicit return types for all functions
 
 ## Module Design
 
 **Exports:**
-- Default exports for page components and layouts (`export default function`)
-- Named exports for metadata and configuration (`export const metadata: Metadata`)
-- Components follow Next.js App Router conventions
+- Default exports for Next.js page components
+- Named exports for utility components and types
+- Type exports marked explicitly with `export type`
 
 **Barrel Files:**
 - Not used in current minimal codebase
-- Can be employed in future multi-file directories following index pattern
+- Not necessary for two-page application
 
 ## TypeScript Configuration
 
-**Compiler Options:**
-- Target: ES2017
-- Strict mode enabled (`"strict": true`)
-- JSX: react-jsx for modern React
-- Module resolution: bundler (Next.js standard)
-- Incremental builds enabled for faster development
+**Strict Mode:** Enabled
+- Location: `tsconfig.json`
+- Options enforced:
+  - `strict: true` - Enables all strict type checking options
+  - `noEmit: true` - No JavaScript output
+  - `skipLibCheck: true` - Skip type checking of declaration files
+  - `isolatedModules: true` - Ensures each file can be safely transpiled
+  - `esModuleInterop: true` - Better interop between modules
+  - `jsx: "react-jsx"` - Modern JSX transform
 
-**Key Settings:**
-- `noEmit: true` - Type checking only, compilation handled by Next.js
-- `isolatedModules: true` - Each file can be transpiled independently
-- `allowJs: true` - JavaScript files can coexist with TypeScript
+**Module Resolution:**
+- `moduleResolution: bundler` - Uses bundler-style module resolution
+- Target: ES2017 with esnext module system
 
 ---
 

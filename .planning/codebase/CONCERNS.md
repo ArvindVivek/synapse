@@ -2,232 +2,172 @@
 
 **Analysis Date:** 2026-01-28
 
-## Project Status
+## Tech Debt
 
-This is a **very early-stage hackathon project** (initial commit only) with minimal implemented code. The codebase consists of a default Next.js 16.1.6 starter template with 3 source files totaling 106 lines of code. A comprehensive Business Requirements Document exists but implementation has not yet begun.
+**Boilerplate Code Not Yet Removed:**
+- Issue: Project contains default Create Next App template code and comments that should be removed before production
+- Files: `app/page.tsx`, `app/layout.tsx`
+- Impact: Confusing for new developers; template artifacts create noise in codebase; default metadata ("Create Next App") is exposed
+- Fix approach: Replace default page content with actual application code; update metadata in `app/layout.tsx` with project-specific title and description
 
----
+**Incomplete Configuration:**
+- Issue: Next.js configuration file (`next.config.ts`) contains only empty placeholder
+- Files: `next.config.ts`
+- Impact: No build-time optimizations or environment-specific configurations; will require changes later
+- Fix approach: Add necessary Next.js configuration as features are implemented (image optimization, redirects, rewrites, etc.)
 
-## Tech Debt & Implementation Gaps
+**Hard-coded Styling with Inline Classes:**
+- Issue: Page component uses long inline Tailwind classes making it difficult to maintain and reuse styles
+- Files: `app/page.tsx` (lines 5, 6, 39, 54)
+- Impact: Styles are not reusable; difficult to maintain consistent design system; violates DRY principle
+- Fix approach: Extract Tailwind classes into component-level utilities or CSS modules; create reusable component structure
 
-**Critical: MVP Not Yet Built:**
-- Files: `app/page.tsx`, `app/layout.tsx` (boilerplate only)
-- Status: Placeholder components with no game logic
-- Impact: Full game implementation required from scratch
-- Fix approach: Follow the detailed BRD in `docs/thrifty_brd.md` as specification; build core systems incrementally
-
-**Major Missing Systems:**
-- Game loop and state management (no useState patterns for game state)
-- Physics/collision system for falling items and catcher
-- Canvas or positioned element rendering for animations
-- Score calculation engine
-- Leaderboard persistence (localStorage integration)
-- Power-up/obstacle system
-- Sound effects (no audio library)
-
----
-
-## Architectural Concerns
-
-**Dependency on React Hooks Without Framework:**
-- Issue: No state management pattern established for complex game state (rounds, budget, items, combos, active effects)
-- Files: Project-wide, starting with `app/page.tsx`
-- Impact: Risk of deeply nested state and prop drilling as game complexity grows
-- Fix approach: Consider implementing custom context API layers early or integrate a lightweight state management solution before implementing core game logic
-
-**No Separation of Game Logic from UI:**
-- Issue: Game mechanics (scoring, budget tracking, collision detection) should be decoupled from React components
-- Current state: No game engine separation
-- Impact: Testing game rules independently becomes difficult; UI changes require game logic review
-- Fix approach: Create `lib/gameEngine.ts` or similar with pure functions for all game calculations before building components
-
-**Rendering Performance Not Addressed:**
-- Issue: No performance optimization strategy for rendering ~50+ falling items simultaneously with animations
-- Current risk: Falling items rendered as separate React components = 60 re-renders per second × component count
-- Impact: Frame drops on lower-end devices despite 60 FPS target in BRD
-- Fix approach: Evaluate canvas-based rendering or React.memo optimization for falling item list
-
----
-
-## Testing & Quality Concerns
+## Test Coverage Gaps
 
 **No Test Infrastructure:**
-- Issue: No test files, test runner, or testing configuration
-- Current state: `package.json` has no test script, no jest/vitest config
-- Impact: Cannot verify scoring calculations, collision detection, or round progression without manual testing
-- Fix approach: Add test infrastructure early (jest or vitest); create test files for `lib/gameEngine.ts` utilities before integration testing
+- What's not tested: Entire codebase has zero test coverage
+- Files: `app/` directory (all files)
+- Risk: No automated verification of UI behavior, routing, or component rendering; regressions can be introduced undetected
+- Priority: High - Should be established early in project lifecycle
 
-**No ESLint Configuration for Game Code:**
-- Issue: `eslint.config.mjs` exists but only enforces Next.js defaults
-- Files: `eslint.config.mjs`
-- Impact: Inconsistent code style as game code grows; no custom rules for game-specific patterns
-- Fix approach: Define explicit rules for game logic files (e.g., pure function enforcement, immutable state handling)
+**No E2E Test Setup:**
+- What's not tested: User workflows and cross-component interactions
+- Files: All application code
+- Risk: Integration issues between features will not be caught until manual testing
+- Priority: Medium - Can be deferred until multiple features are implemented
 
-**Missing Accessibility Verification:**
-- Issue: BRD specifies accessibility requirements (high contrast, 44px touch targets, colorblind-friendly) with no current enforcement
-- Current state: Default Next.js template uses semantic HTML but game components not yet built
-- Impact: Failure to meet BRD requirements if not checked during development
-- Fix approach: Create accessibility checklist; use axe DevTools during component development
+## Missing Critical Features
 
----
+**No Error Boundary or Error Handling:**
+- Problem: No global error handling, error boundaries, or custom error pages defined
+- Blocks: User-friendly error reporting; graceful degradation; error logging
+- Current state: Application will show default Next.js error page on failures
 
-## Performance & Scaling Concerns
+**No Environment Configuration:**
+- Problem: No environment-specific configuration system (dev, staging, production)
+- Blocks: Managing API endpoints, feature flags, and secrets across environments
+- Current state: Hardcoded values only; `.env*` files are in `.gitignore` but not utilized
 
-**Leaderboard Storage Scaling:**
-- Issue: BRD specifies localStorage with top 100 scores retained; localStorage has ~5-10MB browser limit
-- Current risk: Minimal with 100 entries, but unclear if entries include optional fields (highest round score, best combo)
-- Impact: Event booth could accumulate 100s of entries; unclear data structure or cleanup strategy
-- Fix approach: Define leaderboard entry schema; implement cleanup/archival strategy; test with 100+ entries before event
+**No API Routes or Backend Integration:**
+- Problem: Zero backend infrastructure (no API routes, database connections, or external service integrations)
+- Blocks: Data persistence, authentication, business logic execution
+- Current state: Placeholder frontend only with no backend capability
 
-**Animation Frame Count Unknown:**
-- Issue: BRD requires smooth 60 FPS with unclear how many items fall simultaneously
-- Spec says "3-6 typical" but maximum not specified
-- Impact: Without performance baseline, frame rate target may be unmet on booth hardware
-- Fix approach: Establish performance budget; test with worst-case (10+ items + animations + effects) before final build
+**No Logging or Monitoring:**
+- Problem: No structured logging, error tracking, or application monitoring
+- Blocks: Debugging production issues; understanding user behavior; performance monitoring
+- Current state: Will rely on browser console only
 
-**No Build-Time Optimization:**
-- Issue: `next.config.ts` is empty (no config options)
-- Current opportunity: Image optimization, font optimization not configured
-- Impact: Slower load times than possible; matters for event booth where users expect instant play
-- Fix approach: Configure image optimization, font subsetting, and bundle analysis before deployment
+**No Authentication System:**
+- Problem: No auth provider, session management, or protected routes
+- Blocks: User-specific features, secure data access, authorization
+- Current state: All pages are publicly accessible
 
----
+## Dependencies at Risk
 
-## Fragile Areas & Risk Points
+**TypeScript Configuration with Broad Library Inclusion:**
+- Risk: tsconfig.json includes all `.ts` and `.tsx` files plus `.mts` without granular control
+- Impact: Build times may slow as codebase grows; type-checking overhead increases
+- Migration plan: Consider `include` path refinement as project structure solidifies; use project references for monorepo if needed
 
-**Budget Calculation System:**
-- Complexity: Scoring involves multiple components (base, item value, budget bonus, time bonus, combos) with multiplicative combo stacking
-- Files: To be implemented in `lib/gameEngine.ts` or equivalent
-- Risk: Off-by-one errors in score calculation affect leaderboard validity; combo multiplier stacking logic is error-prone
-- Safe modification: Write unit tests for each score component independently; test combo stacking with fixture data
-- Test coverage needed: All 5 combo types; combo interactions (e.g., Perfect Budget + Balanced + Speed Demon)
+**Tailwind CSS v4 with Post CSS:**
+- Risk: Early adoption of Tailwind v4 with new `@tailwindcss/postcss` plugin - potential compatibility issues
+- Impact: Breaking changes in future versions; less community support compared to v3
+- Migration plan: Monitor Tailwind releases; maintain clear postcss configuration; document any version-specific workarounds
 
-**Falling Item Collision Detection:**
-- Complexity: Must detect overlap between continuously-falling items and horizontally-moving catcher at 60 FPS
-- Current concern: No collision library selected; custom hitbox implementation required
-- Risk: Off-by-one pixel errors, frame timing issues, or generous hitbox allowing catches beyond visual bounds
-- Safe modification: Implement with clear hitbox visualization during development; test across multiple catcher positions and item fall rates
-- Test coverage needed: Overlap at screen edges; edge cases (item exactly at catcher boundary)
+**Next.js 16 with React 19:**
+- Risk: Using latest/bleeding-edge versions of both frameworks
+- Impact: Potential API changes, performance regressions in future updates; less battle-tested in production
+- Migration plan: Pin versions in package.json; subscribe to release notes; test thoroughly before updates
 
-**Round Progression State Machine:**
-- Files: To be implemented across components
-- Risk: Multiple overlapping conditions (time out, budget bust, all slots filled) could trigger simultaneously with undefined behavior
-- Example concern: Player fills last slot with 0.1 seconds remaining AND catches budget-busting item—which condition wins?
-- Safe modification: Define explicit state machine in constants (see `lib/gameStates.ts`); test all edge cases
-- Test coverage needed: Round-end conditions with overlapping triggers
+## Fragile Areas
 
-**Junie Reaction System:**
-- Complexity: BRD specifies 14+ emoji reactions triggered by different in-game events
-- Risk: Reaction bubble timing (1.5 seconds fade) could queue or conflict if multiple events occur rapidly
-- Files: To be implemented in component handling Junie display
-- Safe modification: Implement reaction queue (FIFO) rather than immediate replacement; test rapid-fire events
-- Test coverage needed: Concurrent events (catch, budget warning, timer low simultaneously)
+**Font Loading:**
+- Files: `app/layout.tsx` (lines 5-13)
+- Why fragile: Uses Google Fonts with hardcoded subsets; if font URLs change or fail, typography breaks silently
+- Safe modification: Wrap font loading in error boundary; consider fallback fonts; validate font loading in tests
+- Test coverage: No verification that fonts load successfully
 
----
+**Image References:**
+- Files: `app/page.tsx` (lines 7-14, 44-50)
+- Why fragile: References `/next.svg` and `/vercel.svg` from public directory without verification
+- Safe modification: Validate image paths exist; use Next.js Image component optimization; add alt text validation
+- Test coverage: No checks that images load or render
 
-## Dependency Risks
-
-**React 19 & Next.js 16 (Cutting Edge):**
-- Issue: Both dependencies are very recent (Next.js 16.1.6, React 19.2.3)
-- Ecosystem maturity: Fewer third-party libraries tested with these versions
-- Impact: Potential breaking changes; limited Stack Overflow answers for issues
-- Fix approach: Monitor releases; consider pinning to minor version after testing; document all dependency versions in README
-
-**No Type Safety for Game State:**
-- Issue: TypeScript strict mode enabled but no game-specific types defined
-- Current state: `tsconfig.json` has `"strict": true` but game types (Item, Round, GameState, etc.) don't exist yet
-- Impact: Risk of runtime type mismatches (e.g., undefined budget property)
-- Fix approach: Create `lib/types.ts` with all game entity types before implementation
-
-**TailwindCSS v4 (New Major Version):**
-- Issue: `@tailwindcss/postcss` v4 is a major rewrite; limited adoption
-- Current risk: Custom game animations may have compatibility issues with Tailwind directives
-- Fix approach: Test animation syntax early; have fallback CSS ready if Tailwind proves incompatible for complex animations
-
----
-
-## Missing Documentation
-
-**No Implementation Plan:**
-- Issue: BRD exists but no technical breakdown of what to build first
-- Impact: Developers may start with complex systems (power-ups) before core loop (falling items, budget)
-- Fix approach: Create ARCHITECTURE.md with recommended implementation order (See: build core loop first → add budget/scoring → add power-ups)
-
-**Game Constants Undefined:**
-- Issue: BRD contains many magic numbers (fall speeds, spawn rates, budget values) with no central configuration
-- Files: To be implemented in `lib/constants.ts` or `config/gameConfig.ts`
-- Impact: Difficulty tuning during playtesting; scattered hardcoded values in components
-- Fix approach: Create centralized constants file matching BRD section 8.2 Round Configuration
-
-**No Error Handling Strategy:**
-- Issue: No specification for what happens if score calculation fails, localStorage is unavailable, or item spawn fails
-- Files: To be determined during implementation
-- Impact: Silent failures possible; unclear recovery paths
-- Fix approach: Define error boundaries and fallback behavior before implementation
-
----
+**CSS Variables with No Validation:**
+- Files: `app/globals.css` (lines 3-5, 13-16)
+- Why fragile: CSS variables defined without fallback values; no validation of color contrast or accessibility
+- Safe modification: Add fallback values; verify color contrast ratios; document theme system
+- Test coverage: No contrast or accessibility testing
 
 ## Security Considerations
 
-**Leaderboard Name Input Validation:**
-- Risk: BRD specifies "basic blocklist" for inappropriate words but no implementation
-- Files: Game over screen (to be implemented)
-- Current mitigation: None yet
-- Recommendations: Implement client-side blocklist (limited effectiveness); consider server-side validation if leaderboard moved to backend; sanitize HTML to prevent injection
+**No CSRF Protection:**
+- Risk: No CSRF tokens or protection mechanisms if forms are added
+- Files: Would affect any future API route handlers
+- Current mitigation: No forms currently; Next.js provides some default protection
+- Recommendations: Implement CSRF tokens before adding POST forms; use secure SameSite cookie settings
 
-**localStorage Data Integrity:**
-- Risk: Players could manipulate localStorage directly to forge high scores
-- Current mitigation: None; all data trusted from client
-- Impact: Leaderboard validity at event booth compromised
-- Fix approach: If leaderboard matters (prize/ranking), move to backend with authentication; for event entertainment, document that scores are client-stored and could be cheated
+**No Input Validation or Sanitization:**
+- Risk: No schema validation or sanitization middleware for user input
+- Files: Will affect `app/` directory when API routes are added
+- Current mitigation: No user input currently accepted
+- Recommendations: Use libraries like `zod` or `valibot` for validation; sanitize all user inputs early
 
 **No Content Security Policy:**
-- Risk: No CSP headers or configuration in Next.js
-- Impact: Potential XSS vulnerability if user-generated content (player names) rendered without escaping
-- Fix approach: Configure strict CSP in `next.config.ts`; always sanitize player names before display
+- Risk: No CSP headers to prevent XSS attacks or unauthorized resource loading
+- Files: Affects entire application via `app/layout.tsx`
+- Current mitigation: React's JSX provides some protection
+- Recommendations: Add CSP headers via Next.js middleware or `next.config.ts`; restrict external resources
 
----
+**Hardcoded External Links Without Validation:**
+- Risk: Page contains hardcoded Vercel/Next.js URLs without validation
+- Files: `app/page.tsx` (lines 21-22, 28-29, 40, 55)
+- Current mitigation: Links open in new tab with `rel="noopener noreferrer"`
+- Recommendations: Externalize URLs to configuration; validate link destinations at build time
 
-## Known Limitations
+**No Rate Limiting or DDoS Protection:**
+- Risk: No built-in protection against abuse or malicious requests
+- Files: Would affect future API routes
+- Current mitigation: None; relies on hosting provider
+- Recommendations: Implement rate limiting middleware; use Vercel's built-in DDoS protection if deployed there
 
-**Browser Storage Only (No Backend):**
-- Current: Leaderboard stored in localStorage, persists across sessions in same browser
-- Limitation: Different browser = different leaderboard; event booth needs shared leaderboard across all booth terminals
-- Impact: Contradicts BRD requirement for "shared across all players at the event booth"
-- Path forward: Either (1) move leaderboard to backend, (2) manually sync localStorage across terminals, or (3) clarify BRD expectation for single-browser booth setup
+## Performance Bottlenecks
 
-**No Sound Implementation Specified:**
-- Issue: BRD includes detailed sound effects spec but no audio library selected
-- Current risk: Sound fallback behavior undefined if audio cannot load
-- Files: Not yet implemented
-- Fix approach: Choose audio library (Web Audio API, Howler.js, or simple `<audio>` tags); plan graceful degradation if audio fails
+**No Image Optimization Configuration:**
+- Problem: Next.js Image component used without optimization settings
+- Files: `app/page.tsx` (lines 7-14, 44-50)
+- Cause: Missing `next.config.ts` image optimization rules
+- Improvement path: Configure image formats, sizes, and lazy loading; implement responsive images
 
-**Mobile Touch Support:**
-- Issue: BRD specifies touch controls (swipe) but keyboard-first implementation typical in web games
-- Current state: No mobile input handling
-- Fix approach: Implement keyboard control first (fastest); add touch layer as enhancement before event if time permits
+**Unused CSS Loading:**
+- Problem: Entire Tailwind CSS library loaded even with minimal styles used
+- Files: `app/globals.css`
+- Cause: No purging or tree-shaking of unused Tailwind classes
+- Improvement path: Verify Tailwind config purges unused styles; monitor bundle size; use CSS-in-JS if applicable
 
----
+**No Code Splitting Strategy:**
+- Problem: No planning for route-based or component-based code splitting
+- Files: Entire `app/` directory
+- Cause: Single page application structure with no lazy loading
+- Improvement path: Implement dynamic imports for routes; use React.lazy() for heavy components
 
-## Summary of Critical Path Blockers
+## Scaling Limits
 
-**Before Implementation Starts:**
-1. Create `lib/gameEngine.ts` with pure functions for scoring, budget math, collision detection (testable without React)
-2. Define `lib/types.ts` with all TypeScript interfaces for game entities
-3. Create `lib/constants.ts` with all BRD magic numbers in one place
-4. Set up test infrastructure (jest/vitest config and sample test file)
+**Monolithic Page Structure:**
+- Current capacity: Simple single-page layout; works for MVP
+- Limit: Becomes unmaintainable beyond 2-3 major features in one file
+- Scaling path: Extract UI into component library; implement feature-based folder structure; separate concerns by layer
 
-**Before First Playable Build:**
-1. Implement core loop: items fall → catcher catches → budget deducts → round ends when conditions met
-2. Verify round-end conditions (time out, budget bust, slots filled) don't conflict
-3. Test collision detection accuracy across screen positions and fall rates
-4. Verify leaderboard persistence works across page reloads
+**No State Management:**
+- Current capacity: Props-only communication works for shallow component trees
+- Limit: Will struggle with 5+ components needing shared state
+- Scaling path: Introduce Context API or state management library (Redux, Zustand); implement proper data flow
 
-**Before Event Booth Deployment:**
-1. Test with event booth hardware (verify 60 FPS target achievable)
-2. Test localStorage behavior with 100+ entries (verify performance, no data loss)
-3. Verify accessibility requirements (touch target sizes, color contrast, colorblind support)
-4. Test sound fallback if audio service unavailable
+**Database-Free Architecture:**
+- Current capacity: Static content only; no persistence
+- Limit: Cannot store user data, configuration, or dynamic content
+- Scaling path: Add database (PostgreSQL, MongoDB); implement ORM/query builder; design schema with growth in mind
 
 ---
 

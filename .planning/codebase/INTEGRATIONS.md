@@ -4,72 +4,107 @@
 
 ## APIs & External Services
 
-**Not detected** - No external API integrations currently configured in the codebase. No API clients or SDK imports found.
+**Google Fonts:**
+- Google Fonts API - Provides Geist font family
+  - SDK/Client: next/font/google
+  - Implementation: `app/layout.tsx` loads Geist and Geist_Mono fonts with latin subsets
+  - No authentication required
+
+**Documentation & Reference:**
+- Vercel Platform - Deployment target and template source
+  - Links in `app/page.tsx` point to vercel.com templates
+  - No API integration currently present
 
 ## Data Storage
 
 **Databases:**
-- Not applicable - No database integration detected
+- Not detected - No database client, ORM, or data layer present
 
 **File Storage:**
-- Local filesystem only - Uses Next.js public directory (`/public`) for static assets
+- Local filesystem only - Uses Next.js public/ directory for static assets
+  - Public assets: `public/next.svg`, `public/vercel.svg` referenced in `app/page.tsx`
+  - No cloud storage integration
 
 **Caching:**
-- None - No caching layer integrated
+- Not explicitly configured - Next.js default caching applies to static assets and fonts
+- Image optimization via next/image component
 
 ## Authentication & Identity
 
 **Auth Provider:**
-- Not applicable - No authentication system implemented
+- Not detected - No authentication provider integrated
+
+**Current Implementation:**
+- No authentication layer present
+- Purely public application
 
 ## Monitoring & Observability
 
 **Error Tracking:**
-- None - No error tracking service integrated
+- Not detected - No error tracking service (Sentry, Rollbar, etc.) integrated
 
 **Logs:**
-- Console logging only - No structured logging service configured
+- Standard Node.js/Next.js console output only
+- Build-time linting via ESLint
+
+**Performance Metrics:**
+- Next.js Core Web Vitals linting enabled (via eslint-config-next/core-web-vitals)
+- No external monitoring dashboard configured
 
 ## CI/CD & Deployment
 
 **Hosting:**
-- Recommended: Vercel (mentioned in README and ESLint config templates)
-- Alternative: Any Node.js hosting environment
+- Vercel (recommended in README; not configured as required)
+- Can be self-hosted on any Node.js platform
 
 **CI Pipeline:**
-- Not detected - No CI/CD configuration files found (no GitHub Actions, GitLab CI, Jenkins, etc.)
+- Not detected - No GitHub Actions, GitLab CI, or other CI/CD configured
+- `.git/` directory present but no workflow files
+
+**Build Process:**
+- Next.js build: `npm run build`
+- Development: `npm run dev`
+- Production start: `npm start`
 
 ## Environment Configuration
 
 **Required env vars:**
-- None currently configured
+- None explicitly required at runtime
+- `.env*` files are gitignored but not currently used
 
 **Secrets location:**
-- No secrets management system configured
-- `.env*` files are in `.gitignore` but no `.env` files currently exist
+- Not applicable - No external services requiring credentials
+
+**Configuration approach:**
+- next.config.ts is empty (default configuration)
+- All configuration is static in source code
 
 ## Webhooks & Callbacks
 
 **Incoming:**
-- None detected - No webhook endpoints configured
+- Not detected - No webhook endpoints configured
 
 **Outgoing:**
-- None detected - No outbound webhook calls
+- Not detected - No outgoing webhook or callback integrations
 
-## External Fonts
+## Third-party Scripts
 
-**Fonts:**
-- Google Fonts integration via Next.js font optimization
-  - Geist font family (sans-serif and monospace variants)
-  - Implemented in: `app/layout.tsx`
-  - Optimization: Automatic self-hosting via Next.js
+**Analytics:**
+- Not detected - No analytics provider (Google Analytics, Mixpanel, etc.) integrated
 
-## Static Assets
+**External Libraries/CDNs:**
+- Geist font from Google Fonts CDN (via next/font auto-optimization)
+- No other third-party scripts or CDN dependencies
 
-**CDN/Hosting:**
-- Vercel public CDN (if deployed on Vercel)
-- Local public directory: `/public`
-  - Contains: `next.svg`, `vercel.svg`, `favicon.ico`
+## Summary
+
+This is a minimal Next.js starter application with no external service integrations beyond Google Fonts. The application is:
+- Fully self-contained with no backend API dependencies
+- Using local filesystem for assets
+- Ready for development and Vercel deployment
+- Extensible for future integrations (database, auth, external APIs, etc.)
+
+No sensitive credentials or API keys are required in current form.
 
 ---
 

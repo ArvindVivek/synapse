@@ -4,122 +4,129 @@
 
 ## Pattern Overview
 
-**Overall:** Next.js App Router (Server-Centric)
+**Overall:** Full-stack modern web application using Next.js 16 (React 19) frontend with planned Python FastAPI backend.
 
 **Key Characteristics:**
-- File-based routing using the `app/` directory convention
-- React 19 with Server Components as default rendering strategy
-- TypeScript strict mode for type safety
-- Tailwind CSS for utility-first styling
-- Minimal initial structure (greenfield project)
+- Client-side React components with server-side Next.js routing
+- Planned microservice architecture with API layer separation
+- Real-time updates via WebSocket (planned)
+- Machine learning integration for draft analysis (planned backend)
+- Data-driven decision support system
 
 ## Layers
 
-**Presentation Layer:**
-- Purpose: React components rendering the user interface
-- Location: `app/`
-- Contains: Page components, layout components, React UI code
-- Depends on: Next.js framework, React, styling utilities
-- Used by: Browser client
+**Frontend Layer:**
+- Purpose: Professional League of Legends draft simulation UI
+- Location: `app/` directory
+- Contains: React components, page routing, styling
+- Depends on: Next.js 16, React 19, TailwindCSS v4, PostCSS
+- Used by: End users (coaches, analysts, esports teams)
 
-**Layout Layer:**
-- Purpose: Root HTML structure and shared layout templates
-- Location: `app/layout.tsx`
-- Contains: HTML metadata, font loading, CSS global imports, child route rendering
-- Depends on: Next/font for optimized fonts, Next.js Metadata API
-- Used by: All routes within the app directory
+**Presentation Layer (Planned):**
+- Purpose: Serve API responses and format recommendations
+- Location: `app/api/` (to be created)
+- Contains: API route handlers for draft recommendations, win-rate calculations, opponent predictions
+- Depends on: Backend FastAPI service (external)
+- Used by: Frontend components via fetch/WebSocket
 
-**Page Layer:**
-- Purpose: Route-specific page content
-- Location: `app/page.tsx`
-- Contains: Home page component with hero section, calls-to-action, images
-- Depends on: Next/image for optimized image loading
-- Used by: Root route (`/`)
+**Backend Service Layer (Planned):**
+- Purpose: Core intelligence engine for draft analysis
+- Location: External Python service (not yet created)
+- Contains: Champion synergy calculator, win-rate predictor, opponent pick predictor
+- Depends on: PostgreSQL database, Redis cache, ML models
+- Used by: API routes and WebSocket handlers
 
-**Configuration Layer:**
-- Purpose: Build, type checking, and linting configuration
-- Location: `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`
-- Contains: Next.js build options, TypeScript compiler settings, ESLint rules
-- Depends on: Node.js configuration standards
-- Used by: Build tools and development server
+**Data Layer (Planned):**
+- Purpose: Persistent storage and real-time cache
+- Location: PostgreSQL + Redis (external)
+- Contains: Tournament data, team/player stats, champion pools, synergy matrices, match outcomes
+- Depends on: GRID.gg APIs for ETL pipeline
+- Used by: Backend intelligence engine
 
 ## Data Flow
 
-**Initial Page Load:**
+**Draft Simulation Flow:**
 
-1. Browser requests root route (`/`)
-2. Next.js routes to `app/page.tsx` (Home component)
-3. Root layout (`app/layout.tsx`) wraps the page component
-4. Server-side rendering produces HTML with:
-   - Google fonts (Geist sans and mono)
-   - Global styles from `app/globals.css`
-   - Tailwind CSS classes applied
-   - Next.js Image component optimizations
-5. Client receives fully-rendered HTML + hydration script
-6. React hydrates interactive elements (currently minimal)
-
-**Component Rendering:**
-- `RootLayout` (layout.tsx) provides font variables and global styling context
-- `Home` (page.tsx) is a default export Server Component
-- Both use Tailwind CSS utility classes for styling
-- Images use Next.js optimized Image component (from `next/image`)
+1. User selects teams → Frontend renders team/player selectors
+2. User initiates draft → Frontend sends `draft/initialize` action via WebSocket
+3. User picks/bans champion → Frontend sends `ban` or `pick` action
+4. Backend processes pick → Calculates synergies, matchups, win-rate changes
+5. Backend generates recommendations → Queries synergy matrix, champion pools, ML model
+6. Backend predicts opponent pick → Applies Bayesian weighting to player's champion pool
+7. Backend calculates win-rate → Extracts composition features, runs ML model
+8. Server broadcasts update → Sends draft state + recommendations + predictions + win-rate
+9. Frontend renders update → Updates draft board, recommendation panel, win-rate gauge
 
 **State Management:**
-- Not detected. Currently stateless presentation components only.
-- No client-side state libraries (React Context, Redux, Zustand, etc.)
+- Local state: Draft board state (bans, picks) stored in browser (planned Zustand store)
+- Synchronized state: Live draft state maintained via WebSocket connection
+- Computed state: Recommendations, predictions, win-rates calculated server-side (no client-side computation)
 
 ## Key Abstractions
 
-**Layout Component:**
-- Purpose: Root layout wrapper enforcing consistent structure across routes
-- Examples: `app/layout.tsx`
-- Pattern: Exported default `RootLayout` functional component accepting `children` prop
+**Draft State:**
+- Purpose: Unified representation of current pick/ban phase
+- Examples: `{ blueBans: [...], redBans: [...], bluePicks: [...], redPicks: [...], currentTurn: "R3" }`
+- Pattern: Immutable state updates with history tracking for undo/redo
 
-**Page Components:**
-- Purpose: Route-specific content rendering
-- Examples: `app/page.tsx`
-- Pattern: Default export functional components with no props (Server Components)
+**Recommendation:**
+- Purpose: Pick/ban suggestion with reasoning
+- Examples: `{ champion: "Sejuani", predictedWinRate: 0.60, synergyScore: 9.2, reasoning: {...} }`
+- Pattern: Scored suggestions ranked by predicted impact
 
-**Styling:**
-- Purpose: Utility-first CSS with Tailwind and CSS variables
-- Examples: `app/globals.css` (CSS variables), inline className attributes
-- Pattern: Tailwind CSS @import, CSS custom properties for theming, responsive Tailwind modifiers (sm:, md:, dark:)
+**Opponent Prediction:**
+- Purpose: Probabilistic forecast of opponent's next pick
+- Examples: `{ champion: "Orianna", probability: 0.32, reasoning: "Most played (6/10 games)" }`
+- Pattern: Probability distribution normalized to 1.0
+
+**Team Composition Analysis:**
+- Purpose: Feature extraction and scoring of 5v5 matchups
+- Examples: `{ earlyGame: 0.8, midGame: 0.65, lateGame: 0.72, adDamage: 0.60, apDamage: 0.40, ccScore: 8.5 }`
+- Pattern: Feature vectors used in ML model and heuristic evaluation
 
 ## Entry Points
 
-**Server Entry (Next.js Build):**
+**App Root:**
 - Location: `app/layout.tsx`
-- Triggers: Server startup, route requests
-- Responsibilities: Renders root HTML structure, loads fonts, applies global styles
+- Triggers: Browser navigation to any route
+- Responsibilities: Root HTML structure, font loading, global styling, metadata
 
-**Client Entry (Browser):**
+**Home Page:**
 - Location: `app/page.tsx`
-- Triggers: Root route (`/`) navigation
-- Responsibilities: Renders home page content with hero section and CTAs
+- Triggers: Navigation to `/`
+- Responsibilities: Placeholder landing page (to be replaced with draft simulator)
 
-**Build Entry:**
-- Location: `next.config.ts`
-- Triggers: `npm run build`, `npm run dev`
-- Responsibilities: Next.js configuration, empty by default
+**Planned Entry Points (to be created):**
+- `/draft-simulator` - Main draft simulation interface
+- `/champion-pool-analyzer` - Pre-match opponent analysis
+- `/api/draft/recommend-pick` - Pick recommendation API
+- `/ws/draft` - WebSocket endpoint for real-time updates
 
 ## Error Handling
 
-**Strategy:** Not explicitly implemented. Relies on Next.js defaults.
+**Strategy:** Planned layered error handling with user-facing fallback UI
 
 **Patterns:**
-- Error boundaries not configured
-- No custom error pages (`error.tsx`) defined
-- Error handling deferred to Next.js framework defaults
+- **Frontend errors:** Try-catch in component lifecycle, error boundary components
+- **Network errors:** Exponential backoff for API retries, WebSocket reconnection logic
+- **Backend errors:** Detailed error responses with reasoning (e.g., "Champion pool too sparse, using meta defaults")
+- **Validation errors:** Input validation before API calls, clear error messages to users
+- **Model errors:** Confidence scores on predictions, fallback to rule-based recommendations if ML fails
 
 ## Cross-Cutting Concerns
 
-**Logging:** Not detected. No logging framework configured.
+**Logging:**
+- Frontend: Browser console during dev, structured logging service for production (to be implemented)
+- Backend: Python logging module with JSON formatting (to be implemented)
 
-**Validation:** Not applicable (no form inputs or data processing in current structure).
+**Validation:**
+- Draft state validation: Enforce champion uniqueness, ban before pick constraints, role restrictions
+- Input validation: Sanitize team/player IDs, validate champion names against master list
+- API contract validation: Ensure response schemas match expected types
 
-**Authentication:** Not detected. No auth libraries or configuration present.
-
-**Styling:** Tailwind CSS v4 via `@tailwindcss/postcss`. CSS custom properties for theme colors (--background, --foreground) with dark mode support via `prefers-color-scheme` media query.
+**Authentication:**
+- Currently: None (public application)
+- Planned: Session management for team accounts (optional future feature)
 
 ---
 

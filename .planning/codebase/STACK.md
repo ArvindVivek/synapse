@@ -5,82 +5,91 @@
 ## Languages
 
 **Primary:**
-- TypeScript 5.x - Full codebase (strict mode enabled)
-- JavaScript - Configuration files (ESLint, PostCSS, Next.js config)
+- TypeScript 5.x - Used throughout application code, configuration files, and type definitions
 
 **Secondary:**
-- CSS - Styling with Tailwind CSS utilities
+- JavaScript (ESM) - Used in configuration files (eslint.config.mjs, postcss.config.mjs)
+- CSS - Application styling via Tailwind CSS
 
 ## Runtime
 
 **Environment:**
-- Node.js (version specified in package.json, no explicit version lock file)
+- Node.js (version not pinned; uses system default)
 
 **Package Manager:**
-- npm - Used for dependency management
-- Lockfile: `package-lock.json` (present)
+- npm (npm 10+, based on lockfileVersion 3)
+- Lockfile: `package-lock.json` present
 
 ## Frameworks
 
 **Core:**
-- Next.js 16.1.6 - Full-stack React framework with App Router
-- React 19.2.3 - UI library
-- React DOM 19.2.3 - DOM rendering
+- Next.js 16.1.6 - React framework with App Router pattern (`app/` directory structure)
+- React 19.2.3 - UI library and component framework
+- React DOM 19.2.3 - React DOM rendering for web applications
 
 **Styling:**
 - Tailwind CSS 4.x - Utility-first CSS framework
-- PostCSS 4.x - CSS transformation pipeline
+- @tailwindcss/postcss 4.x - PostCSS plugin for Tailwind CSS processing
 
-**Build/Dev:**
-- Next.js built-in dev server (dev: `next dev`)
-- Next.js production build (build: `next build`)
-- Next.js production server (start: `next start`)
+**Development/Build:**
+- TypeScript 5.x - Type checking and transpilation
+- ESLint 9.x - Code linting with Next.js specific rules
 
 ## Key Dependencies
 
 **Critical:**
-- next (16.1.6) - React framework with server-side rendering, API routes, and App Router
-- react (19.2.3) - React library for component-based UI
-- react-dom (19.2.3) - React rendering library for web
+- next@16.1.6 - Full-stack web framework providing build optimization, routing, and deployment capabilities
+- react@19.2.3 - Core UI rendering and component system
+- @tailwindcss/postcss@^4 - CSS generation and optimization
 
-**Styling & CSS:**
-- tailwindcss (4.x) - Utility-first CSS framework
-- @tailwindcss/postcss (4.x) - Tailwind CSS PostCSS plugin
+**Type Safety:**
+- @types/node@^20 - Node.js type definitions
+- @types/react@^19 - React component type definitions
+- @types/react-dom@^19 - React DOM API type definitions
 
-**Development:**
-- typescript (5.x) - TypeScript compiler and type checking
-- eslint (9.x) - Code linting
-- eslint-config-next (16.1.6) - Next.js ESLint configuration with web vitals and TypeScript support
-- @types/node (20.x) - Node.js type definitions
-- @types/react (19.x) - React type definitions
-- @types/react-dom (19.x) - React DOM type definitions
+**Code Quality:**
+- eslint@^9 - Linting framework
+- eslint-config-next@16.1.6 - Next.js specific ESLint rules and configurations
 
 ## Configuration
 
-**Environment:**
-- No `.env` or `.env.local` files present
-- Tailwind CSS configured via PostCSS plugin in `postcss.config.mjs`
-- No runtime environment variables currently configured
+**TypeScript:**
+- Target: ES2017
+- Module: ESNext with bundler resolution
+- Strict mode enabled
+- Path aliases: `@/*` maps to project root
+- Config file: `tsconfig.json`
 
-**Build:**
-- TypeScript configuration: `tsconfig.json` (strict mode, ES2017 target, bundle module resolution)
-- ESLint configuration: `eslint.config.mjs` (Next.js core web vitals + TypeScript support)
-- PostCSS configuration: `postcss.config.mjs` (Tailwind CSS plugin)
-- Next.js configuration: `next.config.ts` (minimal, no custom configuration)
+**Next.js:**
+- Config file: `next.config.ts`
+- App Router enabled (app/ directory)
+- Font optimization via next/font with Google Fonts (Geist family)
 
-**TypeScript Path Aliases:**
-- `@/*` → maps to root directory (allows `@/app/...` imports)
+**ESLint:**
+- Config file: `eslint.config.mjs`
+- Uses flat config format (ESLint v9+)
+- Extends: eslint-config-next/core-web-vitals and eslint-config-next/typescript
+
+**PostCSS:**
+- Config file: `postcss.config.mjs`
+- Plugin: @tailwindcss/postcss
+
+**Styling:**
+- Global CSS: `app/globals.css` using @import "tailwindcss"
+- Dark mode support via prefers-color-scheme media query
+- CSS variables for theming: --background, --foreground
 
 ## Platform Requirements
 
 **Development:**
-- Node.js runtime
-- npm package manager
-- Modern browser for development (Next.js dev server at localhost:3000)
+- Node.js (LTS or current)
+- npm 10+
+- macOS, Linux, or Windows with Node.js support
 
 **Production:**
-- Node.js runtime (for Next.js server)
-- Deployment target: Vercel (recommended in README) or any Node.js hosting
+- Deployment via Vercel (documented in README)
+- Can be self-hosted on any Node.js 18+ compatible platform
+- Build output: `.next/` directory
 
 ---
 

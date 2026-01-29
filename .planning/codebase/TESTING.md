@@ -6,188 +6,197 @@
 
 **Runner:**
 - Not configured
-- No testing framework dependency detected in `package.json`
+- No test framework installed (Jest, Vitest, or similar)
 
 **Assertion Library:**
-- Not detected
+- Not configured
 
 **Run Commands:**
-- No test scripts defined in `package.json`
-- Testing framework to be configured as development scales
+- No test script in `package.json`
+- Available scripts: `dev`, `build`, `start`, `lint`
 
 ## Test File Organization
 
 **Location:**
-- No test files found in current codebase
-- Pattern recommendation for future: co-locate tests with source files or create `__tests__` directory
+- Not applicable - no test files present in codebase
+- Typical convention: Co-located with source files or in `__tests__` directory
 
 **Naming:**
-- Not yet established
-- Recommended pattern: `[ComponentName].test.tsx` for component tests
-- Recommended pattern: `[Module].spec.ts` for utility/function tests
+- No test files detected
+- Standard patterns would be: `*.test.ts`, `*.test.tsx`, `*.spec.ts`, `*.spec.tsx`
 
 **Structure:**
-- Test directory structure not yet created
+```
+Suggested structure (not currently used):
+app/
+├── layout.test.tsx      # Component tests
+├── page.test.tsx
+└── __tests__/
+    └── integration/     # Integration tests
+```
 
 ## Test Structure
 
 **Suite Organization:**
-- Not yet established in codebase
-- Pattern recommendation for future test suites:
+- No tests currently implemented
+- Recommended approach: Use Jest or Vitest with the following pattern:
 
 ```typescript
+// Example pattern to follow in future tests:
 describe('ComponentName', () => {
-  describe('specific functionality', () => {
-    it('should behave in specific way', () => {
-      // Arrange
-      // Act
-      // Assert
-    });
+  it('should render correctly', () => {
+    // Arrange
+    // Act
+    // Assert
+  });
+
+  it('should handle prop changes', () => {
+    // Arrange
+    // Act
+    // Assert
   });
 });
 ```
 
 **Patterns:**
-- No setup/teardown patterns observed
-- Recommended: Use `beforeEach`/`afterEach` for common test initialization
-- Recommended: Use `beforeAll`/`afterAll` for expensive operations (database connections, server startup)
+- No setup/teardown patterns established
+- No assertion patterns established
+- Would follow React Testing Library conventions for component testing
 
 ## Mocking
 
 **Framework:**
-- Not configured
-- Recommendation: Jest for unit testing or Vitest for modern testing
-- Next.js compatibility: Jest has built-in Next.js support
+- No mocking framework installed
+- Jest or Vitest mocking would be standard pattern
 
 **Patterns:**
-- No mocking patterns currently established
-- Recommended for Next.js mocks:
-
-```typescript
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: any) => {
-    // eslint-disable-next-line jsx-a11y/alt-text
-    return <img {...props} />;
-  },
-}));
-```
+- Not established in current codebase
+- Would follow Next.js testing practices for mocking modules and dependencies
 
 **What to Mock:**
 - External API calls
-- Next.js specific modules (Image, Link, etc.)
-- Database operations
-- Environment-dependent modules
+- Next.js router navigation
+- Environment variables
+- File system operations
 
 **What NOT to Mock:**
-- Core React functionality
-- Utility functions with pure logic
-- Custom components under test
+- React components (test the real component)
+- Component state and hooks
+- CSS-in-JS styling
 
 ## Fixtures and Factories
 
 **Test Data:**
-- Not yet established
-- Recommended structure for future:
-
-```typescript
-const mockMetadata = {
-  title: 'Test Title',
-  description: 'Test Description',
-};
-
-export const createMockProps = (overrides = {}) => ({
-  ...defaultProps,
-  ...overrides,
-});
-```
+- No fixture patterns established
+- No factory patterns detected
 
 **Location:**
-- Recommended: `__fixtures__/` or `__mocks__/` directory at root or within feature directory
-- Recommended: Co-locate with test files in `*.fixture.ts` or `*.mock.ts` files
+- Would typically be in `__fixtures__/` or `__mocks__/` directories
+- Example: `app/__fixtures__/mockProps.ts`
 
 ## Coverage
 
-**Requirements:**
-- Not enforced
-- No coverage configuration in place
-- Recommendation: Establish coverage thresholds as testing suite grows
+**Requirements:** Not enforced
+- No coverage targets configured
+- No coverage collection setup
 
 **View Coverage:**
-- To be configured with test runner
-- Typical command: `npm run test:coverage` or `jest --coverage`
+- Not available - testing not configured
 
 ## Test Types
 
 **Unit Tests:**
-- Not yet implemented
-- Scope: Individual components and utility functions
-- Approach: Test component rendering, prop handling, state changes
+- Not implemented
+- Scope: Individual component rendering and prop handling
+- Approach: React Testing Library with focused assertions
 
 **Integration Tests:**
-- Not yet implemented
-- Scope: Multiple components working together, Next.js routing
-- Approach: Test layout with child components, page rendering with data
+- Not implemented
+- Scope: Component interactions and data flow between components
+- Approach: Would test layout integration with page components
 
 **E2E Tests:**
-- Not configured
-- Recommendation: Consider Playwright or Cypress for future implementation
-- Scope: Full user flows through the application
+- Not implemented
+- Framework: Not used
+- Would use Playwright or Cypress for Next.js applications
 
-## Next.js Specific Testing Considerations
+## Dependencies for Testing
 
-**Component Testing:**
-- Recommendation: Use `@testing-library/react` for component testing
-- Example test for `app/page.tsx`:
+**Currently Missing:**
+- Test framework (Jest or Vitest)
+- Testing library (@testing-library/react)
+- Testing utilities (jsdom for Jest)
 
+**To Add for Testing:**
+```json
+{
+  "devDependencies": {
+    "@testing-library/react": "latest",
+    "@testing-library/jest-dom": "latest",
+    "jest": "latest",
+    "jest-environment-jsdom": "latest"
+  }
+}
+```
+
+Or alternatively:
+```json
+{
+  "devDependencies": {
+    "vitest": "latest",
+    "@testing-library/react": "latest",
+    "jsdom": "latest"
+  }
+}
+```
+
+## Test Configuration Placeholder
+
+**Jest Config (if implemented):**
+- Config file: `jest.config.js` or in `package.json`
+- Preset: Should extend Next.js recommendations
+- Environment: `jsdom` for React component testing
+
+**Vitest Config (if implemented):**
+- Config file: `vitest.config.ts`
+- Environment: `jsdom` for React component testing
+- Workspace support for Next.js
+
+## Common Patterns to Follow
+
+**Async Testing:**
+- React Testing Library handles async operations with `waitFor`
+- Example pattern:
 ```typescript
-import { render, screen } from '@testing-library/react';
-import Home from '@/app/page';
-
-describe('Home', () => {
-  it('renders the heading', () => {
-    render(<Home />);
-    expect(screen.getByText(/To get started/i)).toBeInTheDocument();
-  });
+await waitFor(() => {
+  expect(screen.getByText('Expected text')).toBeInTheDocument();
 });
 ```
 
-**Layout Testing:**
-- Test RootLayout with children prop
-- Verify metadata is properly exported
-- Verify font variables are applied correctly
-
-**Image Component:**
-- Mock `next/image` for testing
-- Verify proper alt text is provided
-- Test responsive image loading
-
-## Recommended Testing Setup
-
-**Installation:** Consider adding these when testing is needed:
-```bash
-npm install --save-dev jest @testing-library/react @testing-library/jest-dom @types/jest jest-environment-jsdom
-```
-
-**Jest Config:** Create `jest.config.js` at project root:
+**Error Testing:**
+- Capture console errors during tests
+- Mock error boundaries
+- Example pattern:
 ```typescript
-const nextJest = require('next/jest')
-const createJestConfig = nextJest({
-  dir: './',
-})
-const customJestConfig = {
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testEnvironment: 'jest-environment-jsdom',
-}
-module.exports = createJestConfig(customJestConfig)
+const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+// Test error boundary behavior
+expect(errorSpy).toHaveBeenCalled();
 ```
 
-**Package Scripts:** Add to `package.json`:
-```json
-"test": "jest",
-"test:watch": "jest --watch",
-"test:coverage": "jest --coverage"
-```
+## Next.js Testing Recommendations
+
+**Server Component Testing:**
+- No server component tests configured
+- Would require async testing patterns
+- Location: `app/` directory components
+
+**Client Component Testing:**
+- Use `'use client'` directive if testing interactive components
+- Standard React Testing Library approach applies
+
+**Route Testing:**
+- Integration tests for page routes
+- API routes would need separate endpoint testing
 
 ---
 
