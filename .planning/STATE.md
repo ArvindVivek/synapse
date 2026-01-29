@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 1 of 6 (Data Foundation)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-29 - Completed 01-01-PLAN.md
+Last activity: 2026-01-29 - Completed 01-02-PLAN.md
 
-Progress: [█░░░░░░░░░] 6% (1/17 plans complete)
+Progress: [██░░░░░░░░] 12% (2/17 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
+- Total plans completed: 2
 - Average duration: 6 min
-- Total execution time: 0.1 hours
+- Total execution time: 0.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 - Data Foundation | 1/3 | 6 min | 6 min |
+| 1 - Data Foundation | 2/3 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 6min
-- Trend: Just started (1 plan complete)
+- Last 5 plans: 6min, 6min
+- Trend: Consistent velocity (6 min/plan)
 
 *Updated after each plan completion*
 
@@ -49,6 +49,10 @@ Recent decisions affecting current work:
 - [01-01]: Store role_confidence scores for multi-signal role inference (flex picks need probabilistic scoring)
 - [01-01]: Add etl_checkpoints table for resumable ETL jobs (30-60 min runtime needs checkpoint recovery)
 - [01-01]: Use Zod for GRID API response validation (catch schema changes early)
+- [01-02]: 74 champions with role priors covering professional meta (exceeds 50+ requirement)
+- [01-02]: Multi-signal role inference with weighted scoring: champion prior (0.5) + player role (0.3) + constraints (0.2)
+- [01-02]: Checkpoint system uses upsert for idempotent resume operations
+- [01-02]: Edge Functions use Deno runtime with ESM imports from esm.sh
 
 ### Pending Todos
 
@@ -61,7 +65,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-29
-Stopped at: Completed 01-01-PLAN.md (Data Foundation infrastructure)
+Stopped at: Completed 01-02-PLAN.md (ETL Pipeline with role inference)
 Resume file: None
 
 ## Quick Reference
