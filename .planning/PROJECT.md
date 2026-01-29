@@ -19,25 +19,26 @@ Turn-by-turn draft recommendations with transparent reasoning that help coaches 
 ### Active
 
 **Core Features:**
-- [ ] Real-time pick/ban recommendations with synergy scores and matchup advantages
-- [ ] Opponent pick prediction with probability distributions based on player history
-- [ ] Live win-rate projection that updates with each pick/ban
+- [ ] CORE-02: Real-time pick/ban recommendations with synergy scores and matchup advantages
+- [ ] CORE-03: Opponent pick prediction with probability distributions based on player history
+- [ ] CORE-04: Live win-rate projection that updates with each pick/ban
 
 **Supporting Features:**
-- [ ] Team/player selection from GRID tournament data (LCS, LEC, LCK, LPL)
-- [ ] Champion pool analysis for pre-match opponent scouting
-- [ ] Draft simulator interface with LoL-authentic UI
+- [ ] SUPPORT-01: Team/player selection from GRID tournament data (LCS, LEC, LCK, LPL)
+- [ ] FEAT-02: Champion pool analysis for pre-match opponent scouting
+- [ ] FEAT-01: Draft simulator interface with LoL-authentic UI
 
 **Data Pipeline:**
-- [ ] GRID.gg API integration (Central Data, Series State)
-- [ ] ETL pipeline for tournament, team, player, and draft data
-- [ ] Pre-computed synergy matrices and champion statistics
-- [ ] Player champion pool aggregation
+- [ ] DATA-01: GRID.gg API integration (Central Data, Series State)
+- [ ] DATA-02: ETL pipeline for tournament, team, player, and draft data
+- [ ] DATA-03: Pre-computed synergy matrices and champion statistics
+- [ ] DATA-04: Player champion pool aggregation
+- [ ] CORE-01: Synergy scores and matchup advantages (computed from data)
 
 **Infrastructure:**
-- [ ] Supabase PostgreSQL schema for all entities
-- [ ] Real-time draft state management
-- [ ] API routes for recommendations, predictions, and win-rate calculations
+- [ ] INFRA-01: Supabase PostgreSQL schema for all entities
+- [ ] INFRA-02: Real-time draft state management
+- [ ] API-01: API routes for recommendations, predictions, and win-rate calculations
 
 ### Out of Scope
 
@@ -47,6 +48,25 @@ Turn-by-turn draft recommendations with transparent reasoning that help coaches 
 - Live tournament stream integration — pre-match simulation only
 - Advanced ML models (deep learning) — heuristics-first, ML if time permits
 - Item build recommendations — draft phase only, not in-game
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Pending |
+| DATA-03 | Phase 2 | Pending |
+| DATA-04 | Phase 2 | Pending |
+| INFRA-01 | Phase 1 | Pending |
+| INFRA-02 | Phase 3 | Pending |
+| API-01 | Phase 3 | Pending |
+| CORE-01 | Phase 2 | Pending |
+| CORE-02 | Phase 4 | Pending |
+| CORE-03 | Phase 4 | Pending |
+| CORE-04 | Phase 4 | Pending |
+| FEAT-01 | Phase 5 | Pending |
+| FEAT-02 | Phase 5 | Pending |
+| SUPPORT-01 | Phase 5 | Pending |
 
 ## Context
 
@@ -72,10 +92,12 @@ Turn-by-turn draft recommendations with transparent reasoning that help coaches 
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Vercel + Supabase instead of Python FastAPI | Simpler deployment, single-language stack (TypeScript), faster iteration | — Pending |
-| Heuristics-first predictions | Achievable in timeline, transparent reasoning, ML can be added later | — Pending |
-| Single-page draft simulator as MVP | Core value is the draft experience; other pages can follow | — Pending |
-| Pre-computed synergy/matchup matrices | Reduces real-time compute, enables fast recommendations | — Pending |
+| Vercel + Supabase instead of Python FastAPI | Simpler deployment, single-language stack (TypeScript), faster iteration | Adopted |
+| Heuristics-first predictions | Achievable in timeline, transparent reasoning, ML can be added later | Adopted |
+| Single-page draft simulator as MVP | Core value is the draft experience; other pages can follow | Adopted |
+| Pre-computed synergy/matchup matrices | Reduces real-time compute, enables fast recommendations | Adopted |
+| 6-phase roadmap structure | Balances data foundation, analytics, state management, AI, UI, and polish | Adopted |
+| Risk mitigations from PITFALLS.md | Proactive prevention of role ambiguity, data sparsity, timeout issues | Adopted |
 
 ---
-*Last updated: 2026-01-28 after initialization*
+*Last updated: 2026-01-28 after roadmap creation*
