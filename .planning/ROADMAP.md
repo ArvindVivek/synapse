@@ -35,12 +35,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   - PITFALL-1 (Role Ambiguity): Implement multi-signal role inference with confidence scoring, flag ambiguous assignments for review
   - PITFALL-5 (GRID Rate Limits): Rate-limited client with exponential backoff, checkpointing for resumable ETL
   - PITFALL-9 (Champion Names): Create champion alias table normalizing GRID names to canonical names
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 01-01: Supabase schema and GRID API client
-- [ ] 01-02: ETL pipeline with role inference
-- [ ] 01-03: Data validation and quality checks
+- [ ] 01-01-PLAN.md — Supabase schema and GRID API client
+- [ ] 01-02-PLAN.md — ETL pipeline with role inference
+- [ ] 01-03-PLAN.md — Data validation and quality checks
 
 ### Phase 2: Core Analytics
 **Goal**: Pre-compute champion statistics, synergy matrices, and matchup data with patch-aware filtering and confidence scoring
@@ -153,7 +153,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Foundation | 0/3 | Not started | - |
+| 1. Data Foundation | 0/3 | Planned | - |
 | 2. Core Analytics | 0/3 | Not started | - |
 | 3. Draft State Machine | 0/2 | Not started | - |
 | 4. AI/Heuristics Engine | 0/3 | Not started | - |
