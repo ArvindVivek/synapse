@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 ## Current Position
 
-Phase: 3 of 6 (Draft State Machine) - COMPLETE
-Plan: 3 of 3 in current phase
-Status: Phase 3 complete - API routes and Realtime integration
-Last activity: 2026-01-30 - Completed 03-03-PLAN.md (API routes and Realtime)
+Phase: 4 of 6 (AI/Heuristics Engine) - IN PROGRESS
+Plan: 3 of 5 in current phase
+Status: Player prediction and ban strategy complete
+Last activity: 2026-01-30 - Completed 04-03-PLAN.md (Player prediction & ban strategy)
 
-Progress: [████░░░░░░] 44% (11/25 plans complete)
+Progress: [█████░░░░░] 52% (13/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 4 min
-- Total execution time: 0.80 hours
+- Total plans completed: 13
+- Average duration: 3.7 min
+- Total execution time: 0.87 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [████░░░░░░] 44% (11/25 plans complete)
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
+| 4 - AI/Heuristics Engine | 3/5 | 9.5 min | 3.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 4min, 6min, 6min, 3.4min
-- Trend: Excellent velocity (Phase 3 completed at 5.1 min/plan average)
+- Last 5 plans: 6min, 6min, 3.4min, 3min, 3.5min
+- Trend: Excellent velocity maintained (Phase 4 at 3.2 min/plan average)
 
 *Updated after each plan completion*
 
@@ -90,6 +91,18 @@ Recent decisions affecting current work:
 - [03-03]: In-memory session storage for MVP (will migrate to Supabase for persistence)
 - [03-03]: Broadcast self: false to prevent echo loops
 - [03-03]: Remote actions bypass validation (already validated by originating client)
+- [04-02]: Incremental win-rate updates use deltas (not full recomputation) for <50ms performance
+- [04-02]: Blue side starts with +2% advantage (well-documented pro play advantage)
+- [04-02]: Component weights: base composition 20%, synergy 10% per pair, matchup 15% per matchup
+- [04-02]: Delta clamping at ±5% per pick prevents wild swings from outlier data
+- [04-02]: Win-rate clamped to [0.05, 0.95] to never show impossible 0% or 100%
+- [04-02]: Confidence levels: low (<7 turns), medium (7-11), high (12+) based on pick count
+- [04-02]: Bans have minimal MVP impact on projection (future: adjust for removed counters)
+- [04-03]: Bayesian player prediction uses 4 likelihood factors: comfort (3x signature), recency (1.5x <30 days), team needs (1.3x if fills), win rate (relative to 50%)
+- [04-03]: Player pick probability capped at 0.50 per champion to avoid overconfident single-champion predictions
+- [04-03]: Target ban scoring: games played 40%, WR delta 40%, comfort level 20%
+- [04-03]: Priority ban scoring uses smoothed ban rate with confidence multiplier (high 1.2x, medium 1.0x, low 0.8x)
+- [04-03]: Target bans take precedence over priority bans when same champion appears in both categories
 
 ### Pending Todos
 
