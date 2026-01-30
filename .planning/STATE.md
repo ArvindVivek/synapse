@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 5 of 6 (Draft Simulator UI)
-Plan: 3 of 5 in current phase
-Status: Player selection and pool analysis complete
-Last activity: 2026-01-30 - Completed 05-03-PLAN.md (Player selector and champion pool analysis)
+Plan: 4 of 5 in current phase
+Status: Recommendation and ban panels complete
+Last activity: 2026-01-30 - Completed 05-04-PLAN.md (Recommendation and ban strategy panels)
 
-Progress: [███████░░░] 76% (19/25 plans complete)
+Progress: [████████░░] 80% (20/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: 3.4 min
-- Total execution time: 1.31 hours
+- Total execution time: 1.39 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [███████░░░] 76% (19/25 plans complete)
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
 | 4 - AI/Heuristics Engine | 5/5 | 19.1 min | 3.8 min |
-| 5 - Draft Simulator UI | 3/5 | 17 min | 5.7 min |
+| 5 - Draft Simulator UI | 4/5 | 22 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 2.6min, 8min, 4min, 5min
-- Trend: Plan 05-03 completed efficiently with API route and component creation
+- Last 5 plans: 8min, 4min, 5min, 5min
+- Trend: Phase 5 UI plans averaging ~5.5min with component creation
 
 *Updated after each plan completion*
 
@@ -73,7 +73,7 @@ Recent decisions affecting current work:
 - [02-04]: 3-game minimum threshold for matchups (lower than overall stats due to sparsity)
 - [02-04]: Pick phases classified as early (1-3), mid (4-7), late (8-10)
 - [02-04]: Blind pick success when picked before opponent, counter pick when after
-- [02-04]: Pick order recommendations: good_blind_pick (≥52% + ≥counter), better_late (counter>blind+5%), neutral
+- [02-04]: Pick order recommendations: good_blind_pick (>=52% + >=counter), better_late (counter>blind+5%), neutral
 - [02-05]: Lighter Bayesian prior for player pools (weight: 5) vs champion stats (weight: 10)
 - [02-05]: 30-day half-life for recency weighting balances recent performance with historical consistency
 - [02-05]: Comfort level thresholds: signature (10+ games, 55%+ WR), comfort (5+ games, 50%+ WR)
@@ -95,7 +95,7 @@ Recent decisions affecting current work:
 - [04-02]: Incremental win-rate updates use deltas (not full recomputation) for <50ms performance
 - [04-02]: Blue side starts with +2% advantage (well-documented pro play advantage)
 - [04-02]: Component weights: base composition 20%, synergy 10% per pair, matchup 15% per matchup
-- [04-02]: Delta clamping at ±5% per pick prevents wild swings from outlier data
+- [04-02]: Delta clamping at +/-5% per pick prevents wild swings from outlier data
 - [04-02]: Win-rate clamped to [0.05, 0.95] to never show impossible 0% or 100%
 - [04-02]: Confidence levels: low (<7 turns), medium (7-11), high (12+) based on pick count
 - [04-02]: Bans have minimal MVP impact on projection (future: adjust for removed counters)
@@ -106,11 +106,11 @@ Recent decisions affecting current work:
 - [04-03]: Target bans take precedence over priority bans when same champion appears in both categories
 - [04-01]: Sigmoid normalization (1 / (1 + exp(-delta * 10))) for score components
 - [04-01]: Turn-adaptive weights: early=0.40 flex, mid=balanced, late=0.40 counter
-- [04-01]: Confidence levels based on total game data across components (high ≥20 games, medium ≥10, low <10)
+- [04-01]: Confidence levels based on total game data across components (high >=20 games, medium >=10, low <10)
 - [04-01]: Champion properties hardcoded for pro play champions (future: query database)
 - [04-04]: Reasoning threshold of 0.60 for high-scoring components (filters noise)
 - [04-04]: Max 2 reasons per category for concise, scannable output
-- [04-04]: Synergy delta ≥0.05 threshold for meaningful synergies (5% win rate difference)
+- [04-04]: Synergy delta >=0.05 threshold for meaningful synergies (5% win rate difference)
 - [04-04]: Flex pick requires 2+ roles with 3+ games each (filters one-off experiments)
 - [04-04]: Flexibility score considers both role count and game balance
 - [04-04]: Pre-compute flex picks once in scoreAllChampions for performance
@@ -130,6 +130,10 @@ Recent decisions affecting current work:
 - [05-03]: Comfort level thresholds: signature (10+ games, 55%+ WR), comfort (5+ games, 50%+ WR)
 - [05-03]: 60-second cache TTL for player pool data (analytics don't change during draft)
 - [05-03]: Mock player data for demo purposes (LCK pro players)
+- [05-04]: useBans transforms recommendations API response for MVP (dedicated /bans endpoint deferred)
+- [05-04]: Score breakdown bar shows relative contribution of each scoring component
+- [05-04]: Top pick highlighted with ring-2 ring-yellow-500 for visual emphasis
+- [05-04]: Maximum 2 reasoning bullets per recommendation for scannable output
 
 ### Pending Todos
 
@@ -139,14 +143,10 @@ Recent decisions affecting current work:
 
 - [05-01]: Supabase type imports temporarily disabled (missing types file) - loses type safety for database operations
 
-### Blockers/Concerns
-
-None yet.
-
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 05-03-PLAN.md (Player selector and champion pool analysis)
+Stopped at: Completed 05-04-PLAN.md (Recommendation and ban strategy panels)
 Resume file: None
 
 ## Quick Reference
