@@ -14,6 +14,7 @@ import { useDraftStore } from '@/lib/draft/store'
 import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
 import { TurnIndicator } from '@/components/draft/turn-indicator'
 import { SideSelector } from '@/components/draft/side-selector'
+import { DraftBoard } from '@/components/draft/draft-board'
 
 interface DraftSimulatorProps {
   id: string
@@ -61,14 +62,9 @@ export default function DraftSimulator({ id, initialState }: DraftSimulatorProps
       {/* Main content area */}
       <main className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-12 gap-6">
-          {/* Left: Draft Board - placeholder for Task 2 */}
+          {/* Left: Draft Board */}
           <section className="col-span-3">
-            <div className="bg-gray-800 rounded-lg p-4 h-full">
-              <h2 className="text-lg font-semibold mb-4">Draft Board</h2>
-              <p className="text-gray-400 text-sm">
-                Draft board component will be added here
-              </p>
-            </div>
+            <DraftBoard />
           </section>
 
           {/* Center: Champion Grid - placeholder for future plan */}
