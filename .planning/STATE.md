@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 5 of 6 (Draft Simulator UI)
-Plan: 4 of 5 in current phase
-Status: Recommendation and ban panels complete
-Last activity: 2026-01-30 - Completed 05-04-PLAN.md (Recommendation and ban strategy panels)
+Plan: 6 of 6 in current phase
+Status: Full integration complete - awaiting human verification
+Last activity: 2026-01-30 - Completed 05-06-PLAN.md tasks 1-2 (Win-rate gauge and full integration)
 
-Progress: [████████░░] 80% (20/25 plans complete)
+Progress: [████████░░] 84% (21/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 3.4 min
-- Total execution time: 1.39 hours
+- Total execution time: 1.44 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [████████░░] 80% (20/25 plans complete)
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
 | 4 - AI/Heuristics Engine | 5/5 | 19.1 min | 3.8 min |
-| 5 - Draft Simulator UI | 4/5 | 22 min | 5.5 min |
+| 5 - Draft Simulator UI | 5/6 | 25 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 8min, 4min, 5min, 5min
-- Trend: Phase 5 UI plans averaging ~5.5min with component creation
+- Last 5 plans: 4min, 5min, 5min, 3min
+- Trend: Phase 5 nearing completion, final verification pending
 
 *Updated after each plan completion*
 
@@ -134,6 +134,10 @@ Recent decisions affecting current work:
 - [05-04]: Score breakdown bar shows relative contribution of each scoring component
 - [05-04]: Top pick highlighted with ring-2 ring-yellow-500 for visual emphasis
 - [05-04]: Maximum 2 reasoning bullets per recommendation for scannable output
+- [05-06]: Color-coded win probability: green (>=60%), lime (>=50%), yellow (>=40%), red (<40%)
+- [05-06]: Breakdown tooltip shows composition, synergies, matchups, and side advantage
+- [05-06]: Three-column layout: w-72 left sidebar, flex-1 center, w-80 right sidebar
+- [05-06]: framer-motion for animated gauge enter/exit, react-circular-progressbar for gauge
 
 ### Pending Todos
 
@@ -146,8 +150,8 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 05-04-PLAN.md (Recommendation and ban strategy panels)
-Resume file: None
+Stopped at: 05-06-PLAN.md checkpoint - awaiting human verification
+Resume file: .planning/phases/05-draft-simulator-ui/05-06-PLAN.md (Task 3)
 
 ## Quick Reference
 
