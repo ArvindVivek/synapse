@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 4 of 6 (AI/Heuristics Engine) - IN PROGRESS
-Plan: 3 of 5 in current phase
-Status: Player prediction and ban strategy complete
-Last activity: 2026-01-30 - Completed 04-03-PLAN.md (Player prediction & ban strategy)
+Plan: 4 of 5 in current phase
+Status: Multi-criteria pick scoring complete
+Last activity: 2026-01-30 - Completed 04-01-PLAN.md (Multi-criteria pick scoring)
 
-Progress: [█████░░░░░] 52% (13/25 plans complete)
+Progress: [█████░░░░░] 56% (14/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 3.7 min
-- Total execution time: 0.87 hours
+- Total execution time: 0.95 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [█████░░░░░] 52% (13/25 plans complete)
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
-| 4 - AI/Heuristics Engine | 3/5 | 9.5 min | 3.2 min |
+| 4 - AI/Heuristics Engine | 4/5 | 14.5 min | 3.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 6min, 3.4min, 3min, 3.5min
-- Trend: Excellent velocity maintained (Phase 4 at 3.2 min/plan average)
+- Last 5 plans: 6min, 3.4min, 3min, 3.5min, 5min
+- Trend: Excellent velocity maintained (Phase 4 at 3.6 min/plan average)
 
 *Updated after each plan completion*
 
@@ -103,6 +103,10 @@ Recent decisions affecting current work:
 - [04-03]: Target ban scoring: games played 40%, WR delta 40%, comfort level 20%
 - [04-03]: Priority ban scoring uses smoothed ban rate with confidence multiplier (high 1.2x, medium 1.0x, low 0.8x)
 - [04-03]: Target bans take precedence over priority bans when same champion appears in both categories
+- [04-01]: Sigmoid normalization (1 / (1 + exp(-delta * 10))) for score components
+- [04-01]: Turn-adaptive weights: early=0.40 flex, mid=balanced, late=0.40 counter
+- [04-01]: Confidence levels based on total game data across components (high ≥20 games, medium ≥10, low <10)
+- [04-01]: Champion properties hardcoded for pro play champions (future: query database)
 
 ### Pending Todos
 
@@ -115,7 +119,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 04-03-PLAN.md (Player prediction & ban strategy)
+Stopped at: Completed 04-01-PLAN.md (Multi-criteria pick scoring)
 Resume file: None
 
 ## Quick Reference
