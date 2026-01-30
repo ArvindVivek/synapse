@@ -94,16 +94,16 @@ Plans:
   - PITFALL-2 (Stateless Draft): Model draft as explicit state machine with 20 turns, context-aware API
   - PITFALL-6 (Vercel Timeout): Pre-computed features in database, cached queries, database indexes
   - PITFALL-7 (WebSocket Quota): Supabase Broadcast for ephemeral updates, polling fallback
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 **Data Enhancements from Phase 1**:
   - `champion_picks.pick_order` (1-10) maps to draft turn sequence
   - `drafts.blue_bans` and `drafts.red_bans` define ban phase structure
   - `champion_picks.team_side` enables side-specific state tracking
 
 Plans:
-- [ ] 03-01: Draft state machine with ban phase modeling
-- [ ] 03-02: Side selection and turn validation
-- [ ] 03-03: API routes and Supabase Realtime integration
+- [ ] 03-01-PLAN.md — Draft state machine core (types, 20-turn sequence, Zustand store)
+- [ ] 03-02-PLAN.md — Validation logic (guard functions, pure predicates)
+- [ ] 03-03-PLAN.md — API routes and Supabase Realtime integration
 
 ### Phase 4: AI/Heuristics Engine
 **Goal**: Deliver AI-powered pick/ban recommendations, player-specific opponent predictions, and live win-rate projections with transparent reasoning
