@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 ## Current Position
 
-Phase: 3 of 6 (Draft State Machine) - IN PROGRESS
-Plan: 2 of 3 in current phase
-Status: Plan 03-02 complete - Validation logic with pure guard functions
-Last activity: 2026-01-30 - Completed 03-02-PLAN.md (Validation logic)
+Phase: 3 of 6 (Draft State Machine) - COMPLETE
+Plan: 3 of 3 in current phase
+Status: Phase 3 complete - API routes and Realtime integration
+Last activity: 2026-01-30 - Completed 03-03-PLAN.md (API routes and Realtime)
 
-Progress: [████░░░░░░] 40% (10/25 plans complete)
+Progress: [████░░░░░░] 44% (11/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 4 min
-- Total execution time: 0.74 hours
+- Total execution time: 0.80 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████░░░░░░] 40% (10/25 plans complete)
 |-------|-------|-------|----------|
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
-| 3 - Draft State Machine | 2/3 | 12 min | 6 min |
+| 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 2min, 4min, 6min, 6min
-- Trend: Excellent velocity (Phase 3 maintaining 6 min/plan)
+- Last 5 plans: 2min, 4min, 6min, 6min, 3.4min
+- Trend: Excellent velocity (Phase 3 completed at 5.1 min/plan average)
 
 *Updated after each plan completion*
 
@@ -84,6 +84,12 @@ Recent decisions affecting current work:
 - [03-02]: ValidationErrorCode enum enables internationalization and specific UI feedback
 - [03-02]: Type narrowing with 'valid === false' for discriminated union handling
 - [03-02]: Store tracks lastValidationError for UI display without prop drilling
+- [03-03]: Edge runtime for all API routes to meet <200ms requirement (PITFALL-6)
+- [03-03]: Supabase Broadcast (not postgres_changes) for 50-100ms latency (PITFALL-7)
+- [03-03]: nanoid for short draft session IDs (12 chars vs UUID 36 chars)
+- [03-03]: In-memory session storage for MVP (will migrate to Supabase for persistence)
+- [03-03]: Broadcast self: false to prevent echo loops
+- [03-03]: Remote actions bypass validation (already validated by originating client)
 
 ### Pending Todos
 
@@ -96,7 +102,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 03-02-PLAN.md (Validation logic with pure guard functions)
+Stopped at: Completed 03-03-PLAN.md (API routes and Realtime integration) - Phase 3 complete
 Resume file: None
 
 ## Quick Reference
