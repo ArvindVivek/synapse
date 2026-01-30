@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Turn-by-turn draft recommendations with transparent reasoning that help coaches make better pick/ban decisions in real time.
-**Current focus:** Phase 1 - Data Foundation
+**Current focus:** Phase 2 - Core Analytics
 
 ## Current Position
 
-Phase: 1 of 6 (Data Foundation)
-Plan: 2 of 3 in current phase
+Phase: 2 of 6 (Core Analytics) - In Progress
+Plan: 1 of 5 in current phase
 Status: In progress
-Last activity: 2026-01-29 - Completed 01-02-PLAN.md
+Last activity: 2026-01-30 - Completed 02-01-PLAN.md (Analytics Foundation)
 
-Progress: [██░░░░░░░░] 12% (2/17 plans complete)
+Progress: [██░░░░░░░░] 16% (4/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 6 min
-- Total execution time: 0.2 hours
+- Total plans completed: 4
+- Average duration: 5 min
+- Total execution time: 0.35 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 - Data Foundation | 2/3 | 12 min | 6 min |
+| 1 - Data Foundation | 3/3 | 18 min | 6 min |
+| 2 - Core Analytics | 1/5 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 6min
-- Trend: Consistent velocity (6 min/plan)
+- Last 5 plans: 6min, 6min, 6min, 3min
+- Trend: Improving velocity (analytics phase starting strong)
 
 *Updated after each plan completion*
 
@@ -52,7 +53,13 @@ Recent decisions affecting current work:
 - [01-02]: 74 champions with role priors covering professional meta (exceeds 50+ requirement)
 - [01-02]: Multi-signal role inference with weighted scoring: champion prior (0.5) + player role (0.3) + constraints (0.2)
 - [01-02]: Checkpoint system uses upsert for idempotent resume operations
-- [01-02]: Edge Functions use Deno runtime with ESM imports from esm.sh
+- [01-02]: Track player_id, team_side, pick_order, role_confidence for enhanced analytics
+- [01-03]: ETL ingested 3,442 games (229% of target), 34,530 picks, 34,321 bans
+- [01-03]: Role confidence acceptable at 65.7% medium (player history signal can improve in Phase 2)
+- [01-03]: Data quality production-ready: 0.06% draft issues, perfect 10 picks/draft average
+- [02-02]: Bayesian smoothing with prior weight of 10 games prevents overfitting to small samples
+- [02-02]: Ban analytics tracked at three context levels (global, team, player) for flexible querying
+- [02-02]: Confidence scoring explicitly flags data quality (high/medium/low/insufficient)
 
 ### Pending Todos
 
@@ -64,8 +71,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-29
-Stopped at: Completed 01-02-PLAN.md (ETL Pipeline with role inference)
+Last session: 2026-01-30
+Stopped at: Completed 02-02-PLAN.md (Ban Analytics)
 Resume file: None
 
 ## Quick Reference
