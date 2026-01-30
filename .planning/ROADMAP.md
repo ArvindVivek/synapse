@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Foundation** - GRID API integration, Supabase schema, ETL pipeline ✅
 - [x] **Phase 2: Core Analytics** - Champion statistics, synergy matrices, matchup data ✅
-- [ ] **Phase 3: Draft State Machine** - Real-time state management with turn validation
+- [x] **Phase 3: Draft State Machine** - Real-time state management with turn validation ✅
 - [ ] **Phase 4: AI/Heuristics Engine** - Recommendations, predictions, win-rate projections
 - [ ] **Phase 5: Draft Simulator UI** - LoL-authentic interface with real-time updates
 - [ ] **Phase 6: Polish and Deploy** - Performance optimization, demo prep, Vercel deployment
@@ -101,9 +101,9 @@ Plans:
   - `champion_picks.team_side` enables side-specific state tracking
 
 Plans:
-- [ ] 03-01-PLAN.md — Draft state machine core (types, 20-turn sequence, Zustand store)
-- [ ] 03-02-PLAN.md — Validation logic (guard functions, pure predicates)
-- [ ] 03-03-PLAN.md — API routes and Supabase Realtime integration
+- [x] 03-01-PLAN.md — Draft state machine core (types, 20-turn sequence, Zustand store) ✅
+- [x] 03-02-PLAN.md — Validation logic (guard functions, pure predicates) ✅
+- [x] 03-03-PLAN.md — API routes and Supabase Realtime integration ✅
 
 ### Phase 4: AI/Heuristics Engine
 **Goal**: Deliver AI-powered pick/ban recommendations, player-specific opponent predictions, and live win-rate projections with transparent reasoning
@@ -198,7 +198,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Data Foundation | 3/3 | ✅ Complete | 2026-01-29 |
 | 2. Core Analytics | 5/5 | ✅ Complete | 2026-01-30 |
-| 3. Draft State Machine | 0/3 | Ready to start | - |
+| 3. Draft State Machine | 3/3 | ✅ Complete | 2026-01-30 |
 | 4. AI/Heuristics Engine | 0/5 | Not started | - |
 | 5. Draft Simulator UI | 0/6 | Not started | - |
 | 6. Polish and Deploy | 0/3 | Not started | - |
