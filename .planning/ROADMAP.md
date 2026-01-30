@@ -121,7 +121,7 @@ Plans:
   - PITFALL-4 (Sparsity): Use archetype-based fallback for rare champion combinations
   - PITFALL-6 (Timeout): Heuristics-first approach, no heavy ML inference
   - PITFALL-11 (Unknown Champion): Graceful fallback to neutral scores for new/unknown champions
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
 **Data Enhancements from Phase 1** (MAJOR UPGRADE):
   - `champion_picks.player_id` enables player-specific predictions (was team-level only)
   - `champion_picks.role_confidence` identifies flex picks for early draft recommendations
@@ -130,11 +130,11 @@ Plans:
   - `drafts.blue_bans` and `drafts.red_bans` enable ban strategy analysis
 
 Plans:
-- [ ] 04-01: Recommendation engine with side-aware scoring and transparent reasoning
-- [ ] 04-02: Player-specific opponent prediction using champion pools
-- [ ] 04-03: Ban strategy recommendations (target bans + priority bans)
-- [ ] 04-04: Flex pick detection and early draft optimization
-- [ ] 04-05: Win-rate projection with side adjustments and live updates
+- [ ] 04-01-PLAN.md — Pick scorer with multi-criteria weighted scoring (MCDM)
+- [ ] 04-02-PLAN.md — Win-rate projector with incremental updates
+- [ ] 04-03-PLAN.md — Player predictor and ban strategy recommendations
+- [ ] 04-04-PLAN.md — Reasoning generator and flex pick detection
+- [ ] 04-05-PLAN.md — API routes for recommendations, predictions, win-rate
 
 ### Phase 5: Draft Simulator UI
 **Goal**: Build LoL-authentic draft simulator interface with ban phase visualization, player selection, role confidence indicators, real-time recommendations, and win-rate visualization
@@ -199,7 +199,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Data Foundation | 3/3 | ✅ Complete | 2026-01-29 |
 | 2. Core Analytics | 5/5 | ✅ Complete | 2026-01-30 |
 | 3. Draft State Machine | 3/3 | ✅ Complete | 2026-01-30 |
-| 4. AI/Heuristics Engine | 0/5 | Not started | - |
+| 4. AI/Heuristics Engine | 0/5 | Ready to execute | - |
 | 5. Draft Simulator UI | 0/6 | Not started | - |
 | 6. Polish and Deploy | 0/3 | Not started | - |
 
