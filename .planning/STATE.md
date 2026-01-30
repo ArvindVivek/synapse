@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 5 of 6 (Draft Simulator UI)
-Plan: 1 of 5 in current phase
-Status: Core layout complete
-Last activity: 2026-01-30 - Completed 05-01-PLAN.md (Draft page routes and core layout components)
+Plan: 5 of 5 in current phase
+Status: Prediction panel complete
+Last activity: 2026-01-30 - Completed 05-05-PLAN.md (Prediction panel with probability bars)
 
-Progress: [███████░░░] 68% (17/25 plans complete)
+Progress: [███████░░░] 72% (18/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
-- Average duration: 3.5 min
-- Total execution time: 1.16 hours
+- Total plans completed: 18
+- Average duration: 3.4 min
+- Total execution time: 1.23 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [███████░░░] 68% (17/25 plans complete)
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
 | 4 - AI/Heuristics Engine | 5/5 | 19.1 min | 3.8 min |
-| 5 - Draft Simulator UI | 1/5 | 8 min | 8 min |
+| 5 - Draft Simulator UI | 2/5 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 2min, 2.6min, 8min
-- Trend: Plan 05-01 took longer (8min) due to Next.js 16 API migration and Supabase type fixes
+- Last 5 plans: 2min, 2.6min, 8min, 4min
+- Trend: Plan 05-05 executed quickly (4min) with straightforward component creation
 
 *Updated after each plan completion*
 
@@ -123,6 +123,9 @@ Recent decisions affecting current work:
 - [05-01]: Granular Zustand selectors minimize re-renders (subscribe to specific slices only)
 - [05-01]: Server Components fetch data, Client Components manage UI state
 - [05-01]: Layout shell with placeholders enables clean integration of future features
+- [05-05]: Refetch predictions on turn change to reflect updated draft state
+- [05-05]: Filter unavailable champions client-side using availableChampions Set
+- [05-05]: Color-coded probability bars: red >40%, orange >25%, yellow <25%
 
 ### Pending Todos
 
@@ -139,7 +142,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 05-01-PLAN.md (Draft page routes and core layout)
+Stopped at: Completed 05-05-PLAN.md (Prediction panel with probability bars)
 Resume file: None
 
 ## Quick Reference
