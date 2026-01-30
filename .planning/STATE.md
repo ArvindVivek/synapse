@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 ## Current Position
 
-Phase: 2 of 6 (Core Analytics) - ✅ COMPLETE
-Plan: 5 of 5 in current phase
-Status: Phase complete, verified, ready for Phase 3
-Last activity: 2026-01-30 - Completed Phase 2 (All analytics verified)
+Phase: 3 of 6 (Draft State Machine) - IN PROGRESS
+Plan: 1 of 3 in current phase
+Status: Plan 03-01 complete - Draft state machine core ready
+Last activity: 2026-01-30 - Completed 03-01-PLAN.md (Draft state machine core)
 
-Progress: [███░░░░░░░] 32% (8/25 plans complete)
+Progress: [████░░░░░░] 36% (9/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 4 min
-- Total execution time: 0.54 hours
+- Total execution time: 0.64 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [███░░░░░░░] 32% (8/25 plans complete)
 |-------|-------|-------|----------|
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
+| 3 - Draft State Machine | 1/3 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 3min, 4min, 2min, 4min
-- Trend: Excellent velocity (Phase 2 complete at 2.8 min/plan)
+- Last 5 plans: 3min, 4min, 2min, 4min, 6min
+- Trend: Consistent velocity (Phase 3 started at 6 min/plan)
 
 *Updated after each plan completion*
 
@@ -75,6 +76,10 @@ Recent decisions affecting current work:
 - [02-05]: 30-day half-life for recency weighting balances recent performance with historical consistency
 - [02-05]: Comfort level thresholds: signature (10+ games, 55%+ WR), comfort (5+ games, 50%+ WR)
 - [02-05]: True flex pick requires 2+ roles with 3+ games each (filters one-off experiments)
+- [03-01]: Simple lookup table (DRAFT_SEQUENCE) over XState (50kb overhead avoidance)
+- [03-01]: Enable Immer MapSet plugin for Set support in Zustand store
+- [03-01]: Zustand (1.2kb) + Immer for client state management (vs Redux 11kb)
+- [03-01]: currentTurn tracks 0-20 (0=not started, 1-20=active, >20=complete)
 
 ### Pending Todos
 
@@ -87,7 +92,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: ✅ Phase 2 Complete - All analytics verified, ready for Phase 3 (Draft State Machine)
+Stopped at: Completed 03-01-PLAN.md (Draft state machine core with Zustand + Immer)
 Resume file: None
 
 ## Quick Reference
