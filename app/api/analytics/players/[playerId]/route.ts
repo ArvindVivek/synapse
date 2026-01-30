@@ -91,6 +91,7 @@ export async function GET(
     }
 
     // Query champion picks from synapse schema, grouped by champion and role
+    // Note: games.blue_team_won is boolean (true = blue won, false = red won)
     const { data: picks, error: picksError } = await supabase
       .schema('synapse')
       .from('champion_picks')
@@ -101,7 +102,7 @@ export async function GET(
         team_side,
         draft:drafts!inner(
           game:games!inner(
-            winning_side
+            blue_team_won
           )
         )
       `)
@@ -141,7 +142,9 @@ export async function GET(
     for (const pick of picks) {
       const existing = championMap.get(pick.champion_name)
       const game = (pick.draft as any)?.game
-      const isWin = game?.winning_side === pick.team_side
+      // Determine win: blue_team_won=true means blue won, false means red won
+      const blueWon = game?.blue_team_won === true
+      const isWin = (pick.team_side === 'blue' && blueWon) || (pick.team_side === 'red' && !blueWon)
 
       if (existing) {
         existing.gamesPlayed++
