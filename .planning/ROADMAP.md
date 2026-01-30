@@ -154,7 +154,7 @@ Plans:
 **Risk Mitigations**:
   - PITFALL-8 (Scope Creep): MVP-first development, time-box each component to 1 day max
   - PITFALL-12 (Cold Start): Pre-warm API before demo
-**Plans**: TBD
+**Plans**: 6 plans in 3 waves
 **Data Enhancements from Phase 1**:
   - `champion_picks.player_id` enables player-specific scouting (not just team-level)
   - `champion_picks.role_confidence` shown as visual badges on picks
@@ -162,12 +162,12 @@ Plans:
   - `champion_picks.team_side` enables side selection toggle
 
 Plans:
-- [ ] 05-01: Draft board with ban phase visualization and side selection
-- [ ] 05-02: Champion grid with flex pick indicators
-- [ ] 05-03: Individual player selection and champion pool analysis
-- [ ] 05-04: Recommendation and ban strategy panels
-- [ ] 05-05: Prediction panel with player-specific probabilities
-- [ ] 05-06: Win-rate gauge with side adjustments and final polish
+- [ ] 05-01-PLAN.md — Draft page routes, draft board, side selector, turn indicator (Wave 1)
+- [ ] 05-02-PLAN.md — Champion grid with search, role filters, flex indicators (Wave 1)
+- [ ] 05-03-PLAN.md — Player selector and champion pool analysis panel (Wave 2)
+- [ ] 05-04-PLAN.md — Recommendation and ban strategy panels (Wave 2)
+- [ ] 05-05-PLAN.md — Prediction panel with probability bars (Wave 2)
+- [ ] 05-06-PLAN.md — Win-rate gauge and full integration with polish (Wave 3)
 
 ### Phase 6: Polish and Deploy
 **Goal**: Production-ready deployment with performance optimization, demo scenario preparation, and hackathon submission
