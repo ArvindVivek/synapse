@@ -413,3 +413,86 @@ export class WinRateProjector {
     return 'low' // Still in bans or early picks
   }
 }
+
+/**
+ * Factory function for creating a win-rate projector
+ *
+ * Provides clean API for instantiation.
+ *
+ * @param patchVersion - Patch version for data queries
+ * @returns New WinRateProjector instance
+ *
+ * @example
+ * const projector = createWinRateProjector('14.23')
+ */
+export function createWinRateProjector(patchVersion: string): WinRateProjector {
+  return new WinRateProjector(patchVersion)
+}
+
+/**
+ * Calculate win-rate projection for a complete draft state
+ *
+ * Useful for stateless API usage where full draft state is provided.
+ * Creates a projector, applies all picks in order, and returns final projection.
+ *
+ * @param bluePicks - Array of blue team picks (champion names)
+ * @param blueRoles - Array of blue team roles (parallel to bluePicks)
+ * @param redPicks - Array of red team picks (champion names)
+ * @param redRoles - Array of red team roles (parallel to redPicks)
+ * @param patchVersion - Patch version for data queries
+ * @returns Final win-rate projection
+ *
+ * @example
+ * const projection = await calculateWinRateForState(
+ *   ['Sejuani', 'Orianna', 'Jinx'],
+ *   ['jungle', 'mid', 'adc'],
+ *   ['Rell', 'Ahri', 'Kai\'Sa'],
+ *   ['support', 'mid', 'adc'],
+ *   '14.23'
+ * )
+ * // Returns: { blueWinRate: 0.52, breakdown: {...}, ... }
+ */
+export async function calculateWinRateForState(
+  bluePicks: string[],
+  blueRoles: (string | null)[],
+  redPicks: string[],
+  redRoles: (string | null)[],
+  patchVersion: string
+): Promise<WinRateProjection> {
+  const projector = new WinRateProjector(patchVersion)
+
+  // Simulate draft sequence - interleave picks based on standard draft order
+  // For simplicity, assume picks are already ordered chronologically
+  // Real implementation would need to know exact turn sequence
+
+  let turnNumber = 7 // Picks start at turn 7 (after ban phase 1)
+
+  // Apply picks in order (alternating or as provided)
+  const maxLength = Math.max(bluePicks.length, redPicks.length)
+
+  for (let i = 0; i < maxLength; i++) {
+    // Apply blue pick if available
+    if (i < bluePicks.length) {
+      await projector.updateAfterPick(
+        bluePicks[i],
+        blueRoles[i] || null,
+        'blue',
+        turnNumber
+      )
+      turnNumber++
+    }
+
+    // Apply red pick if available
+    if (i < redPicks.length) {
+      await projector.updateAfterPick(
+        redPicks[i],
+        redRoles[i] || null,
+        'red',
+        turnNumber
+      )
+      turnNumber++
+    }
+  }
+
+  return projector.getCurrentProjection()
+}
