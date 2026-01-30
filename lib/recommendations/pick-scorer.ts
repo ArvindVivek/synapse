@@ -17,6 +17,12 @@ import {
   LATE_PICK_WEIGHTS,
   getTurnPhase
 } from './types'
+import {
+  generateReasoning,
+  ReasoningContext
+} from './reasoning-generator'
+import { detectFlexPicks, FlexPickInfo } from './flex-detector'
+import { assessTeamNeeds } from './champion-properties'
 
 /**
  * Get scoring weights for a given draft turn
@@ -73,23 +79,20 @@ function calculateSideScore(champion: string, userSide: 'blue' | 'red'): number 
  * Evaluates multi-role viability. Champions with low role confidence
  * (can be played in multiple roles) score higher.
  *
- * Future enhancement: Query champion_stats_computed.role_confidence
+ * Uses FlexPickInfo from flex-detector.ts (04-04)
  *
  * @param champion - Champion name
+ * @param flexInfo - Flex pick information from detector (null if not flex)
  * @returns Score 0.0-1.0
  */
-function calculateFlexScore(champion: string): number {
-  // TODO: Query champion_stats_computed for actual role_confidence
-  // Lower role_confidence = more flex potential
-  // For now, use hardcoded flex champions
+function calculateFlexScore(champion: string, flexInfo: FlexPickInfo | null): number {
+  if (!flexInfo || !flexInfo.isTrueFlex) {
+    return 0.50 // Neutral score for non-flex picks
+  }
 
-  const flexChampions = new Set([
-    'Jayce', 'Swain', 'Sylas', 'Lucian', 'Gragas',
-    'Yasuo', 'Yone', 'Sett', 'Pantheon', 'Pyke',
-    'Karma', 'Lulu', 'Morgana', 'Twisted Fate'
-  ])
-
-  return flexChampions.has(champion) ? 0.75 : 0.50
+  // Use flexibility score from detector (already normalized 0.0-1.0)
+  // Map to 0.5-1.0 range (neutral to excellent)
+  return 0.5 + (flexInfo.flexibilityScore * 0.5)
 }
 
 /**
@@ -100,30 +103,38 @@ function calculateFlexScore(champion: string): number {
  * 2. Apply turn-adaptive weights
  * 3. Sum weighted scores
  * 4. Determine confidence based on data quality
+ * 5. Generate human-readable reasoning (04-04)
  *
  * @param champion - Champion to score
  * @param context - Current draft state
  * @param patchVersion - Patch version for data queries
- * @returns Complete pick recommendation
+ * @param flexPicksCache - Optional pre-computed flex picks (for batch scoring)
+ * @returns Complete pick recommendation with reasoning
  */
 export async function scoreChampionForPick(
   champion: string,
   context: DraftContext,
-  patchVersion: string
+  patchVersion: string,
+  flexPicksCache?: FlexPickInfo[]
 ): Promise<PickRecommendation> {
   // Get turn-adaptive weights
   const weights = getWeightsForTurn(context.currentTurn)
 
   // Calculate all score components in parallel
-  const [synergyResult, counterResult, compositionResult] = await Promise.all([
+  // Also detect flex picks if not cached
+  const [synergyResult, counterResult, compositionResult, flexPicksDetected] = await Promise.all([
     calculateSynergyScore(champion, context.userPicks, patchVersion),
     calculateCounterScore(champion, context.opponentPicks, null, patchVersion),
-    calculateCompositionScore(champion, context.userPicks, patchVersion)
+    calculateCompositionScore(champion, context.userPicks, patchVersion),
+    flexPicksCache ? Promise.resolve(flexPicksCache) : detectFlexPicks([champion], patchVersion)
   ])
+
+  // Find flex info for this champion
+  const flexInfo = flexPicksDetected.find(fp => fp.champion === champion) || null
 
   // Calculate simple scores
   const sideScore = calculateSideScore(champion, context.userSide)
-  const flexScore = calculateFlexScore(champion)
+  const flexScore = calculateFlexScore(champion, flexInfo)
 
   // Build score breakdown
   const scores = {
@@ -157,12 +168,27 @@ export async function scoreChampionForPick(
     confidence = 'low'
   }
 
+  // Build reasoning context with data from score calculations
+  const reasoningContext: ReasoningContext = {
+    champion,
+    scores,
+    draftContext: context,
+    synergyDetails: synergyResult.details,  // Includes games from 04-01
+    matchupDetails: counterResult.details,   // Includes games from 04-01
+    compositionNeeds: compositionResult.fills,
+    sideWinRate: sideScore, // Normalized score (0.48-0.52 range)
+    flexRoles: flexInfo?.viableRoles
+  }
+
+  // Generate reasoning (populates the empty array from 04-01)
+  const reasoning = generateReasoning(reasoningContext)
+
   return {
     champion,
     totalScore,
     scores,
     confidence,
-    reasoning: [] // Populated by 04-04 reasoning-generator.ts
+    reasoning  // Now populated with human-readable explanations!
   }
 }
 
@@ -171,6 +197,8 @@ export async function scoreChampionForPick(
  *
  * Scores all champions in parallel and sorts by total score.
  * Returns top N recommendations for display.
+ *
+ * Optimization: Pre-computes flex picks once for all champions.
  *
  * @param availableChampions - Champions still available for pick
  * @param context - Current draft state
@@ -184,10 +212,13 @@ export async function scoreAllChampions(
   patchVersion: string,
   limit: number = 5
 ): Promise<PickRecommendation[]> {
-  // Score all champions in parallel
+  // Pre-compute flex picks once for all champions (performance optimization)
+  const flexPicks = await detectFlexPicks(availableChampions, patchVersion)
+
+  // Score all champions in parallel, passing flex picks cache
   const allScores = await Promise.all(
     availableChampions.map(champion =>
-      scoreChampionForPick(champion, context, patchVersion)
+      scoreChampionForPick(champion, context, patchVersion, flexPicks)
     )
   )
 
