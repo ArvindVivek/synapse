@@ -3,7 +3,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import type { Database } from '@/supabase/functions/_shared/types';
+// import type { Database } from '@/supabase/functions/_shared/types';
 
 /**
  * Create a Supabase client for use in Server Components and Route Handlers
@@ -12,7 +12,7 @@ import type { Database } from '@/supabase/functions/_shared/types';
 export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

@@ -44,10 +44,10 @@ const draftSessions = new Map<string, DraftState>()
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     // In production, this would query Supabase
     // For now, check in-memory store or return mock data

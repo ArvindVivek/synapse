@@ -42,10 +42,10 @@ interface ActionRequest {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = (await request.json()) as ActionRequest
 
     // Validate request body
@@ -78,8 +78,20 @@ export async function POST(
       currentTurn: session.currentTurn,
       phase: session.phase,
       userSide: session.userSide,
-      blue: session.blue,
-      red: session.red,
+      blue: {
+        bans: session.blue.bans,
+        picks: session.blue.picks.map(p => ({
+          champion: p.champion,
+          role: p.role as Role | null
+        }))
+      },
+      red: {
+        bans: session.red.bans,
+        picks: session.red.picks.map(p => ({
+          champion: p.champion,
+          role: p.role as Role | null
+        }))
+      },
       availableChampions: new Set<string>(), // Will be computed below
       isComplete: session.isComplete,
       startedAt: new Date(session.startedAt),

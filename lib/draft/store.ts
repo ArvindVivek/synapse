@@ -48,6 +48,7 @@ interface DraftStore extends DraftState {
 
   undo: () => void
   reset: () => void
+  setUserSide: (side: 'blue' | 'red') => void
 
   // Validation error tracking
   lastValidationError: ValidationError | null
@@ -227,6 +228,16 @@ export const useDraftStore = create<DraftStore>()(
       }),
 
     /**
+     * Set user side (only allowed before draft starts)
+     */
+    setUserSide: (side: 'blue' | 'red') =>
+      set((state) => {
+        if (state.currentTurn === 0) {
+          state.userSide = side
+        }
+      }),
+
+    /**
      * Get the last validation error
      */
     getLastError: () => {
@@ -344,7 +355,7 @@ export const useDraftStore = create<DraftStore>()(
           } else if (type === 'PICK') {
             state[side].picks.push({
               champion,
-              role: role || null,
+              role: (role as Role) || null,
             })
             state.availableChampions.delete(champion)
           }
