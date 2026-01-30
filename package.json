@@ -13,6 +13,7 @@
     "@supabase/supabase-js": "^2.50.0",
     "bottleneck": "^2.19.5",
     "immer": "^11.0.0",
+    "nanoid": "^5.1.6",
     "next": "16.1.6",
     "p-retry": "^6.2.1",
     "react": "19.2.3",
