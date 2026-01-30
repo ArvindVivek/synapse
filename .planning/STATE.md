@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 2 of 6 (Core Analytics) - In Progress
-Plan: 1 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: In progress
-Last activity: 2026-01-30 - Completed 02-01-PLAN.md (Analytics Foundation)
+Last activity: 2026-01-30 - Completed 02-04-PLAN.md (Matchup Matrix)
 
-Progress: [██░░░░░░░░] 16% (4/25 plans complete)
+Progress: [███░░░░░░░] 28% (7/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 5 min
-- Total execution time: 0.35 hours
+- Total plans completed: 7
+- Average duration: 4 min
+- Total execution time: 0.47 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
-| 2 - Core Analytics | 1/5 | 3 min | 3 min |
+| 2 - Core Analytics | 4/5 | 10 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 6min, 6min, 3min
-- Trend: Improving velocity (analytics phase starting strong)
+- Last 5 plans: 6min, 3min, 2min, 1min, 4min
+- Trend: Excellent velocity (analytics phase execution efficient)
 
 *Updated after each plan completion*
 
@@ -62,6 +62,11 @@ Recent decisions affecting current work:
 - [02-01]: Side-specific stats computed separately (blue, red, NULL) to account for side advantage
 - [02-01]: Role confidence threshold of 0.5 filters low-confidence role assignments from analytics
 - [02-01]: Champion stats stored in computed table for flexible upsert operations
+- [02-04]: Matchup delta is directional (positive = favorable) for champion perspective
+- [02-04]: 3-game minimum threshold for matchups (lower than overall stats due to sparsity)
+- [02-04]: Pick phases classified as early (1-3), mid (4-7), late (8-10)
+- [02-04]: Blind pick success when picked before opponent, counter pick when after
+- [02-04]: Pick order recommendations: good_blind_pick (≥52% + ≥counter), better_late (counter>blind+5%), neutral
 
 ### Pending Todos
 
@@ -74,7 +79,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 02-01-PLAN.md (Analytics Foundation)
+Stopped at: Completed 02-04-PLAN.md (Matchup Matrix)
 Resume file: None
 
 ## Quick Reference
