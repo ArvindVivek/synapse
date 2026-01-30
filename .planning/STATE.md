@@ -11,17 +11,17 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 Phase: 4 of 6 (AI/Heuristics Engine) - IN PROGRESS
 Plan: 4 of 5 in current phase
-Status: Multi-criteria pick scoring complete
-Last activity: 2026-01-30 - Completed 04-01-PLAN.md (Multi-criteria pick scoring)
+Status: Transparent reasoning and flex detection complete
+Last activity: 2026-01-30 - Completed 04-04-PLAN.md (Reasoning generator and flex detection)
 
-Progress: [█████░░░░░] 56% (14/25 plans complete)
+Progress: [██████░░░░] 60% (15/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 3.7 min
-- Total execution time: 0.95 hours
+- Total plans completed: 15
+- Average duration: 3.5 min
+- Total execution time: 0.98 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [█████░░░░░] 56% (14/25 plans complete)
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
-| 4 - AI/Heuristics Engine | 4/5 | 14.5 min | 3.6 min |
+| 4 - AI/Heuristics Engine | 4/5 | 16.5 min | 3.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 3.4min, 3min, 3.5min, 5min
-- Trend: Excellent velocity maintained (Phase 4 at 3.6 min/plan average)
+- Last 5 plans: 3.4min, 3min, 3.5min, 5min, 2min
+- Trend: Excellent velocity maintained (Phase 4 at 3.3 min/plan average)
 
 *Updated after each plan completion*
 
@@ -107,6 +107,12 @@ Recent decisions affecting current work:
 - [04-01]: Turn-adaptive weights: early=0.40 flex, mid=balanced, late=0.40 counter
 - [04-01]: Confidence levels based on total game data across components (high ≥20 games, medium ≥10, low <10)
 - [04-01]: Champion properties hardcoded for pro play champions (future: query database)
+- [04-04]: Reasoning threshold of 0.60 for high-scoring components (filters noise)
+- [04-04]: Max 2 reasons per category for concise, scannable output
+- [04-04]: Synergy delta ≥0.05 threshold for meaningful synergies (5% win rate difference)
+- [04-04]: Flex pick requires 2+ roles with 3+ games each (filters one-off experiments)
+- [04-04]: Flexibility score considers both role count and game balance
+- [04-04]: Pre-compute flex picks once in scoreAllChampions for performance
 
 ### Pending Todos
 
@@ -119,7 +125,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 04-01-PLAN.md (Multi-criteria pick scoring)
+Stopped at: Completed 04-04-PLAN.md (Reasoning generator and flex detection)
 Resume file: None
 
 ## Quick Reference
