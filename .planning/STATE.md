@@ -57,9 +57,11 @@ Recent decisions affecting current work:
 - [01-03]: ETL ingested 3,442 games (229% of target), 34,530 picks, 34,321 bans
 - [01-03]: Role confidence acceptable at 65.7% medium (player history signal can improve in Phase 2)
 - [01-03]: Data quality production-ready: 0.06% draft issues, perfect 10 picks/draft average
-- [02-02]: Bayesian smoothing with prior weight of 10 games prevents overfitting to small samples
-- [02-02]: Ban analytics tracked at three context levels (global, team, player) for flexible querying
-- [02-02]: Confidence scoring explicitly flags data quality (high/medium/low/insufficient)
+- [02-01]: Bayesian smoothing with prior weight of 10 games prevents overfitting to small samples
+- [02-01]: Wilson confidence intervals used instead of normal approximation (more accurate for n<30)
+- [02-01]: Side-specific stats computed separately (blue, red, NULL) to account for side advantage
+- [02-01]: Role confidence threshold of 0.5 filters low-confidence role assignments from analytics
+- [02-01]: Champion stats stored in computed table for flexible upsert operations
 
 ### Pending Todos
 
@@ -72,7 +74,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 02-02-PLAN.md (Ban Analytics)
+Stopped at: Completed 02-01-PLAN.md (Analytics Foundation)
 Resume file: None
 
 ## Quick Reference
