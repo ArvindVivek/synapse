@@ -48,8 +48,8 @@ interface DraftStore extends DraftState {
     allChampions: string[]
   }) => void
 
-  executeBan: (champion: string) => boolean
-  executePick: (champion: string, role?: Role) => boolean
+  executeBan: (champion: string, isOpponentAction?: boolean) => boolean
+  executePick: (champion: string, role?: Role, isOpponentAction?: boolean) => boolean
 
   undo: () => void
   reset: () => void
@@ -146,19 +146,31 @@ export const useDraftStore = create<DraftStore>()(
     /**
      * Execute a ban action
      *
+     * @param champion - Champion to ban
+     * @param isOpponentAction - If true, skip user turn validation (for AI opponent)
      * @returns true if ban was successful, false if invalid
      */
-    executeBan: (champion: string) => {
+    executeBan: (champion: string, isOpponentAction?: boolean) => {
       const state = get()
-      const result = validateAction(state, { type: 'BAN', champion })
 
-      // Type guard for validation failure
-      if (result.valid === false) {
-        console.warn('[DraftStore] Ban rejected:', result.error.message)
-        set((draft) => {
-          draft.lastValidationError = result.error
-        })
-        return false
+      // Skip full validation for opponent actions, just check basics
+      if (!isOpponentAction) {
+        const result = validateAction(state, { type: 'BAN', champion })
+
+        // Type guard for validation failure
+        if (result.valid === false) {
+          console.warn('[DraftStore] Ban rejected:', result.error.message)
+          set((draft) => {
+            draft.lastValidationError = result.error
+          })
+          return false
+        }
+      } else {
+        // For opponent actions, just verify champion is available
+        if (!state.availableChampions.has(champion)) {
+          console.warn('[DraftStore] Opponent ban rejected: champion not available')
+          return false
+        }
       }
 
       // Execute ban
@@ -188,19 +200,32 @@ export const useDraftStore = create<DraftStore>()(
     /**
      * Execute a pick action
      *
+     * @param champion - Champion to pick
+     * @param role - Optional role assignment
+     * @param isOpponentAction - If true, skip user turn validation (for AI opponent)
      * @returns true if pick was successful, false if invalid
      */
-    executePick: (champion: string, role?: Role) => {
+    executePick: (champion: string, role?: Role, isOpponentAction?: boolean) => {
       const state = get()
-      const result = validateAction(state, { type: 'PICK', champion, role })
 
-      // Type guard for validation failure
-      if (result.valid === false) {
-        console.warn('[DraftStore] Pick rejected:', result.error.message)
-        set((draft) => {
-          draft.lastValidationError = result.error
-        })
-        return false
+      // Skip full validation for opponent actions, just check basics
+      if (!isOpponentAction) {
+        const result = validateAction(state, { type: 'PICK', champion, role })
+
+        // Type guard for validation failure
+        if (result.valid === false) {
+          console.warn('[DraftStore] Pick rejected:', result.error.message)
+          set((draft) => {
+            draft.lastValidationError = result.error
+          })
+          return false
+        }
+      } else {
+        // For opponent actions, just verify champion is available
+        if (!state.availableChampions.has(champion)) {
+          console.warn('[DraftStore] Opponent pick rejected: champion not available')
+          return false
+        }
       }
 
       // Execute pick

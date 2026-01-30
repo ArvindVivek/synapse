@@ -13,7 +13,6 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useDraftStore } from '@/lib/draft/store'
-import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
 import {
   createDraftChannel,
   subscribeToDraft,
@@ -31,21 +30,15 @@ import { SideSelector } from '@/components/draft/side-selector'
 
 interface DraftSimulatorProps {
   draftId: string
-  initialSide?: 'blue' | 'red'
 }
-
-// All champions from champion-properties
-const ALL_CHAMPIONS = Object.keys(DAMAGE_TYPES)
 
 /**
  * Main draft simulator with LoL-authentic layout
  */
 export default function DraftSimulator({
   draftId,
-  initialSide = 'blue',
 }: DraftSimulatorProps) {
   // Draft store state
-  const initializeDraft = useDraftStore((state) => state.initializeDraft)
   const currentTurn = useDraftStore((state) => state.currentTurn)
   const isComplete = useDraftStore((state) => state.isComplete)
   const applyRemoteAction = useDraftStore((state) => state.applyRemoteAction)
@@ -56,15 +49,6 @@ export default function DraftSimulator({
 
   // Auto-play opponent turns
   useAutoOpponent()
-
-  // Initialize draft on mount
-  useEffect(() => {
-    initializeDraft({
-      id: draftId,
-      userSide: initialSide,
-      allChampions: ALL_CHAMPIONS,
-    })
-  }, [draftId, initialSide, initializeDraft])
 
   // Handle remote actions from realtime
   const handleRemoteAction = useCallback(
@@ -92,10 +76,7 @@ export default function DraftSimulator({
       <div className="h-screen bg-gray-950 flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold text-white mb-2">SYNAPSE</h1>
         <p className="text-gray-400 mb-8">AI-Powered Draft Assistant</p>
-        <SideSelector />
-        <p className="text-gray-500 text-sm mt-4">
-          Choose your side to begin the draft
-        </p>
+        <SideSelector draftId={draftId} />
       </div>
     )
   }

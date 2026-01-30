@@ -15,19 +15,11 @@ import { useDraftStore } from '@/lib/draft/store'
 import { getTurnInfo } from '@/lib/draft/sequence'
 import { getChampionImageUrl } from '@/lib/draft/champion-data'
 import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
+import { getRoleIcon } from '@/components/ui/icons'
 
 interface TeamColumnProps {
   side: 'blue' | 'red'
   className?: string
-}
-
-// Role badge colors and icons
-const ROLE_INFO: Record<string, { color: string; icon: string }> = {
-  top: { color: 'bg-yellow-600', icon: '🗡️' },
-  jungle: { color: 'bg-green-600', icon: '🌲' },
-  mid: { color: 'bg-blue-600', icon: '⚡' },
-  adc: { color: 'bg-red-600', icon: '🎯' },
-  support: { color: 'bg-cyan-600', icon: '🛡️' },
 }
 
 function ChampionSlot({
@@ -83,9 +75,12 @@ function ChampionSlot({
         <div className="flex-1 min-w-0">
           {champion ? (
             <div className="flex items-center gap-1">
-              {role && (
-                <span className="text-[10px]">{ROLE_INFO[role]?.icon || '•'}</span>
-              )}
+              {role && (() => {
+                const RoleIcon = getRoleIcon(role)
+                return RoleIcon ? (
+                  <RoleIcon className="w-3 h-3 text-gray-400" />
+                ) : null
+              })()}
               <span className="text-xs text-white truncate">{champion}</span>
             </div>
           ) : (

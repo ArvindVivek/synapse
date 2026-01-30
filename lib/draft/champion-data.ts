@@ -24,6 +24,9 @@ export const DDRAGON_NAME_MAP: Record<string, string> = {
   'Tahm Kench': 'TahmKench',
   'Renata Glasc': 'Renata',
 
+  // Capitalization differences
+  'LeBlanc': 'Leblanc',
+
   // Apostrophes/special chars removed
   "Kai'Sa": 'Kaisa',
   "Kha'Zix": 'Khazix',
@@ -39,12 +42,15 @@ export const DDRAGON_NAME_MAP: Record<string, string> = {
   'Nunu & Willump': 'Nunu',
 }
 
+// Latest patch version with all champions
+const DDRAGON_VERSION = '14.24.1'
+
 /**
  * Get the ddragon image URL for a champion
  */
 export function getChampionImageUrl(champion: string): string {
   const ddragonName = DDRAGON_NAME_MAP[champion] || champion
-  return `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${ddragonName}.png`
+  return `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/champion/${ddragonName}.png`
 }
 
 // Get all champion names from DAMAGE_TYPES

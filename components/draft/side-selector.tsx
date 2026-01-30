@@ -3,64 +3,84 @@
 /**
  * Side Selector Component
  *
- * Toggle switch for Blue/Red side selection
- * Only enabled when currentTurn === 0 (before draft starts)
+ * Select Blue/Red side and start the draft
+ * Calls initializeDraft when user clicks Start Draft
  */
 
+import { useState } from 'react'
 import { useDraftStore } from '@/lib/draft/store'
+import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
+
+// All champions from champion-properties
+const ALL_CHAMPIONS = Object.keys(DAMAGE_TYPES)
+
+interface SideSelectorProps {
+  draftId: string
+}
 
 /**
- * Blue/Red side toggle
- * Disabled after draft starts (turn > 0)
+ * Blue/Red side selector with Start Draft button
  */
-export function SideSelector() {
-  const currentTurn = useDraftStore((state) => state.currentTurn)
-  const userSide = useDraftStore((state) => state.userSide)
-  const setUserSide = useDraftStore((state) => state.setUserSide)
+export function SideSelector({ draftId }: SideSelectorProps) {
+  const [selectedSide, setSelectedSide] = useState<'blue' | 'red'>('blue')
+  const initializeDraft = useDraftStore((state) => state.initializeDraft)
 
-  const isDisabled = currentTurn > 0
-
-  const handleSideChange = (side: 'blue' | 'red') => {
-    if (!isDisabled && setUserSide) {
-      setUserSide(side)
-    }
+  const handleStartDraft = () => {
+    initializeDraft({
+      id: draftId,
+      userSide: selectedSide,
+      allChampions: ALL_CHAMPIONS,
+    })
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-400 mr-2">Your Side:</span>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => handleSideChange('blue')}
-          disabled={isDisabled}
-          className={`
-            px-4 py-2 rounded-lg font-semibold text-sm transition
-            ${userSide === 'blue'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }
-            ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          `}
-        >
-          Blue
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSideChange('red')}
-          disabled={isDisabled}
-          className={`
-            px-4 py-2 rounded-lg font-semibold text-sm transition
-            ${userSide === 'red'
-              ? 'bg-red-500 text-white'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }
-            ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          `}
-        >
-          Red
-        </button>
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-400 mr-2">Your Side:</span>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setSelectedSide('blue')}
+            className={`
+              px-6 py-3 rounded-lg font-semibold text-lg transition
+              ${selectedSide === 'blue'
+                ? 'bg-blue-500 text-white ring-2 ring-blue-300'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }
+            `}
+          >
+            Blue Side
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedSide('red')}
+            className={`
+              px-6 py-3 rounded-lg font-semibold text-lg transition
+              ${selectedSide === 'red'
+                ? 'bg-red-500 text-white ring-2 ring-red-300'
+                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              }
+            `}
+          >
+            Red Side
+          </button>
+        </div>
       </div>
+
+      <div className="text-sm text-gray-500 text-center max-w-md">
+        {selectedSide === 'blue' ? (
+          <p>Blue side bans first and gets first pick.</p>
+        ) : (
+          <p>Red side responds to blue&apos;s bans and gets counter-pick advantage.</p>
+        )}
+      </div>
+
+      <button
+        onClick={handleStartDraft}
+        className="px-8 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold text-lg transition-colors"
+      >
+        Start Draft
+      </button>
     </div>
   )
 }

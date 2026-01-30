@@ -103,6 +103,8 @@ export function useWinRate(): UseWinRateResult {
   const draftId = useDraftStore((state) => state.id)
   const currentTurn = useDraftStore((state) => state.currentTurn)
   const userSide = useDraftStore((state) => state.userSide)
+  const bluePicks = useDraftStore((state) => state.blue.picks)
+  const redPicks = useDraftStore((state) => state.red.picks)
 
   const [data, setData] = useState<WinRateProjection | null>(null)
   const [loading, setLoading] = useState(false)
@@ -121,13 +123,31 @@ export function useWinRate(): UseWinRateResult {
       return
     }
 
-    // Fetch win rate from API
+    // If no picks yet, return with blue side advantage
+    if (bluePicks.length === 0 && redPicks.length === 0) {
+      setData({
+        blueWinRate: 0.52,
+        redWinRate: 0.48,
+        breakdown: INITIAL_BREAKDOWN,
+        confidence: 'low',
+        turnNumber: currentTurn,
+      })
+      return
+    }
+
+    // Fetch win rate from API, passing picks as query params
     const fetchWinRate = async () => {
       setLoading(true)
       setError(null)
 
       try {
-        const res = await fetch(`/api/draft/${draftId}/winrate`)
+        const params = new URLSearchParams({
+          userSide,
+          bluePicks: bluePicks.map(p => p.champion).join(','),
+          redPicks: redPicks.map(p => p.champion).join(','),
+        })
+
+        const res = await fetch(`/api/draft/${draftId}/winrate?${params}`)
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}: ${res.statusText}`)
         }
@@ -143,7 +163,7 @@ export function useWinRate(): UseWinRateResult {
     }
 
     fetchWinRate()
-  }, [draftId, currentTurn])
+  }, [draftId, currentTurn, userSide, bluePicks, redPicks])
 
   // Calculate user-perspective win rate
   const userWinRate = data

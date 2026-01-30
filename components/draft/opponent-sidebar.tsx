@@ -19,6 +19,17 @@ import {
   ROLES,
   createEmptySelectedPlayers,
 } from './player-selector'
+import {
+  TopIcon,
+  JungleIcon,
+  MidIcon,
+  AdcIcon,
+  SupportIcon,
+  UsersIcon,
+  CloseIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+} from '@/components/ui/icons'
 
 // Player roster with teams
 const PLAYER_ROSTER: Record<Role, PlayerInfo[]> = {
@@ -49,12 +60,20 @@ const PLAYER_ROSTER: Record<Role, PlayerInfo[]> = {
   ],
 }
 
-const ROLE_LABELS: Record<Role, { short: string; icon: string }> = {
-  top: { short: 'TOP', icon: '🗡️' },
-  jungle: { short: 'JGL', icon: '🌲' },
-  mid: { short: 'MID', icon: '⚡' },
-  adc: { short: 'ADC', icon: '🎯' },
-  support: { short: 'SUP', icon: '🛡️' },
+const ROLE_ICONS = {
+  top: TopIcon,
+  jungle: JungleIcon,
+  mid: MidIcon,
+  adc: AdcIcon,
+  support: SupportIcon,
+}
+
+const ROLE_LABELS: Record<Role, string> = {
+  top: 'TOP',
+  jungle: 'JGL',
+  mid: 'MID',
+  adc: 'ADC',
+  support: 'SUP',
 }
 
 interface OpponentSidebarProps {
@@ -113,6 +132,7 @@ export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
         {ROLES.map((role) => {
           const player = selectedPlayers[role]
           const isExpanded = expandedRole === role
+          const RoleIcon = ROLE_ICONS[role]
 
           return (
             <div
@@ -122,8 +142,8 @@ export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
               }`}
             >
               {/* Role icon */}
-              <div className="w-6 text-center text-sm">
-                {ROLE_LABELS[role].icon}
+              <div className="w-6 flex items-center justify-center">
+                <RoleIcon className="w-4 h-4 text-gray-400" />
               </div>
 
               {/* Player select */}
@@ -136,7 +156,7 @@ export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
                 className="flex-1 px-2 py-1 bg-gray-800 text-white text-xs rounded
                            border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                <option value="">Select {ROLE_LABELS[role].short}...</option>
+                <option value="">Select {ROLE_LABELS[role]}...</option>
                 {PLAYER_ROSTER[role].map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name} ({p.team})
@@ -148,13 +168,17 @@ export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
               {player && (
                 <button
                   onClick={() => setExpandedRole(isExpanded ? null : role)}
-                  className={`px-1.5 py-1 text-xs rounded transition-colors ${
+                  className={`p-1 rounded transition-colors ${
                     isExpanded
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
-                  {isExpanded ? '▼' : '▶'}
+                  {isExpanded ? (
+                    <ChevronDownIcon className="w-3 h-3" />
+                  ) : (
+                    <ChevronRightIcon className="w-3 h-3" />
+                  )}
                 </button>
               )}
             </div>
@@ -176,7 +200,7 @@ export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
                 onClick={() => setExpandedRole(null)}
                 className="text-gray-500 hover:text-white"
               >
-                ✕
+                <CloseIcon className="w-4 h-4" />
               </button>
             </div>
 
@@ -223,7 +247,7 @@ export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
       {/* Empty state */}
       {!expandedPlayer && (
         <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-          <div className="text-2xl mb-2">👥</div>
+          <UsersIcon className="w-8 h-8 text-gray-600 mb-2" />
           <p className="text-xs text-gray-500">
             Select opponent players to analyze their champion pools and predict picks
           </p>

@@ -9,6 +9,15 @@
 
 import { useDraftStore } from '@/lib/draft/store'
 import { getTurnInfo } from '@/lib/draft/sequence'
+import {
+  TopIcon,
+  JungleIcon,
+  MidIcon,
+  AdcIcon,
+  SupportIcon,
+  SearchIcon,
+} from '@/components/ui/icons'
+import { HelpButton } from './help-modal'
 
 interface PhaseHeaderProps {
   searchQuery: string
@@ -17,13 +26,13 @@ interface PhaseHeaderProps {
   onRoleFilterChange: (role: string | null) => void
 }
 
-const ROLE_ICONS: Record<string, { icon: string; label: string }> = {
-  top: { icon: '⚔️', label: 'Top' },
-  jungle: { icon: '🌲', label: 'Jungle' },
-  mid: { icon: '🎯', label: 'Mid' },
-  adc: { icon: '🏹', label: 'ADC' },
-  support: { icon: '🛡️', label: 'Support' },
-}
+const ROLES = [
+  { key: 'top', label: 'Top', Icon: TopIcon },
+  { key: 'jungle', label: 'Jungle', Icon: JungleIcon },
+  { key: 'mid', label: 'Mid', Icon: MidIcon },
+  { key: 'adc', label: 'ADC', Icon: AdcIcon },
+  { key: 'support', label: 'Support', Icon: SupportIcon },
+]
 
 export function PhaseHeader({
   searchQuery,
@@ -83,18 +92,18 @@ export function PhaseHeader({
           >
             All
           </button>
-          {Object.entries(ROLE_ICONS).map(([role, { icon, label }]) => (
+          {ROLES.map(({ key, label, Icon }) => (
             <button
-              key={role}
-              onClick={() => onRoleFilterChange(roleFilter === role ? null : role)}
-              className={`px-2 py-1.5 rounded text-lg transition-colors ${
-                roleFilter === role
-                  ? 'bg-blue-600'
-                  : 'bg-gray-700 hover:bg-gray-600'
+              key={key}
+              onClick={() => onRoleFilterChange(roleFilter === key ? null : key)}
+              className={`p-2 rounded transition-colors ${
+                roleFilter === key
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
               title={label}
             >
-              {icon}
+              <Icon className="w-5 h-5" />
             </button>
           ))}
         </div>
@@ -123,17 +132,21 @@ export function PhaseHeader({
           </p>
         </div>
 
-        {/* Right: Search */}
-        <div className="w-48">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search champions..."
-            className="w-full px-3 py-1.5 bg-gray-800 border border-gray-700 rounded
-                       text-white placeholder-gray-500 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        {/* Right: Search and Help */}
+        <div className="flex items-center gap-2">
+          <div className="w-48 relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search..."
+              className="w-full pl-9 pr-3 py-1.5 bg-gray-800 border border-gray-700 rounded
+                         text-white placeholder-gray-500 text-sm
+                         focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <HelpButton />
         </div>
       </div>
     </header>

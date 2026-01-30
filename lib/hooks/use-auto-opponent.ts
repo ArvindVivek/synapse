@@ -62,11 +62,11 @@ export function useAutoOpponent() {
       // Pick a champion (weighted random based on pro play popularity)
       const champion = pickWeightedChampion(available, turnInfo.action)
 
-      // Execute the action
+      // Execute the action (pass true for isOpponentAction to bypass user-turn validation)
       if (turnInfo.action === 'ban') {
-        executeBan(champion)
+        executeBan(champion, true)
       } else {
-        executePick(champion)
+        executePick(champion, undefined, true)
       }
 
       isAutoPlaying.current = false
