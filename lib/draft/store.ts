@@ -11,6 +11,7 @@ import { enableMapSet } from 'immer'
 import type { DraftState, DraftPhase, TeamComposition, Role } from './types'
 import { getTurnInfo, getNextTurn, isUserTurn, DRAFT_SEQUENCE } from './sequence'
 import { validateAction, ValidationError } from './validation'
+import type { DraftSyncPayload } from './realtime'
 
 // Enable Immer MapSet plugin for Set support
 enableMapSet()
@@ -51,6 +52,9 @@ interface DraftStore extends DraftState {
   // Validation error tracking
   lastValidationError: ValidationError | null
   getLastError: () => ValidationError | null
+
+  // Realtime sync
+  applyRemoteAction: (payload: DraftSyncPayload) => void
 
   // Computed/derived helpers
   getCurrentTurnInfo: () => ReturnType<typeof getTurnInfo>
@@ -278,6 +282,84 @@ export const useDraftStore = create<DraftStore>()(
     getTeamComposition: (side: 'blue' | 'red') => {
       const state = get()
       return state[side]
+    },
+
+    /**
+     * Apply remote action from Supabase Realtime Broadcast
+     *
+     * This method is called when another client executes an action.
+     * It bypasses validation since the action was already validated
+     * by the client that executed it.
+     *
+     * @param payload - Broadcast payload from Supabase Realtime
+     */
+    applyRemoteAction: (payload: DraftSyncPayload) => {
+      set((state) => {
+        if (payload.event === 'reset') {
+          // Reset draft to initial state
+          Object.assign(state, createInitialState())
+          state.lastValidationError = null
+          return
+        }
+
+        if (payload.event === 'undo') {
+          // Undo last action
+          if (state.currentTurn <= 1) return
+
+          const previousTurn = state.currentTurn - 1
+          const previousTurnInfo = getTurnInfo(previousTurn)
+          if (!previousTurnInfo) return
+
+          const side = previousTurnInfo.side
+          const action = previousTurnInfo.action
+
+          // Restore champion to available set
+          let champion: string | undefined
+          if (action === 'ban') {
+            champion = state[side].bans.pop()
+          } else {
+            const pick = state[side].picks.pop()
+            champion = pick?.champion
+          }
+
+          if (champion) {
+            state.availableChampions.add(champion)
+          }
+
+          // Revert turn
+          state.currentTurn = previousTurn
+          state.phase = previousTurnInfo.phase
+          state.isComplete = false
+          state.completedAt = null
+          return
+        }
+
+        if (payload.event === 'action' && payload.data) {
+          const { type, champion, role, side } = payload.data
+
+          // Apply action (already validated by remote client)
+          if (type === 'BAN') {
+            state[side].bans.push(champion)
+            state.availableChampions.delete(champion)
+          } else if (type === 'PICK') {
+            state[side].picks.push({
+              champion,
+              role: role || null,
+            })
+            state.availableChampions.delete(champion)
+          }
+
+          // Advance turn
+          const nextTurn = getNextTurn(state.currentTurn)
+          if (nextTurn) {
+            state.currentTurn = nextTurn.turnNumber
+            state.phase = nextTurn.phase
+          } else {
+            state.isComplete = true
+            state.completedAt = new Date()
+          }
+        }
+      })
     },
   }))
 )
