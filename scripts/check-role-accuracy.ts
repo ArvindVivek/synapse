@@ -2,7 +2,7 @@
 // Spot-checks role inference accuracy against known ground truth
 
 import { createClient } from '@supabase/supabase-js';
-import type { Database, Role } from '../supabase/functions/_shared/types';
+import type { Role } from '../lib/draft/types';
 import { config } from 'dotenv';
 import path from 'path';
 

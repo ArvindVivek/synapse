@@ -129,7 +129,19 @@ async function computeGlobalBanAnalytics(patches: string[]) {
   }
 
   // Build analytics records
-  const analyticsRecords = []
+  type BanAnalyticsRecord = {
+    champion_name: string
+    patch_version: string
+    context_type: string
+    context_id: string | null
+    times_banned: number
+    total_games_in_context: number
+    ban_rate: number
+    smoothed_ban_rate: number
+    confidence: string
+    rank_in_context: number
+  }
+  const analyticsRecords: BanAnalyticsRecord[] = []
 
   for (const patch of patches) {
     const totalGames = totalGamesPerPatch[patch] || 0
@@ -252,7 +264,19 @@ async function computeTeamBanAnalytics(patches: string[]) {
   }
 
   // Build analytics records
-  const analyticsRecords = []
+  type TeamBanAnalyticsRecord = {
+    champion_name: string
+    patch_version: string
+    context_type: string
+    context_id: string
+    times_banned: number
+    total_games_in_context: number
+    ban_rate: number
+    smoothed_ban_rate: number
+    confidence: string
+    rank_in_context: number
+  }
+  const analyticsRecords: TeamBanAnalyticsRecord[] = []
 
   for (const patch of patches) {
     const teams = Object.keys(teamBans[patch] || {})
@@ -263,7 +287,17 @@ async function computeTeamBanAnalytics(patches: string[]) {
 
       const champions = Object.keys(teamBans[patch][teamId] || {})
 
-      const championStats = champions.map(champion => {
+      const championStats: Array<{
+        champion_name: string
+        patch_version: string
+        context_type: string
+        context_id: string
+        times_banned: number
+        total_games_in_context: number
+        ban_rate: number
+        smoothed_ban_rate: number
+        confidence: string
+      }> = champions.map(champion => {
         const timesBanned = teamBans[patch][teamId][champion] || 0
         const banRate = timesBanned / totalGames
         const smoothedBanRate = smoothBanRate(timesBanned, totalGames)
