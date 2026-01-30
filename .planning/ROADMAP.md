@@ -18,7 +18,7 @@ Synapse transforms from a greenfield Next.js project into an AI-powered LoL draf
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Foundation** - GRID API integration, Supabase schema, ETL pipeline ✅
-- [ ] **Phase 2: Core Analytics** - Champion statistics, synergy matrices, matchup data
+- [x] **Phase 2: Core Analytics** - Champion statistics, synergy matrices, matchup data ✅
 - [ ] **Phase 3: Draft State Machine** - Real-time state management with turn validation
 - [ ] **Phase 4: AI/Heuristics Engine** - Recommendations, predictions, win-rate projections
 - [ ] **Phase 5: Draft Simulator UI** - LoL-authentic interface with real-time updates
@@ -73,11 +73,11 @@ Plans:
   - `drafts.blue_bans` and `drafts.red_bans` enable ban priority analysis
 
 Plans:
-- [ ] 02-01-PLAN.md — Champion statistics with side-aware Bayesian smoothing
-- [ ] 02-02-PLAN.md — Ban analytics and priority tracking
-- [ ] 02-03-PLAN.md — Synergy matrix with archetype fallback
-- [ ] 02-04-PLAN.md — Matchup matrix and pick order analysis
-- [ ] 02-05-PLAN.md — Player champion pools with role flexibility scores
+- [x] 02-01-PLAN.md — Champion statistics with side-aware Bayesian smoothing ✅
+- [x] 02-02-PLAN.md — Ban analytics and priority tracking ✅
+- [x] 02-03-PLAN.md — Synergy matrix with archetype fallback ✅
+- [x] 02-04-PLAN.md — Matchup matrix and pick order analysis ✅
+- [x] 02-05-PLAN.md — Player champion pools with role flexibility scores ✅
 
 ### Phase 3: Draft State Machine
 **Goal**: Implement real-time draft state management with proper turn sequencing, ban phase modeling, side selection, validation, and API endpoints
@@ -197,8 +197,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Foundation | 3/3 | ✅ Complete | 2026-01-29 |
-| 2. Core Analytics | 0/5 | Ready to start | - |
-| 3. Draft State Machine | 0/3 | Not started | - |
+| 2. Core Analytics | 5/5 | ✅ Complete | 2026-01-30 |
+| 3. Draft State Machine | 0/3 | Ready to start | - |
 | 4. AI/Heuristics Engine | 0/5 | Not started | - |
 | 5. Draft Simulator UI | 0/6 | Not started | - |
 | 6. Polish and Deploy | 0/3 | Not started | - |
