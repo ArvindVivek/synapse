@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 5 of 6 (Draft Simulator UI)
-Plan: 2 of 5 in current phase
-Status: Champion selection grid complete
-Last activity: 2026-01-30 - Completed 05-02-PLAN.md (Champion selection grid with search and filters)
+Plan: 1 of 5 in current phase
+Status: Core layout complete
+Last activity: 2026-01-30 - Completed 05-01-PLAN.md (Draft page routes and core layout components)
 
 Progress: [███████░░░] 68% (17/25 plans complete)
 
@@ -20,8 +20,8 @@ Progress: [███████░░░] 68% (17/25 plans complete)
 
 **Velocity:**
 - Total plans completed: 17
-- Average duration: 3.3 min
-- Total execution time: 1.08 hours
+- Average duration: 3.5 min
+- Total execution time: 1.16 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [███████░░░] 68% (17/25 plans complete)
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
 | 4 - AI/Heuristics Engine | 5/5 | 19.1 min | 3.8 min |
-| 5 - Draft Simulator UI | 2/5 | 4 min | 2 min |
+| 5 - Draft Simulator UI | 1/5 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 3.5min, 5min, 2min, 2.6min, 2min
-- Trend: Excellent velocity maintained (Phase 5 started at 2 min/plan average)
+- Last 5 plans: 5min, 2min, 2.6min, 8min
+- Trend: Plan 05-01 took longer (8min) due to Next.js 16 API migration and Supabase type fixes
 
 *Updated after each plan completion*
 
@@ -119,15 +119,18 @@ Recent decisions affecting current work:
 - [04-05]: Edge runtime for all routes to meet <200ms latency requirement
 - [04-05]: Short cache headers (5s) for recommendation endpoints due to rapidly changing draft state
 - [04-05]: Player pool data loaded lazily per-player to avoid over-fetching
-- [05-02]: Champion roles based on professional meta (70 champions from DAMAGE_TYPES)
-- [05-02]: Flex picks defined as champions with 2+ roles (17 total including Jayce, Sylas, Karma, Neeko)
-- [05-02]: Memoize champion cards with React.memo + granular Zustand selectors for performance
-- [05-02]: CSS Grid 8-column layout without virtualization (manageable dataset size)
-- [05-02]: Available champions sorted first, then alphabetically for quick identification
+- [05-01]: Next.js 16 async params pattern required for all route handlers (params now Promise)
+- [05-01]: Granular Zustand selectors minimize re-renders (subscribe to specific slices only)
+- [05-01]: Server Components fetch data, Client Components manage UI state
+- [05-01]: Layout shell with placeholders enables clean integration of future features
 
 ### Pending Todos
 
-None yet.
+- [05-01]: Generate Supabase Database types from schema (currently disabled for build compatibility)
+
+### Blockers/Concerns
+
+- [05-01]: Supabase type imports temporarily disabled (missing types file) - loses type safety for database operations
 
 ### Blockers/Concerns
 
@@ -136,7 +139,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 05-02-PLAN.md (Champion selection grid)
+Stopped at: Completed 05-01-PLAN.md (Draft page routes and core layout)
 Resume file: None
 
 ## Quick Reference
