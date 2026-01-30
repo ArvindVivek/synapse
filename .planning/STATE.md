@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 ## Current Position
 
-Phase: 4 of 6 (AI/Heuristics Engine) - IN PROGRESS
-Plan: 4 of 5 in current phase
-Status: Transparent reasoning and flex detection complete
-Last activity: 2026-01-30 - Completed 04-04-PLAN.md (Reasoning generator and flex detection)
+Phase: 4 of 6 (AI/Heuristics Engine) - COMPLETE
+Plan: 5 of 5 in current phase
+Status: API routes complete - Phase 4 finished
+Last activity: 2026-01-30 - Completed 04-05-PLAN.md (API routes for recommendations, predictions, win-rate)
 
-Progress: [██████░░░░] 60% (15/25 plans complete)
+Progress: [██████░░░░] 64% (16/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 3.5 min
-- Total execution time: 0.98 hours
+- Total plans completed: 16
+- Average duration: 3.4 min
+- Total execution time: 1.04 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [██████░░░░] 60% (15/25 plans complete)
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
-| 4 - AI/Heuristics Engine | 4/5 | 16.5 min | 3.3 min |
+| 4 - AI/Heuristics Engine | 5/5 | 19.1 min | 3.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 3.4min, 3min, 3.5min, 5min, 2min
-- Trend: Excellent velocity maintained (Phase 4 at 3.3 min/plan average)
+- Last 5 plans: 3min, 3.5min, 5min, 2min, 2.6min
+- Trend: Excellent velocity maintained (Phase 4 completed at 3.8 min/plan average)
 
 *Updated after each plan completion*
 
@@ -113,6 +113,11 @@ Recent decisions affecting current work:
 - [04-04]: Flex pick requires 2+ roles with 3+ games each (filters one-off experiments)
 - [04-04]: Flexibility score considers both role count and game balance
 - [04-04]: Pre-compute flex picks once in scoreAllChampions for performance
+- [04-05]: Analytics cache uses direct queries to computed tables instead of RPC functions (simpler, faster)
+- [04-05]: 60-second TTL for analytics cache (analytics don't change during a draft)
+- [04-05]: Edge runtime for all routes to meet <200ms latency requirement
+- [04-05]: Short cache headers (5s) for recommendation endpoints due to rapidly changing draft state
+- [04-05]: Player pool data loaded lazily per-player to avoid over-fetching
 
 ### Pending Todos
 
@@ -125,7 +130,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 04-04-PLAN.md (Reasoning generator and flex detection)
+Stopped at: Completed 04-05-PLAN.md (API routes) - Phase 4 complete
 Resume file: None
 
 ## Quick Reference
