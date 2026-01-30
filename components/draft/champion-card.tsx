@@ -1,6 +1,7 @@
 'use client'
 
 import { memo } from 'react'
+import Image from 'next/image'
 import { useDraftStore } from '@/lib/draft/store'
 import { FLEX_CHAMPIONS } from '@/lib/draft/champion-data'
 
@@ -13,20 +14,18 @@ function ChampionCardComponent({ champion, isBanPhase }: ChampionCardProps) {
   // Granular selectors to prevent unnecessary re-renders
   const canPick = useDraftStore((state) => state.canPick(champion))
   const canBan = useDraftStore((state) => state.canBan(champion))
-  const executePick = useDraftStore((state) => state.executePick)
-  const executeBan = useDraftStore((state) => state.executeBan)
+  const selectedChampion = useDraftStore((state) => state.selectedChampion)
+  const selectChampion = useDraftStore((state) => state.selectChampion)
   const isMyTurn = useDraftStore((state) => state.isMyTurn())
 
   const isAvailable = isBanPhase ? canBan : canPick
   const isFlex = FLEX_CHAMPIONS.has(champion)
+  const isSelected = selectedChampion === champion
 
   const handleClick = () => {
-    if (!isMyTurn) return
-    if (isBanPhase && canBan) {
-      executeBan(champion)
-    } else if (!isBanPhase && canPick) {
-      executePick(champion)
-    }
+    if (!isMyTurn || !isAvailable) return
+    // Two-step flow: select (or deselect if already selected)
+    selectChampion(isSelected ? null : champion)
   }
 
   return (
@@ -34,32 +33,52 @@ function ChampionCardComponent({ champion, isBanPhase }: ChampionCardProps) {
       onClick={handleClick}
       disabled={!isAvailable || !isMyTurn}
       className={`
-        relative aspect-square rounded-lg overflow-hidden
+        relative w-16 h-16 rounded-lg overflow-hidden
         transition-all duration-150
         ${isAvailable
-          ? 'opacity-100 hover:scale-105 hover:ring-2 hover:ring-yellow-400'
+          ? 'opacity-100 hover:scale-105'
           : 'opacity-30 grayscale'
         }
         ${isMyTurn && isAvailable ? 'cursor-pointer' : 'cursor-not-allowed'}
-        ${isFlex && isAvailable ? 'ring-2 ring-amber-500' : ''}
+        ${isSelected ? 'ring-2 ring-yellow-400 scale-105' : ''}
+        ${isFlex && isAvailable && !isSelected ? 'ring-1 ring-amber-500' : ''}
         bg-gray-700
       `}
       title={champion}
     >
-      {/* Champion placeholder - colored square with initial */}
-      <div className="w-full h-full flex items-center justify-center text-lg font-bold text-gray-300">
-        {champion.charAt(0)}
-      </div>
+      {/* Champion image */}
+      <Image
+        src={`https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${champion}.png`}
+        alt={champion}
+        width={64}
+        height={64}
+        className="w-full h-full object-cover"
+      />
 
-      {/* Champion name */}
-      <div className="absolute bottom-0 w-full bg-black/80 text-white text-xs py-1 px-1 text-center truncate">
+      {/* Champion name overlay */}
+      <div className="absolute bottom-0 w-full bg-black/70 text-white text-[10px] py-0.5 text-center truncate">
         {champion}
       </div>
 
       {/* Flex indicator badge */}
-      {isFlex && isAvailable && (
-        <div className="absolute top-1 right-1 bg-amber-500 text-black text-[10px] px-1.5 py-0.5 rounded font-bold">
-          FLEX
+      {isFlex && isAvailable && !isSelected && (
+        <div className="absolute top-0.5 right-0.5 bg-amber-500 text-black text-[8px] px-1 py-0.5 rounded font-bold">
+          F
+        </div>
+      )}
+
+      {/* Selected indicator */}
+      {isSelected && (
+        <div className="absolute top-0.5 left-0.5 bg-yellow-400 text-black text-[8px] px-1 py-0.5 rounded font-bold">
+          ✓
+        </div>
+      )}
+
+      {/* Unavailable X */}
+      {!isAvailable && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-10 h-0.5 bg-red-500/70 rotate-45" />
+          <div className="w-10 h-0.5 bg-red-500/70 -rotate-45 absolute" />
         </div>
       )}
     </button>

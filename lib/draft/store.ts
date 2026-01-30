@@ -36,6 +36,11 @@ const createInitialState = (): DraftState => ({
  * Draft store interface extending DraftState with actions
  */
 interface DraftStore extends DraftState {
+  // Selection state (for two-step action flow)
+  selectedChampion: string | null
+  selectChampion: (champion: string | null) => void
+  confirmAction: (role?: Role) => boolean // Execute the selected champion
+
   // Actions
   initializeDraft: (params: {
     id: string
@@ -75,6 +80,49 @@ export const useDraftStore = create<DraftStore>()(
   immer((set, get) => ({
     ...createInitialState(),
     lastValidationError: null,
+    selectedChampion: null,
+
+    /**
+     * Select a champion (first step of two-step action flow)
+     * Click again to deselect
+     */
+    selectChampion: (champion: string | null) =>
+      set((state) => {
+        if (champion === state.selectedChampion) {
+          // Clicking the same champion deselects it
+          state.selectedChampion = null
+        } else {
+          state.selectedChampion = champion
+        }
+      }),
+
+    /**
+     * Confirm the selected champion action (ban or pick)
+     * This is the second step of the two-step flow
+     */
+    confirmAction: (role?: Role) => {
+      const state = get()
+      const champion = state.selectedChampion
+      if (!champion) return false
+
+      const currentTurn = getTurnInfo(state.currentTurn)
+      if (!currentTurn) return false
+
+      let success = false
+      if (currentTurn.action === 'ban') {
+        success = get().executeBan(champion)
+      } else {
+        success = get().executePick(champion, role)
+      }
+
+      // Clear selection after action
+      if (success) {
+        set((draft) => {
+          draft.selectedChampion = null
+        })
+      }
+      return success
+    },
 
     /**
      * Initialize a new draft session
@@ -92,6 +140,7 @@ export const useDraftStore = create<DraftStore>()(
         state.blue = { bans: [], picks: [] }
         state.red = { bans: [], picks: [] }
         state.lastValidationError = null
+        state.selectedChampion = null
       }),
 
     /**
@@ -225,6 +274,7 @@ export const useDraftStore = create<DraftStore>()(
       set((state) => {
         Object.assign(state, createInitialState())
         state.lastValidationError = null
+        state.selectedChampion = null
       }),
 
     /**
