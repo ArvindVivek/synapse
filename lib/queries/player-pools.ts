@@ -1,14 +1,14 @@
 /**
  * Player pool query helpers for player scouting
  *
+ * Computes champion pools from synapse.champion_picks data.
  * Provides typed queries for:
  * - Player champion pools with comfort levels
  * - Signature picks (best bans against a player)
  * - Flex picks (multi-role champions)
- * - Full scouting reports
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
 export interface PlayerChampion {
   champion_name: string
@@ -30,49 +30,163 @@ export interface FlexPick {
   is_true_flex: boolean
 }
 
-export interface PlayerScouting {
-  player_id: string
-  player_name: string
-  team_name: string | null
-  primary_role: string
-  signature_picks: PlayerChampion[]
-  comfort_picks: PlayerChampion[]
-  flex_picks: FlexPick[]
-  total_games_analyzed: number
+// Create Supabase client directly for server-side queries
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) {
+    throw new Error('Missing Supabase environment variables')
+  }
+  return createClient(url, key)
 }
 
 /**
- * Get a player's full champion pool
+ * Resolve player ID from name or UUID
+ */
+async function resolvePlayerId(
+  supabase: ReturnType<typeof getSupabaseClient>,
+  playerIdOrName: string
+): Promise<{ id: string; name: string } | null> {
+  try {
+    // If it looks like a UUID, try that first
+    if (playerIdOrName.includes('-')) {
+      const { data, error } = await supabase
+        .schema('synapse')
+        .from('players')
+        .select('id, name')
+        .eq('id', playerIdOrName)
+        .maybeSingle()
+      if (!error && data) return data
+    }
+
+    // Try by name (case-insensitive exact match)
+    const { data, error } = await supabase
+      .schema('synapse')
+      .from('players')
+      .select('id, name')
+      .ilike('name', playerIdOrName)
+      .maybeSingle()
+
+    if (!error && data) return data
+    return null
+  } catch (error) {
+    console.error('[resolvePlayerId] Error:', error)
+    return null
+  }
+}
+
+/**
+ * Classify comfort level based on games played and win rate
+ */
+function classifyComfortLevel(
+  gamesPlayed: number,
+  winRate: number
+): 'signature' | 'comfort' | 'occasional' | 'rare' {
+  if (gamesPlayed >= 10 && winRate >= 0.55) return 'signature'
+  if (gamesPlayed >= 5 && winRate >= 0.50) return 'comfort'
+  if (gamesPlayed >= 3) return 'occasional'
+  return 'rare'
+}
+
+/**
+ * Get a player's full champion pool computed from champion_picks
  *
- * @param playerId - Player UUID
+ * @param playerId - Player UUID or name
  * @param role - Optional role filter (top, jungle, mid, adc, support)
  * @returns Array of player champions sorted by games played
- *
- * @example
- * const pool = await getPlayerChampionPool(fakerId, 'mid')
- * // Returns Faker's mid lane champion pool
  */
 export async function getPlayerChampionPool(
   playerId: string,
   role?: string
 ): Promise<PlayerChampion[]> {
-  const supabase = await createClient()
+  const supabase = getSupabaseClient()
 
+  // Resolve player ID
+  const player = await resolvePlayerId(supabase, playerId)
+  if (!player) return []
+
+  // Query champion picks with win/loss data
   let query = supabase
-    .from('player_champion_pools')
-    .select('*')
-    .eq('player_id', playerId)
-    .order('games_played', { ascending: false })
+    .schema('synapse')
+    .from('champion_picks')
+    .select(`
+      champion_name,
+      role,
+      role_confidence,
+      team_side,
+      created_at,
+      draft:drafts!inner(
+        game:games!inner(
+          winning_side
+        )
+      )
+    `)
+    .eq('player_id', player.id)
 
   if (role) {
     query = query.eq('role', role)
   }
 
-  const { data, error } = await query
+  const { data: picks, error } = await query
 
-  if (error) throw error
+  if (error || !picks) return []
 
-  return data || []
+  // Aggregate by champion and role
+  const aggregated = new Map<string, {
+    champion_name: string
+    role: string
+    games: number
+    wins: number
+    totalConfidence: number
+    lastPlayed: Date
+  }>()
+
+  for (const pick of picks) {
+    const key = `${pick.champion_name}|${pick.role}`
+    const game = (pick.draft as any)?.game
+    const isWin = game?.winning_side === pick.team_side
+    const pickDate = new Date(pick.created_at)
+
+    const existing = aggregated.get(key)
+    if (existing) {
+      existing.games++
+      if (isWin) existing.wins++
+      existing.totalConfidence += pick.role_confidence || 0.5
+      if (pickDate > existing.lastPlayed) existing.lastPlayed = pickDate
+    } else {
+      aggregated.set(key, {
+        champion_name: pick.champion_name,
+        role: pick.role || 'unknown',
+        games: 1,
+        wins: isWin ? 1 : 0,
+        totalConfidence: pick.role_confidence || 0.5,
+        lastPlayed: pickDate
+      })
+    }
+  }
+
+  // Transform to PlayerChampion format
+  const now = new Date()
+  const results: PlayerChampion[] = Array.from(aggregated.values()).map(entry => {
+    const winRate = entry.games > 0 ? entry.wins / entry.games : 0.5
+    const daysSincePlayed = Math.floor(
+      (now.getTime() - entry.lastPlayed.getTime()) / (1000 * 60 * 60 * 24)
+    )
+
+    return {
+      champion_name: entry.champion_name,
+      role: entry.role,
+      games_played: entry.games,
+      smoothed_win_rate: winRate,
+      weighted_win_rate: winRate, // TODO: Apply recency weighting
+      comfort_level: classifyComfortLevel(entry.games, winRate),
+      days_since_played: daysSincePlayed,
+      avg_role_confidence: entry.games > 0 ? entry.totalConfidence / entry.games : 0.5
+    }
+  })
+
+  // Sort by games played descending
+  return results.sort((a, b) => b.games_played - a.games_played)
 }
 
 /**
@@ -81,161 +195,54 @@ export async function getPlayerChampionPool(
  * Signature picks are champions with:
  * - 10+ games played
  * - 55%+ win rate
- * - Sorted by weighted win rate (recency-weighted)
- *
- * @param playerId - Player UUID
- * @returns Array of signature picks sorted by weighted win rate
- *
- * @example
- * const signatures = await getPlayerSignaturePicks(fakerId)
- * // Returns ["Azir", "LeBlanc", "Orianna"] - ban these!
  */
 export async function getPlayerSignaturePicks(
   playerId: string
 ): Promise<PlayerChampion[]> {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('player_champion_pools')
-    .select('*')
-    .eq('player_id', playerId)
-    .eq('comfort_level', 'signature')
-    .order('weighted_win_rate', { ascending: false })
-
-  if (error) throw error
-
-  return data || []
+  const pool = await getPlayerChampionPool(playerId)
+  return pool.filter(c => c.comfort_level === 'signature')
 }
 
 /**
- * Get a player's flex picks
- *
- * Returns champions this player has played in multiple roles,
- * useful for identifying flexible players and role-swap threats.
- *
- * @param playerId - Player UUID
- * @returns Array of flex picks sorted by flexibility score
- *
- * @example
- * const flexPicks = await getPlayerFlexPicks(playerId)
- * // Returns [{champion: "Seraphine", roles: ["mid", "support"], ...}]
+ * Get a player's flex picks (multi-role champions)
  */
 export async function getPlayerFlexPicks(
   playerId: string
 ): Promise<FlexPick[]> {
-  const supabase = await createClient()
+  const pool = await getPlayerChampionPool(playerId)
 
-  const { data, error } = await supabase
-    .from('flex_picks')
-    .select('*')
-    .eq('player_id', playerId)
-    .order('flexibility_score', { ascending: false })
-
-  if (error) throw error
-
-  return data || []
-}
-
-/**
- * Get full scouting report for a player
- *
- * Aggregates:
- * - Player info (name, team, primary role)
- * - Signature picks (10+ games, 55%+ WR)
- * - Comfort picks (5+ games, 50%+ WR)
- * - Flex picks (multi-role champions)
- * - Total games analyzed
- *
- * @param playerId - Player UUID
- * @returns Complete scouting report
- *
- * @example
- * const report = await getPlayerScoutingReport(fakerId)
- * console.log(`${report.player_name} signature picks:`, report.signature_picks)
- */
-export async function getPlayerScoutingReport(
-  playerId: string
-): Promise<PlayerScouting> {
-  const supabase = await createClient()
-
-  // Fetch player info
-  const { data: player, error: playerError } = await supabase
-    .from('players')
-    .select(`
-      id,
-      name,
-      primary_role,
-      teams (
-        name
-      )
-    `)
-    .eq('id', playerId)
-    .single()
-
-  if (playerError) throw playerError
-
-  if (!player) {
-    throw new Error(`Player not found: ${playerId}`)
+  // Group by champion to find multi-role picks
+  const byChampion = new Map<string, PlayerChampion[]>()
+  for (const pick of pool) {
+    const existing = byChampion.get(pick.champion_name) || []
+    existing.push(pick)
+    byChampion.set(pick.champion_name, existing)
   }
 
-  // Fetch signature picks
-  const signaturePicks = await getPlayerSignaturePicks(playerId)
+  // Find champions played in 2+ roles
+  const flexPicks: FlexPick[] = []
+  for (const [champion, picks] of byChampion) {
+    if (picks.length >= 2) {
+      const roles = picks.map(p => p.role)
+      const sortedByGames = [...picks].sort((a, b) => b.games_played - a.games_played)
+      const totalGames = picks.reduce((sum, p) => sum + p.games_played, 0)
 
-  // Fetch comfort picks (exclude signatures to avoid duplicates)
-  const { data: comfortData, error: comfortError } = await supabase
-    .from('player_champion_pools')
-    .select('*')
-    .eq('player_id', playerId)
-    .eq('comfort_level', 'comfort')
-    .order('weighted_win_rate', { ascending: false })
-
-  if (comfortError) throw comfortError
-
-  const comfortPicks = comfortData || []
-
-  // Fetch flex picks
-  const flexPicks = await getPlayerFlexPicks(playerId)
-
-  // Calculate total games
-  const { data: totalGames, error: totalError } = await supabase
-    .from('player_champion_pools')
-    .select('games_played')
-    .eq('player_id', playerId)
-
-  if (totalError) throw totalError
-
-  const totalGamesAnalyzed = (totalGames || []).reduce(
-    (sum, row) => sum + row.games_played,
-    0
-  )
-
-  return {
-    player_id: player.id,
-    player_name: player.name,
-    team_name: (player as any).teams?.name || null,
-    primary_role: player.primary_role,
-    signature_picks: signaturePicks,
-    comfort_picks: comfortPicks,
-    flex_picks: flexPicks,
-    total_games_analyzed: totalGamesAnalyzed
+      flexPicks.push({
+        champion_name: champion,
+        roles_played: roles,
+        primary_role: sortedByGames[0].role,
+        secondary_role: sortedByGames[1]?.role || null,
+        flexibility_score: Math.min(totalGames / 20, 1.0), // Normalize to 0-1
+        is_true_flex: roles.length >= 2 && totalGames >= 5
+      })
+    }
   }
+
+  return flexPicks.sort((a, b) => b.flexibility_score - a.flexibility_score)
 }
 
 /**
  * Find players who play a specific champion
- *
- * Useful for answering questions like:
- * - "Who plays Azir in LCK?"
- * - "Which ADCs have high Jinx win rates?"
- *
- * @param championName - Champion name
- * @param role - Optional role filter
- * @param minGames - Minimum games played (default: 3)
- * @returns Array of players who play this champion
- *
- * @example
- * const azirPlayers = await findPlayersForChampion('Azir', 'mid', 5)
- * // Returns [{player_name: "Faker", games: 47, win_rate: 0.68}, ...]
  */
 export async function findPlayersForChampion(
   championName: string,
@@ -247,34 +254,64 @@ export async function findPlayersForChampion(
   games_played: number
   win_rate: number
 }>> {
-  const supabase = await createClient()
+  const supabase = getSupabaseClient()
 
   let query = supabase
-    .from('player_champion_pools')
+    .schema('synapse')
+    .from('champion_picks')
     .select(`
       player_id,
-      games_played,
-      smoothed_win_rate,
-      players!inner (
-        name
+      team_side,
+      player:players!inner(name),
+      draft:drafts!inner(
+        game:games!inner(winning_side)
       )
     `)
     .eq('champion_name', championName)
-    .gte('games_played', minGames)
-    .order('games_played', { ascending: false })
 
   if (role) {
     query = query.eq('role', role)
   }
 
-  const { data, error } = await query
+  const { data: picks, error } = await query
 
-  if (error) throw error
+  if (error || !picks) return []
 
-  return (data || []).map((row: any) => ({
-    player_id: row.player_id,
-    player_name: row.players.name,
-    games_played: row.games_played,
-    win_rate: row.smoothed_win_rate
-  }))
+  // Aggregate by player
+  const byPlayer = new Map<string, {
+    player_id: string
+    player_name: string
+    games: number
+    wins: number
+  }>()
+
+  for (const pick of picks) {
+    const playerName = (pick.player as any)?.name || 'Unknown'
+    const game = (pick.draft as any)?.game
+    const isWin = game?.winning_side === pick.team_side
+
+    const existing = byPlayer.get(pick.player_id)
+    if (existing) {
+      existing.games++
+      if (isWin) existing.wins++
+    } else {
+      byPlayer.set(pick.player_id, {
+        player_id: pick.player_id,
+        player_name: playerName,
+        games: 1,
+        wins: isWin ? 1 : 0
+      })
+    }
+  }
+
+  // Filter by min games and transform
+  return Array.from(byPlayer.values())
+    .filter(p => p.games >= minGames)
+    .map(p => ({
+      player_id: p.player_id,
+      player_name: p.player_name,
+      games_played: p.games,
+      win_rate: p.games > 0 ? p.wins / p.games : 0.5
+    }))
+    .sort((a, b) => b.games_played - a.games_played)
 }

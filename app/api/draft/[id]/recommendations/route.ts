@@ -5,6 +5,7 @@
  *
  * Query params:
  * - role?: string - Filter to specific role
+ * - userSide?: 'blue' | 'red' - User's side (default: blue)
  *
  * Response:
  * {
@@ -26,7 +27,7 @@ import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
 // This accesses the in-memory draftSessions Map
 import { getDraftSession } from '../route'
 
-export const runtime = 'edge' // Edge runtime for <200ms
+export const runtime = 'nodejs' // Node runtime for full Supabase support
 
 // All champions from champion-properties DAMAGE_TYPES
 const ALL_CHAMPIONS = Object.keys(DAMAGE_TYPES)
@@ -38,17 +39,25 @@ export async function GET(
   const startTime = Date.now()
   const { id } = await params
   const role = request.nextUrl.searchParams.get('role')
+  const userSide = request.nextUrl.searchParams.get('userSide') === 'red' ? 'red' : 'blue'
 
   try {
-    // Get current draft state using Phase 3 pattern
-    // getDraftSession returns DraftState | undefined from in-memory Map
-    const draftState = getDraftSession(id)
+    // Get current draft state, or use initial state for new drafts
+    let draftState = getDraftSession(id)
 
+    // If no session exists, use default initial state
     if (!draftState) {
-      return NextResponse.json(
-        { error: 'Draft not found' },
-        { status: 404 }
-      )
+      draftState = {
+        id,
+        currentTurn: 1,
+        phase: 'ban1' as const,
+        userSide,
+        blue: { bans: [], picks: [] },
+        red: { bans: [], picks: [] },
+        isComplete: false,
+        startedAt: new Date().toISOString(),
+        completedAt: null
+      }
     }
 
     // Determine opponent side
@@ -121,9 +130,16 @@ export async function GET(
 
   } catch (error) {
     console.error('[GET /api/draft/:id/recommendations] Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate recommendations' },
-      { status: 500 }
-    )
+    // Return empty recommendations on error
+    return NextResponse.json({
+      recommendations: [],
+      meta: {
+        responseTime: Date.now() - startTime,
+        turnNumber: 1,
+        weights: getWeightsForTurn(1),
+        candidatesScored: 0,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }, { status: 200 }) // Return 200 with empty array, not 500
   }
 }

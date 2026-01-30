@@ -53,11 +53,8 @@ export function generateReasoning(context: ReasoningContext): string[] {
     reasons.push(...generateFlexReasons(context))
   }
 
-  // Fallback if no strong reasons
-  if (reasons.length === 0) {
-    reasons.push(`${context.champion} is a solid, balanced pick`)
-  }
-
+  // No fallback - only show real data-backed reasons
+  // Empty array means no analytics data available for this champion
   return reasons
 }
 

@@ -39,46 +39,44 @@ export interface SelectedPlayers {
 }
 
 /**
- * Mock player data for demo purposes
- * In production, this would come from an API call
- *
- * These are example LCK pro players used for demonstration
+ * Player roster data - uses player names as IDs to match database
+ * Names are case-sensitive to match database records
  */
-const MOCK_PLAYERS: Record<Role, PlayerInfo[]> = {
+const PLAYER_ROSTER: Record<Role, PlayerInfo[]> = {
   top: [
-    { id: 'zeus', name: 'Zeus', team: 'T1' },
-    { id: 'kiin', name: 'Kiin', team: 'DK' },
-    { id: 'doran', name: 'Doran', team: 'GEN' },
-    { id: 'perfect', name: 'Perfect', team: 'HLE' },
-    { id: 'morgan', name: 'Morgan', team: 'KT' },
+    { id: 'Zeus', name: 'Zeus', team: 'T1' },
+    { id: 'Kiin', name: 'Kiin', team: 'DK' },
+    { id: 'Doran', name: 'Doran', team: 'GEN' },
+    { id: 'Rascal', name: 'Rascal', team: 'HLE' },
+    { id: 'Rich', name: 'Rich', team: 'KT' },
   ],
   jungle: [
-    { id: 'oner', name: 'Oner', team: 'T1' },
-    { id: 'canyon', name: 'Canyon', team: 'GEN' },
-    { id: 'peanut', name: 'Peanut', team: 'DK' },
-    { id: 'lucid', name: 'Lucid', team: 'KT' },
-    { id: 'sponge', name: 'Sponge', team: 'HLE' },
+    { id: 'Oner', name: 'Oner', team: 'T1' },
+    { id: 'Canyon', name: 'Canyon', team: 'GEN' },
+    { id: 'Peanut', name: 'Peanut', team: 'DK' },
+    { id: 'Lucid', name: 'Lucid', team: 'KT' },
+    { id: 'Ellim', name: 'Ellim', team: 'HLE' },
   ],
   mid: [
-    { id: 'faker', name: 'Faker', team: 'T1' },
-    { id: 'chovy', name: 'Chovy', team: 'GEN' },
-    { id: 'showmaker', name: 'ShowMaker', team: 'DK' },
-    { id: 'zeka', name: 'Zeka', team: 'HLE' },
-    { id: 'bdd', name: 'BDD', team: 'KT' },
+    { id: 'Faker', name: 'Faker', team: 'T1' },
+    { id: 'Chovy', name: 'Chovy', team: 'GEN' },
+    { id: 'ShowMaker', name: 'ShowMaker', team: 'DK' },
+    { id: 'Zeka', name: 'Zeka', team: 'HLE' },
+    { id: 'Callme', name: 'Callme', team: 'KT' },
   ],
   adc: [
-    { id: 'gumayusi', name: 'Gumayusi', team: 'T1' },
-    { id: 'peyz', name: 'Peyz', team: 'GEN' },
-    { id: 'aiming', name: 'Aiming', team: 'DK' },
-    { id: 'viper', name: 'Viper', team: 'HLE' },
-    { id: 'deft', name: 'Deft', team: 'KT' },
+    { id: 'Gumayusi', name: 'Gumayusi', team: 'T1' },
+    { id: 'Peyz', name: 'Peyz', team: 'GEN' },
+    { id: 'Aiming', name: 'Aiming', team: 'DK' },
+    { id: 'Viper', name: 'Viper', team: 'HLE' },
+    { id: 'Deft', name: 'Deft', team: 'KT' },
   ],
   support: [
-    { id: 'keria', name: 'Keria', team: 'T1' },
-    { id: 'lehends', name: 'Lehends', team: 'GEN' },
-    { id: 'kellin', name: 'Kellin', team: 'DK' },
-    { id: 'delight', name: 'Delight', team: 'HLE' },
-    { id: 'beryl', name: 'BeryL', team: 'KT' },
+    { id: 'Keria', name: 'Keria', team: 'T1' },
+    { id: 'Lehends', name: 'Lehends', team: 'GEN' },
+    { id: 'Kellin', name: 'Kellin', team: 'DK' },
+    { id: 'Delight', name: 'Delight', team: 'HLE' },
+    { id: 'BeryL', name: 'BeryL', team: 'KT' },
   ],
 }
 
@@ -137,7 +135,7 @@ export function PlayerSelector({
             <select
               value={selectedPlayers[role]?.id || ''}
               onChange={(e) => {
-                const player = MOCK_PLAYERS[role].find(
+                const player = PLAYER_ROSTER[role].find(
                   (p) => p.id === e.target.value
                 )
                 onPlayerSelect(role, player || null)
@@ -147,7 +145,7 @@ export function PlayerSelector({
                          focus:ring-blue-500 cursor-pointer"
             >
               <option value="">Select {role} player...</option>
-              {MOCK_PLAYERS[role].map((player) => (
+              {PLAYER_ROSTER[role].map((player) => (
                 <option key={player.id} value={player.id}>
                   {player.name} ({player.team})
                 </option>

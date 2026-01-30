@@ -1,7 +1,7 @@
 /**
  * GET /api/analytics/players/:playerId
  *
- * Returns player's champion pool with stats.
+ * Returns player's champion pool computed from champion_picks data in Supabase.
  *
  * Response:
  * {
@@ -19,9 +19,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
-export const runtime = 'edge'
+// Use Node.js runtime for full Supabase support
+export const runtime = 'nodejs'
+
+// Create Supabase client directly (not using cookies - read-only data)
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) {
+    throw new Error('Missing Supabase environment variables')
+  }
+  return createClient(url, key)
+}
 
 export async function GET(
   request: NextRequest,
@@ -31,77 +42,141 @@ export async function GET(
   const { playerId } = await params
 
   try {
-    const supabase = await createClient()
+    const supabase = getSupabaseClient()
 
-    // Query player_champion_pools from Phase 2
-    // Note: This table stores player-specific champion statistics
-    const { data, error } = await supabase
-      .from('player_champion_pools')
-      .select('*')
-      .eq('player_id', playerId)
-      .order('games_played', { ascending: false })
-      .limit(20)
+    // Try to find player by ID first, then by name (case-insensitive)
+    let player: { id: string; name: string } | null = null
+    let playerDbId = playerId
 
-    if (error) {
-      console.error('[GET /api/analytics/players] Error:', error)
-      return NextResponse.json(
-        { error: 'Failed to fetch player pool' },
-        { status: 500 }
-      )
+    // First try by UUID (if playerId looks like a UUID)
+    if (playerId.includes('-')) {
+      const { data: playerById, error } = await supabase
+        .schema('synapse')
+        .from('players')
+        .select('id, name')
+        .eq('id', playerId)
+        .maybeSingle() // Use maybeSingle to not throw on no match
+      if (!error && playerById) {
+        player = playerById
+        playerDbId = playerById.id
+      }
     }
 
-    // Aggregate roles for each champion (a player might play same champ in multiple roles)
+    // If not found, try by name (case-insensitive)
+    if (!player) {
+      const { data: playerByName, error } = await supabase
+        .schema('synapse')
+        .from('players')
+        .select('id, name')
+        .ilike('name', playerId)
+        .maybeSingle() // Use maybeSingle to not throw on no match
+      if (!error && playerByName) {
+        player = playerByName
+        playerDbId = playerByName.id
+      }
+    }
+
+    // If still not found, return empty result
+    if (!player) {
+      console.log(`[GET /api/analytics/players] Player not found: ${playerId}`)
+      return NextResponse.json({
+        playerId,
+        playerName: playerId,
+        championPool: [],
+        meta: {
+          responseTime: Date.now() - startTime,
+          error: `Player "${playerId}" not found in database`
+        }
+      })
+    }
+
+    // Query champion picks from synapse schema, grouped by champion and role
+    const { data: picks, error: picksError } = await supabase
+      .schema('synapse')
+      .from('champion_picks')
+      .select(`
+        champion_name,
+        role,
+        role_confidence,
+        team_side,
+        draft:drafts!inner(
+          game:games!inner(
+            winning_side
+          )
+        )
+      `)
+      .eq('player_id', playerDbId)
+
+    if (picksError) {
+      console.error('[GET /api/analytics/players] DB error:', picksError)
+      return NextResponse.json({
+        playerId,
+        playerName: player?.name || playerId,
+        championPool: [],
+        meta: {
+          responseTime: Date.now() - startTime,
+          error: picksError.message
+        }
+      })
+    }
+
+    // Return empty if no picks found
+    if (!picks || picks.length === 0) {
+      return NextResponse.json({
+        playerId,
+        playerName: player?.name || playerId,
+        championPool: [],
+        meta: { responseTime: Date.now() - startTime }
+      })
+    }
+
+    // Aggregate picks by champion
     const championMap = new Map<string, {
       champion: string
       gamesPlayed: number
-      winRate: number
       wins: number
-      roles: string[]
+      roles: Set<string>
     }>()
 
-    for (const row of data || []) {
-      const existing = championMap.get(row.champion_name)
+    for (const pick of picks) {
+      const existing = championMap.get(pick.champion_name)
+      const game = (pick.draft as any)?.game
+      const isWin = game?.winning_side === pick.team_side
+
       if (existing) {
-        // Combine stats across roles
-        existing.gamesPlayed += row.games_played
-        existing.wins += row.wins
-        existing.roles.push(row.role)
+        existing.gamesPlayed++
+        if (isWin) existing.wins++
+        if (pick.role) existing.roles.add(pick.role)
       } else {
-        championMap.set(row.champion_name, {
-          champion: row.champion_name,
-          gamesPlayed: row.games_played,
-          winRate: row.smoothed_win_rate,
-          wins: row.wins,
-          roles: [row.role]
+        championMap.set(pick.champion_name, {
+          champion: pick.champion_name,
+          gamesPlayed: 1,
+          wins: isWin ? 1 : 0,
+          roles: new Set(pick.role ? [pick.role] : [])
         })
       }
     }
 
     // Transform to API response format with comfort levels
     const championPool = Array.from(championMap.values())
-      .map(entry => ({
-        champion: entry.champion,
-        gamesPlayed: entry.gamesPlayed,
-        winRate: entry.gamesPlayed > 0
+      .map(entry => {
+        const winRate = entry.gamesPlayed > 0
           ? entry.wins / entry.gamesPlayed
-          : entry.winRate,
-        comfortLevel: classifyComfortLevel(
-          entry.gamesPlayed,
-          entry.gamesPlayed > 0 ? entry.wins / entry.gamesPlayed : entry.winRate
-        ),
-        roles: entry.roles
-      }))
+          : 0.5
+        return {
+          champion: entry.champion,
+          gamesPlayed: entry.gamesPlayed,
+          winRate,
+          comfortLevel: classifyComfortLevel(entry.gamesPlayed, winRate),
+          roles: Array.from(entry.roles)
+        }
+      })
       .sort((a, b) => b.gamesPlayed - a.gamesPlayed)
       .slice(0, 15) // Limit to top 15 champions
 
-    // Get player name from first row if available
-    const playerName = (data && data.length > 0)
-      ? (data[0] as any).player_name || 'Unknown'
-      : 'Unknown'
-
     return NextResponse.json({
       playerId,
-      playerName,
+      playerName: player?.name || playerId,
       championPool,
       meta: { responseTime: Date.now() - startTime }
     }, {
@@ -112,20 +187,20 @@ export async function GET(
 
   } catch (error) {
     console.error('[GET /api/analytics/players] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({
+      playerId,
+      playerName: playerId,
+      championPool: [],
+      meta: {
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }, { status: 200 })
   }
 }
 
 /**
  * Classify comfort level based on games played and win rate
- *
- * - signature: 10+ games with 55%+ WR (ban targets)
- * - comfort: 5+ games with 50%+ WR (reliable picks)
- * - recent: 3+ games (in their pool but less proven)
- * - historical: <3 games (rarely played)
  */
 function classifyComfortLevel(
   gamesPlayed: number,

@@ -138,6 +138,10 @@ Recent decisions affecting current work:
 - [05-06]: Breakdown tooltip shows composition, synergies, matchups, and side advantage
 - [05-06]: Three-column layout: w-72 left sidebar, flex-1 center, w-80 right sidebar
 - [05-06]: framer-motion for animated gauge enter/exit, react-circular-progressbar for gauge
+- [API-FIX]: Changed `.single()` to `.maybeSingle()` for player lookup to avoid errors when no match found
+- [API-FIX]: Player IDs in player-selector.tsx must match exact DB names (case-sensitive: 'Faker' not 'faker')
+- [API-FIX]: Removed generic fallback text "is a solid, balanced pick" from reasoning-generator.ts
+- [API-FIX]: All API routes use nodejs runtime with direct Supabase client (not edge) for full query support
 
 ### Pending Todos
 
@@ -150,8 +154,8 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: 05-06-PLAN.md checkpoint - awaiting human verification
-Resume file: .planning/phases/05-draft-simulator-ui/05-06-PLAN.md (Task 3)
+Stopped at: API fixes complete - real Supabase data flowing, ready for verification
+Resume file: .planning/phases/05-draft-simulator-ui/05-06-PLAN.md (Task 3 - verification)
 
 ## Quick Reference
 

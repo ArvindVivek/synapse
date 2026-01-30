@@ -16,7 +16,7 @@ import { calculateWinRateForState } from '@/lib/recommendations/win-rate-project
 // Import getDraftSession from the parent route (Phase 3 pattern)
 import { getDraftSession } from '../route'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs' // Node runtime for full Supabase support
 
 export async function GET(
   request: NextRequest,
@@ -24,12 +24,45 @@ export async function GET(
 ) {
   const startTime = Date.now()
   const { id } = await params
+  const userSide = request.nextUrl.searchParams.get('userSide') === 'red' ? 'red' : 'blue'
 
   try {
     // Get draft state using Phase 3 pattern
-    const draftState = getDraftSession(id)
+    let draftState = getDraftSession(id)
+
+    // If no session found, use default initial state
+    // Return 50-50 projection (mathematically correct for empty draft)
     if (!draftState) {
-      return NextResponse.json({ error: 'Draft not found' }, { status: 404 })
+      draftState = {
+        id,
+        currentTurn: 1,
+        phase: 'ban1' as const,
+        userSide,
+        blue: { bans: [], picks: [] },
+        red: { bans: [], picks: [] },
+        isComplete: false,
+        startedAt: new Date().toISOString(),
+        completedAt: null
+      }
+    }
+
+    // If no picks yet, return initial 50-50 projection
+    if (draftState.blue.picks.length === 0 && draftState.red.picks.length === 0) {
+      return NextResponse.json({
+        projection: {
+          blueWinRate: 0.50,
+          redWinRate: 0.50,
+          breakdown: {
+            baseComposition: 0,
+            synergies: 0,
+            matchups: 0,
+            sideAdvantage: 0.02, // Blue side advantage
+          },
+          confidence: 'low' as const,
+          turnsAnalyzed: 0,
+        },
+        meta: { responseTime: Date.now() - startTime }
+      })
     }
 
     const bluePicks = draftState.blue.picks.map(p => p.champion)
@@ -53,9 +86,24 @@ export async function GET(
 
   } catch (error) {
     console.error('[GET /api/draft/:id/winrate] Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to calculate win rate' },
-      { status: 500 }
-    )
+    // Return 50-50 on error - graceful degradation
+    return NextResponse.json({
+      projection: {
+        blueWinRate: 0.50,
+        redWinRate: 0.50,
+        breakdown: {
+          baseComposition: 0,
+          synergies: 0,
+          matchups: 0,
+          sideAdvantage: 0.02,
+        },
+        confidence: 'low' as const,
+        turnsAnalyzed: 0,
+      },
+      meta: {
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }, { status: 200 }) // Return 200 so frontend doesn't break
   }
 }

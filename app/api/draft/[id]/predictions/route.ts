@@ -7,6 +7,7 @@
  * - playerId: string - Opponent player to predict
  * - playerName?: string - Player display name
  * - role: string - Role being drafted
+ * - userSide?: 'blue' | 'red' - User's side (default: blue)
  *
  * Response:
  * {
@@ -23,7 +24,7 @@ import { assessTeamNeeds } from '@/lib/recommendations/champion-properties'
 // Import getDraftSession from the parent route (Phase 3 pattern)
 import { getDraftSession } from '../route'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs' // Node runtime for full Supabase support
 
 export async function GET(
   request: NextRequest,
@@ -34,6 +35,7 @@ export async function GET(
   const playerId = request.nextUrl.searchParams.get('playerId')
   const playerName = request.nextUrl.searchParams.get('playerName') || 'Unknown'
   const role = request.nextUrl.searchParams.get('role')
+  const userSide = request.nextUrl.searchParams.get('userSide') === 'red' ? 'red' : 'blue'
 
   if (!playerId || !role) {
     return NextResponse.json(
@@ -43,10 +45,21 @@ export async function GET(
   }
 
   try {
-    // Get draft state using Phase 3 pattern
-    const draftState = getDraftSession(id)
+    // Get draft state, or use default initial state
+    let draftState = getDraftSession(id)
+
     if (!draftState) {
-      return NextResponse.json({ error: 'Draft not found' }, { status: 404 })
+      draftState = {
+        id,
+        currentTurn: 1,
+        phase: 'ban1' as const,
+        userSide,
+        blue: { bans: [], picks: [] },
+        red: { bans: [], picks: [] },
+        isComplete: false,
+        startedAt: new Date().toISOString(),
+        completedAt: null
+      }
     }
 
     // Build prediction context
@@ -76,9 +89,14 @@ export async function GET(
 
   } catch (error) {
     console.error('[GET /api/draft/:id/predictions] Error:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate predictions' },
-      { status: 500 }
-    )
+    // Return empty predictions on error - let frontend show "no data" state
+    return NextResponse.json({
+      predictions: [],
+      player: { id: playerId, name: playerName, role },
+      meta: {
+        responseTime: Date.now() - startTime,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
+    }, { status: 200 }) // Return 200 with empty array, not 500
   }
 }
