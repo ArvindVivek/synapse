@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Data Foundation** - GRID API integration, Supabase schema, ETL pipeline ✅
 - [x] **Phase 2: Core Analytics** - Champion statistics, synergy matrices, matchup data ✅
 - [x] **Phase 3: Draft State Machine** - Real-time state management with turn validation ✅
-- [ ] **Phase 4: AI/Heuristics Engine** - Recommendations, predictions, win-rate projections
+- [x] **Phase 4: AI/Heuristics Engine** - Recommendations, predictions, win-rate projections ✅
 - [ ] **Phase 5: Draft Simulator UI** - LoL-authentic interface with real-time updates
 - [ ] **Phase 6: Polish and Deploy** - Performance optimization, demo prep, Vercel deployment
 
@@ -130,11 +130,11 @@ Plans:
   - `drafts.blue_bans` and `drafts.red_bans` enable ban strategy analysis
 
 Plans:
-- [ ] 04-01-PLAN.md — Pick scorer with multi-criteria weighted scoring (MCDM)
-- [ ] 04-02-PLAN.md — Win-rate projector with incremental updates
-- [ ] 04-03-PLAN.md — Player predictor and ban strategy recommendations
-- [ ] 04-04-PLAN.md — Reasoning generator and flex pick detection
-- [ ] 04-05-PLAN.md — API routes for recommendations, predictions, win-rate
+- [x] 04-01-PLAN.md — Pick scorer with multi-criteria weighted scoring (MCDM) ✅
+- [x] 04-02-PLAN.md — Win-rate projector with incremental updates ✅
+- [x] 04-03-PLAN.md — Player predictor and ban strategy recommendations ✅
+- [x] 04-04-PLAN.md — Reasoning generator and flex pick detection ✅
+- [x] 04-05-PLAN.md — API routes for recommendations, predictions, win-rate ✅
 
 ### Phase 5: Draft Simulator UI
 **Goal**: Build LoL-authentic draft simulator interface with ban phase visualization, player selection, role confidence indicators, real-time recommendations, and win-rate visualization
@@ -199,8 +199,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Data Foundation | 3/3 | ✅ Complete | 2026-01-29 |
 | 2. Core Analytics | 5/5 | ✅ Complete | 2026-01-30 |
 | 3. Draft State Machine | 3/3 | ✅ Complete | 2026-01-30 |
-| 4. AI/Heuristics Engine | 0/5 | Ready to execute | - |
-| 5. Draft Simulator UI | 0/6 | Not started | - |
+| 4. AI/Heuristics Engine | 5/5 | ✅ Complete | 2026-01-30 |
+| 5. Draft Simulator UI | 0/6 | Ready to execute | - |
 | 6. Polish and Deploy | 0/3 | Not started | - |
 
 ## Requirement Coverage
