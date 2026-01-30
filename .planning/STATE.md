@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Turn-by-turn draft recommendations with transparent reasoning that help coaches make better pick/ban decisions in real time.
-**Current focus:** Phase 4 - AI/Heuristics Engine
+**Current focus:** Phase 5 - Draft Simulator UI
 
 ## Current Position
 
-Phase: 4 of 6 (AI/Heuristics Engine) - COMPLETE
-Plan: 5 of 5 in current phase
-Status: API routes complete - Phase 4 finished
-Last activity: 2026-01-30 - Completed 04-05-PLAN.md (API routes for recommendations, predictions, win-rate)
+Phase: 5 of 6 (Draft Simulator UI)
+Plan: 2 of 5 in current phase
+Status: Champion selection grid complete
+Last activity: 2026-01-30 - Completed 05-02-PLAN.md (Champion selection grid with search and filters)
 
-Progress: [██████░░░░] 64% (16/25 plans complete)
+Progress: [███████░░░] 68% (17/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 3.4 min
-- Total execution time: 1.04 hours
+- Total plans completed: 17
+- Average duration: 3.3 min
+- Total execution time: 1.08 hours
 
 **By Phase:**
 
@@ -31,10 +31,11 @@ Progress: [██████░░░░] 64% (16/25 plans complete)
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
 | 4 - AI/Heuristics Engine | 5/5 | 19.1 min | 3.8 min |
+| 5 - Draft Simulator UI | 2/5 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 3.5min, 5min, 2min, 2.6min
-- Trend: Excellent velocity maintained (Phase 4 completed at 3.8 min/plan average)
+- Last 5 plans: 3.5min, 5min, 2min, 2.6min, 2min
+- Trend: Excellent velocity maintained (Phase 5 started at 2 min/plan average)
 
 *Updated after each plan completion*
 
@@ -118,6 +119,11 @@ Recent decisions affecting current work:
 - [04-05]: Edge runtime for all routes to meet <200ms latency requirement
 - [04-05]: Short cache headers (5s) for recommendation endpoints due to rapidly changing draft state
 - [04-05]: Player pool data loaded lazily per-player to avoid over-fetching
+- [05-02]: Champion roles based on professional meta (70 champions from DAMAGE_TYPES)
+- [05-02]: Flex picks defined as champions with 2+ roles (17 total including Jayce, Sylas, Karma, Neeko)
+- [05-02]: Memoize champion cards with React.memo + granular Zustand selectors for performance
+- [05-02]: CSS Grid 8-column layout without virtualization (manageable dataset size)
+- [05-02]: Available champions sorted first, then alphabetically for quick identification
 
 ### Pending Todos
 
@@ -130,7 +136,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 04-05-PLAN.md (API routes) - Phase 4 complete
+Stopped at: Completed 05-02-PLAN.md (Champion selection grid)
 Resume file: None
 
 ## Quick Reference
