@@ -48,5 +48,5 @@ export default async function DraftPage({ params }: PageProps) {
     notFound()
   }
 
-  return <DraftSimulator id={id} initialState={draftState} />
+  return <DraftSimulator draftId={id} initialSide={draftState?.userSide || 'blue'} />
 }
