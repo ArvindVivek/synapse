@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 3 of 6 (Draft State Machine) - IN PROGRESS
-Plan: 1 of 3 in current phase
-Status: Plan 03-01 complete - Draft state machine core ready
-Last activity: 2026-01-30 - Completed 03-01-PLAN.md (Draft state machine core)
+Plan: 2 of 3 in current phase
+Status: Plan 03-02 complete - Validation logic with pure guard functions
+Last activity: 2026-01-30 - Completed 03-02-PLAN.md (Validation logic)
 
-Progress: [████░░░░░░] 36% (9/25 plans complete)
+Progress: [████░░░░░░] 40% (10/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 4 min
-- Total execution time: 0.64 hours
+- Total execution time: 0.74 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [████░░░░░░] 36% (9/25 plans complete)
 |-------|-------|-------|----------|
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
-| 3 - Draft State Machine | 1/3 | 6 min | 6 min |
+| 3 - Draft State Machine | 2/3 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 4min, 2min, 4min, 6min
-- Trend: Consistent velocity (Phase 3 started at 6 min/plan)
+- Last 5 plans: 4min, 2min, 4min, 6min, 6min
+- Trend: Excellent velocity (Phase 3 maintaining 6 min/plan)
 
 *Updated after each plan completion*
 
@@ -80,6 +80,10 @@ Recent decisions affecting current work:
 - [03-01]: Enable Immer MapSet plugin for Set support in Zustand store
 - [03-01]: Zustand (1.2kb) + Immer for client state management (vs Redux 11kb)
 - [03-01]: currentTurn tracks 0-20 (0=not started, 1-20=active, >20=complete)
+- [03-02]: Pure guard functions for testability and client/server portability
+- [03-02]: ValidationErrorCode enum enables internationalization and specific UI feedback
+- [03-02]: Type narrowing with 'valid === false' for discriminated union handling
+- [03-02]: Store tracks lastValidationError for UI display without prop drilling
 
 ### Pending Todos
 
@@ -92,7 +96,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 03-01-PLAN.md (Draft state machine core with Zustand + Immer)
+Stopped at: Completed 03-02-PLAN.md (Validation logic with pure guard functions)
 Resume file: None
 
 ## Quick Reference
