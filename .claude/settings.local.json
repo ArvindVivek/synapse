@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx supabase:*)",
+      "Bash(docker restart:*)",
+      "WebFetch(domain:grid.gg)",
+      "Bash(pnpm etl:test:*)",
+      "Bash(./node_modules/.bin/tsx:*)"
+    ]
+  }
+}

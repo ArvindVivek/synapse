@@ -3,9 +3,11 @@
 
 import { createClient } from '@supabase/supabase-js';
 import type { Database, Role } from '../supabase/functions/_shared/types';
-import * as dotenv from 'dotenv';
+import { config } from 'dotenv';
+import path from 'path';
 
-dotenv.config({ path: '.env.local' });
+// Load env from parent directory (.env.local is at project root)
+config({ path: path.join(__dirname, '../.env.local') });
 
 interface RoleCheck {
   champion: string;
@@ -132,14 +134,16 @@ const FLEX_PICKS = new Set([
 
 async function checkRoleAccuracy(): Promise<RoleAccuracyResult> {
   // Initialize Supabase client
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Missing Supabase credentials. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local');
+    throw new Error('Missing Supabase credentials. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local');
   }
 
-  const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+    db: { schema: 'synapse' },
+  });
 
   console.log('🎯 Checking role inference accuracy...\n');
 

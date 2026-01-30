@@ -5,7 +5,7 @@
 
 ## Executive Summary
 
-**Project Name:** DraftIQ - AI-Powered League of Legends Drafting Assistant  
+**Project Name:** Synapse - AI-Powered League of Legends Drafting Assistant  
 **Target Competition:** Cloud9 x JetBrains Hackathon - Category 3: Drafting Assistant/Predictor  
 **Game Title:** League of Legends  
 **Data Source:** GRID.gg APIs (LCS, LEC, LCK, LPL tournaments, past 2 years)  
@@ -18,7 +18,7 @@
 
 ### 1.1 Product Vision
 
-DraftIQ transforms professional League of Legends draft preparation from guesswork into data-driven strategy. The tool provides three critical capabilities:
+Synapse transforms professional League of Legends draft preparation from guesswork into data-driven strategy. The tool provides three critical capabilities:
 
 1. **Real-Time Draft Recommendations** - Suggests optimal picks/bans based on current draft state, opponent tendencies, and historical performance
 2. **Turn-by-Turn Prediction** - Predicts opponent's next likely picks with probability distribution
@@ -2407,7 +2407,7 @@ KNOWN_SYNERGIES = {
 ## Contact & Support
 
 **Developer:** Arvind  
-**Project:** DraftIQ - LoL AI Drafting Assistant  
+**Project:** Synapse - LoL AI Drafting Assistant  
 **Competition:** Cloud9 x JetBrains Hackathon  
 **Timeline:** 8 days  
 

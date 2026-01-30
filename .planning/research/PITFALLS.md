@@ -1,7 +1,7 @@
 # Domain Pitfalls: LoL Draft Assistant
 
 **Domain:** Esports analytics - League of Legends draft prediction and recommendation
-**Project:** DraftIQ - AI-Powered Draft Assistant
+**Project:** Synapse - AI-Powered Draft Assistant
 **Researched:** 2026-01-28
 **Confidence:** HIGH (based on training data about esports analytics, LoL game mechanics, and serverless architectures)
 

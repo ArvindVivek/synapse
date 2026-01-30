@@ -12,7 +12,7 @@ Professional LoL draft assistants occupy a niche but critical space in esports i
 2. **Differentiators** - Features that would impress hackathon judges and professional users (12 features identified)
 3. **Anti-Features** - Complexity traps to avoid (8 anti-patterns identified)
 
-**Key Finding:** Most existing tools focus on *post-match analysis* (stats, replays). Very few offer *real-time draft recommendations* with transparent reasoning. This is DraftIQ's core competitive advantage.
+**Key Finding:** Most existing tools focus on *post-match analysis* (stats, replays). Very few offer *real-time draft recommendations* with transparent reasoning. This is Synapse's core competitive advantage.
 
 **Hackathon Strategy:** Build all table stakes features (essential for credibility), nail 2-3 differentiators (AI predictions, transparent reasoning), and ruthlessly avoid anti-features (over-complexity, ML opacity).
 
@@ -62,14 +62,14 @@ Features users expect. Missing these = product feels incomplete or unprofessiona
 
 ## Differentiators
 
-Features that set DraftIQ apart and impress hackathon judges. Not expected, but highly valued.
+Features that set Synapse apart and impress hackathon judges. Not expected, but highly valued.
 
 | Feature | Value Proposition | Complexity | Hackathon Impact |
 |---------|-------------------|------------|------------------|
 | **AI-powered pick recommendations** | "What should we pick next?" with data-backed reasoning | High | **CRITICAL DIFFERENTIATOR**. This is the core innovation. Judges expect AI integration. |
 | **Opponent pick prediction** | "Enemy will likely pick Orianna (68% probability)" | High | **HIGH IMPACT**. Demonstrates ML capability. Real coaching value. |
 | **Live win-rate projection** | Real-time % chance to win as draft evolves | High | **HIGH IMPACT**. Visual, dynamic, impressive demo. Shows technical sophistication. |
-| **Transparent reasoning** | "Pick Sejuani because: CC chain with Ashe, counters Viego, adds AP damage" | Medium | **CRITICAL**. Separates DraftIQ from "black box" AI tools. Coaches need to trust recommendations. |
+| **Transparent reasoning** | "Pick Sejuani because: CC chain with Ashe, counters Viego, adds AP damage" | Medium | **CRITICAL**. Separates Synapse from "black box" AI tools. Coaches need to trust recommendations. |
 | **Comfort pick detection** | "Faker is 8-0 on Azir this split" = high-priority ban | Medium | **MEDIUM IMPACT**. Shows understanding of player psychology, not just stats. |
 | **Composition gap warnings** | "WARNING: Full AD comp, easily countered" | Medium | **MEDIUM IMPACT**. Proactive coaching assistance. Prevents draft blunders. |
 | **Historical draft similarity search** | "This draft is 85% similar to T1 vs DK Game 3" | High | **LOW IMPACT** (time-intensive). Cool feature but not demo-critical. Post-hackathon. |
@@ -112,7 +112,7 @@ Features that set DraftIQ apart and impress hackathon judges. Not expected, but 
 - Mobalytics: No real-time draft recommendations (only post-match analysis)
 - U.GG/OP.GG Pro: Static statistics, no predictive AI
 - Oracle's Elixir: Data journalism focus, not a coaching tool
-- **DraftIQ fills the gap: Real-time, AI-powered, transparent draft assistance**
+- **Synapse fills the gap: Real-time, AI-powered, transparent draft assistance**
 
 ---
 
@@ -143,7 +143,7 @@ Features to deliberately NOT build. Common mistakes in this domain.
 - Example: "Let's use LSTM neural networks!" → 1,500 games is too small for deep learning. Gradient Boosting works better, faster, and is explainable.
 
 **Feature Bloat from Competitor Envy:**
-- Mobalytics has champion guides → "We should too!" → NO. DraftIQ is a draft tool, not a learning platform.
+- Mobalytics has champion guides → "We should too!" → NO. Synapse is a draft tool, not a learning platform.
 - OP.GG has player profiles → "We should too!" → NO. Focus on draft phase, not player careers.
 
 ### Hackathon-Specific Anti-Patterns
@@ -244,7 +244,7 @@ For hackathon submission, these features constitute a **complete, impressive dem
 1. **User selects teams** (e.g., T1 vs C9)
 2. **Draft begins** (Blue ban 1)
 3. **User makes ban/pick**
-4. **DraftIQ responds with:**
+4. **Synapse responds with:**
    - ✅ Recommended next pick (Top 3 with reasoning)
    - ✅ Opponent prediction (Top 3 with probability)
    - ✅ Current win-rate projection (%) with breakdown
@@ -285,9 +285,9 @@ For hackathon submission, these features constitute a **complete, impressive dem
 
 ## Feature Comparison Matrix
 
-How DraftIQ compares to existing tools.
+How Synapse compares to existing tools.
 
-| Feature | Mobalytics | U.GG Pro | OP.GG Esports | Oracle's Elixir | **DraftIQ** |
+| Feature | Mobalytics | U.GG Pro | OP.GG Esports | Oracle's Elixir | **Synapse** |
 |---------|------------|----------|---------------|-----------------|-------------|
 | **Champion statistics** | ✅ Comprehensive | ✅ Good | ✅ Good | ✅ Excellent | ✅ Good (GRID data) |
 | **Player champion pools** | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No | ✅ Yes |
@@ -305,14 +305,14 @@ How DraftIQ compares to existing tools.
 
 ### Key Takeaway
 
-**DraftIQ is the ONLY tool that offers real-time, AI-powered draft recommendations with transparent reasoning.**
+**Synapse is the ONLY tool that offers real-time, AI-powered draft recommendations with transparent reasoning.**
 
 Existing tools are either:
 1. **Stat aggregators** (U.GG, OP.GG) - Show you numbers, don't tell you what to do
 2. **Post-match analyzers** (Mobalytics, Oracle's Elixir) - Great for reviewing past games, useless during draft
 3. **Generic AI tools** - "Black box" recommendations without reasoning
 
-**DraftIQ combines:**
+**Synapse combines:**
 - Real-time draft assistance (unique)
 - AI-powered predictions (unique)
 - Transparent reasoning (unique)

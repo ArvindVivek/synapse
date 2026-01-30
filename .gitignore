@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+scripts/etl/node_modules
 /.pnp
 .pnp.*
 .yarn/*

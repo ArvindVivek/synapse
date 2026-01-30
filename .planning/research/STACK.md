@@ -1,6 +1,6 @@
 # Technology Stack Research
 
-**Project:** DraftIQ - LoL Draft Assistant
+**Project:** Synapse - LoL Draft Assistant
 **Context:** Real-time esports analytics web application
 **Timeline:** 7-8 days
 **Researched:** 2026-01-28

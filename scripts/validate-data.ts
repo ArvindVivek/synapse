@@ -30,7 +30,9 @@ async function validateDataCompleteness(): Promise<ValidationResult> {
     throw new Error('Missing Supabase credentials. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local');
   }
 
-  const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+  const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+    db: { schema: 'synapse' },
+  });
   const checks: ValidationCheck[] = [];
 
   console.log('🔍 Starting data validation...\n');

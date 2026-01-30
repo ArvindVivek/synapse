@@ -1,4 +1,4 @@
-# Stack Research Summary: DraftIQ
+# Stack Research Summary: Synapse
 
 **Project:** LoL Draft Assistant
 **Research Date:** 2026-01-28
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The optimal 2025 stack for DraftIQ is **Next.js 16 + Supabase + Zustand**, building on the existing foundation (Next.js 16.1.6, React 19.2.3, TailwindCSS 4). This stack consolidates backend needs into Supabase's managed platform, enabling rapid development within the 7-8 day timeline.
+The optimal 2025 stack for Synapse is **Next.js 16 + Supabase + Zustand**, building on the existing foundation (Next.js 16.1.6, React 19.2.3, TailwindCSS 4). This stack consolidates backend needs into Supabase's managed platform, enabling rapid development within the 7-8 day timeline.
 
 **Key Decision:** Use Supabase instead of Python FastAPI (from BRD) to consolidate real-time, database, and edge compute into a single platform with zero-ops deployment.
 
