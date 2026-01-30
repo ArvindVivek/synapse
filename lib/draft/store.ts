@@ -10,6 +10,7 @@ import { immer } from 'zustand/middleware/immer'
 import { enableMapSet } from 'immer'
 import type { DraftState, DraftPhase, TeamComposition, Role } from './types'
 import { getTurnInfo, getNextTurn, isUserTurn, DRAFT_SEQUENCE } from './sequence'
+import { validateAction, ValidationError } from './validation'
 
 // Enable Immer MapSet plugin for Set support
 enableMapSet()
@@ -47,6 +48,10 @@ interface DraftStore extends DraftState {
   undo: () => void
   reset: () => void
 
+  // Validation error tracking
+  lastValidationError: ValidationError | null
+  getLastError: () => ValidationError | null
+
   // Computed/derived helpers
   getCurrentTurnInfo: () => ReturnType<typeof getTurnInfo>
   isMyTurn: () => boolean
@@ -64,6 +69,7 @@ interface DraftStore extends DraftState {
 export const useDraftStore = create<DraftStore>()(
   immer((set, get) => ({
     ...createInitialState(),
+    lastValidationError: null,
 
     /**
      * Initialize a new draft session
@@ -80,6 +86,7 @@ export const useDraftStore = create<DraftStore>()(
         state.completedAt = null
         state.blue = { bans: [], picks: [] }
         state.red = { bans: [], picks: [] }
+        state.lastValidationError = null
       }),
 
     /**
@@ -89,20 +96,23 @@ export const useDraftStore = create<DraftStore>()(
      */
     executeBan: (champion: string) => {
       const state = get()
-      const currentTurn = getTurnInfo(state.currentTurn)
+      const result = validateAction(state, { type: 'BAN', champion })
 
-      // Validate it's a ban turn
-      if (!currentTurn || currentTurn.action !== 'ban') {
-        return false
-      }
-
-      // Validate champion is available
-      if (!state.availableChampions.has(champion)) {
+      // Type guard for validation failure
+      if (result.valid === false) {
+        console.warn('[DraftStore] Ban rejected:', result.error.message)
+        set((draft) => {
+          draft.lastValidationError = result.error
+        })
         return false
       }
 
       // Execute ban
       set((draft) => {
+        draft.lastValidationError = null
+        const currentTurn = getTurnInfo(draft.currentTurn)
+        if (!currentTurn) return
+
         const side = currentTurn.side
         draft[side].bans.push(champion)
         draft.availableChampions.delete(champion)
@@ -128,20 +138,23 @@ export const useDraftStore = create<DraftStore>()(
      */
     executePick: (champion: string, role?: Role) => {
       const state = get()
-      const currentTurn = getTurnInfo(state.currentTurn)
+      const result = validateAction(state, { type: 'PICK', champion, role })
 
-      // Validate it's a pick turn
-      if (!currentTurn || currentTurn.action !== 'pick') {
-        return false
-      }
-
-      // Validate champion is available
-      if (!state.availableChampions.has(champion)) {
+      // Type guard for validation failure
+      if (result.valid === false) {
+        console.warn('[DraftStore] Pick rejected:', result.error.message)
+        set((draft) => {
+          draft.lastValidationError = result.error
+        })
         return false
       }
 
       // Execute pick
       set((draft) => {
+        draft.lastValidationError = null
+        const currentTurn = getTurnInfo(draft.currentTurn)
+        if (!currentTurn) return
+
         const side = currentTurn.side
         draft[side].picks.push({
           champion,
@@ -203,7 +216,19 @@ export const useDraftStore = create<DraftStore>()(
     /**
      * Reset draft to initial state
      */
-    reset: () => set(createInitialState()),
+    reset: () =>
+      set((state) => {
+        Object.assign(state, createInitialState())
+        state.lastValidationError = null
+      }),
+
+    /**
+     * Get the last validation error
+     */
+    getLastError: () => {
+      const state = get()
+      return state.lastValidationError
+    },
 
     /**
      * Get current turn information
