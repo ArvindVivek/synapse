@@ -3,7 +3,7 @@
 import { memo } from 'react'
 import Image from 'next/image'
 import { useDraftStore } from '@/lib/draft/store'
-import { FLEX_CHAMPIONS } from '@/lib/draft/champion-data'
+import { FLEX_CHAMPIONS, getChampionImageUrl } from '@/lib/draft/champion-data'
 
 interface ChampionCardProps {
   champion: string
@@ -48,7 +48,7 @@ function ChampionCardComponent({ champion, isBanPhase }: ChampionCardProps) {
     >
       {/* Champion image */}
       <Image
-        src={`https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${champion}.png`}
+        src={getChampionImageUrl(champion)}
         alt={champion}
         width={64}
         height={64}

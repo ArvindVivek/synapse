@@ -11,6 +11,7 @@ import { useDraftStore } from '@/lib/draft/store'
 import { getTurnInfo } from '@/lib/draft/sequence'
 import { useWinRate } from '@/lib/hooks/use-winrate'
 import { useRecommendations } from '@/lib/hooks/use-recommendations'
+import { getChampionImageUrl } from '@/lib/draft/champion-data'
 
 interface ActionBarProps {
   draftId: string
@@ -72,7 +73,7 @@ export function ActionBar({ draftId }: ActionBarProps) {
             <>
               <div className="w-12 h-12 rounded-lg overflow-hidden ring-2 ring-yellow-400">
                 <Image
-                  src={`https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${selectedChampion}.png`}
+                  src={getChampionImageUrl(selectedChampion)}
                   alt={selectedChampion}
                   width={48}
                   height={48}
@@ -86,7 +87,7 @@ export function ActionBar({ draftId }: ActionBarProps) {
             </>
           ) : (
             <div className="text-gray-500 text-sm">
-              {isMyTurn ? 'Select a champion...' : 'Waiting for opponent...'}
+              {isMyTurn ? 'Select a champion...' : 'Opponent picking...'}
             </div>
           )}
         </div>

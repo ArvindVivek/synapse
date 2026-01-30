@@ -7,6 +7,46 @@
 
 import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
 
+/**
+ * Mapping from display names to ddragon image IDs
+ * Only champions with non-standard names need to be listed here
+ */
+export const DDRAGON_NAME_MAP: Record<string, string> = {
+  // Spaces removed
+  'Xin Zhao': 'XinZhao',
+  'Lee Sin': 'LeeSin',
+  'Jarvan IV': 'JarvanIV',
+  'Miss Fortune': 'MissFortune',
+  'Twisted Fate': 'TwistedFate',
+  'Master Yi': 'MasterYi',
+  'Dr. Mundo': 'DrMundo',
+  'Aurelion Sol': 'AurelionSol',
+  'Tahm Kench': 'TahmKench',
+  'Renata Glasc': 'Renata',
+
+  // Apostrophes/special chars removed
+  "Kai'Sa": 'Kaisa',
+  "Kha'Zix": 'Khazix',
+  "Cho'Gath": 'Chogath',
+  "Vel'Koz": 'Velkoz',
+  "Rek'Sai": 'RekSai',
+  "K'Sante": 'KSante',
+  "Bel'Veth": 'Belveth',
+  "Kog'Maw": 'KogMaw',
+
+  // Completely different names
+  'Wukong': 'MonkeyKing',
+  'Nunu & Willump': 'Nunu',
+}
+
+/**
+ * Get the ddragon image URL for a champion
+ */
+export function getChampionImageUrl(champion: string): string {
+  const ddragonName = DDRAGON_NAME_MAP[champion] || champion
+  return `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${ddragonName}.png`
+}
+
 // Get all champion names from DAMAGE_TYPES
 export const ALL_CHAMPIONS = Object.keys(DAMAGE_TYPES)
 

@@ -19,6 +19,7 @@ import {
   subscribeToDraft,
   DraftSyncPayload,
 } from '@/lib/draft/realtime'
+import { useAutoOpponent } from '@/lib/hooks/use-auto-opponent'
 
 // New components for LoL-authentic layout
 import { PhaseHeader } from '@/components/draft/phase-header'
@@ -52,6 +53,9 @@ export default function DraftSimulator({
   // Search and filter state (controlled by PhaseHeader)
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<string | null>(null)
+
+  // Auto-play opponent turns
+  useAutoOpponent()
 
   // Initialize draft on mount
   useEffect(() => {

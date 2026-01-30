@@ -1,30 +1,33 @@
 'use client'
 
 /**
- * Compact vertical team column showing bans and picks
+ * Enhanced team column showing bans, picks, and team composition stats
  *
- * Displays team composition in a narrow vertical strip:
- * - Bans in groups (3 + 2)
- * - Picks with role badges (3 + 2)
+ * Displays team composition in a vertical strip with:
+ * - Bans in groups (3 + 2) with champion names
+ * - Picks with role badges and champion names
  * - Current action slot highlighted
+ * - Team composition insights (damage type, roles)
  */
 
 import Image from 'next/image'
 import { useDraftStore } from '@/lib/draft/store'
 import { getTurnInfo } from '@/lib/draft/sequence'
+import { getChampionImageUrl } from '@/lib/draft/champion-data'
+import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
 
 interface TeamColumnProps {
   side: 'blue' | 'red'
   className?: string
 }
 
-// Role badge colors
-const ROLE_COLORS: Record<string, string> = {
-  top: 'bg-yellow-600',
-  jungle: 'bg-green-600',
-  mid: 'bg-blue-600',
-  adc: 'bg-red-600',
-  support: 'bg-cyan-600',
+// Role badge colors and icons
+const ROLE_INFO: Record<string, { color: string; icon: string }> = {
+  top: { color: 'bg-yellow-600', icon: '🗡️' },
+  jungle: { color: 'bg-green-600', icon: '🌲' },
+  mid: { color: 'bg-blue-600', icon: '⚡' },
+  adc: { color: 'bg-red-600', icon: '🎯' },
+  support: { color: 'bg-cyan-600', icon: '🛡️' },
 }
 
 function ChampionSlot({
@@ -33,50 +36,69 @@ function ChampionSlot({
   isEmpty,
   isCurrentAction,
   isBan,
-  size = 'normal',
+  showName = false,
 }: {
   champion?: string
   role?: string | null
   isEmpty: boolean
   isCurrentAction: boolean
   isBan: boolean
-  size?: 'normal' | 'small'
+  showName?: boolean
 }) {
-  const sizeClass = size === 'small' ? 'w-10 h-10' : 'w-12 h-12'
-  const iconSize = size === 'small' ? 32 : 40
-
   return (
-    <div
-      className={`
-        ${sizeClass} rounded-lg overflow-hidden relative
-        ${isEmpty ? 'bg-gray-800 border-2 border-dashed border-gray-600' : 'bg-gray-700'}
-        ${isCurrentAction ? 'ring-2 ring-yellow-400 ring-offset-1 ring-offset-gray-900 animate-pulse' : ''}
-        ${isBan && !isEmpty ? 'opacity-60' : ''}
-      `}
-    >
-      {champion && (
-        <>
-          <Image
-            src={`https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${champion}.png`}
-            alt={champion}
-            width={iconSize}
-            height={iconSize}
-            className={`w-full h-full object-cover ${isBan ? 'grayscale' : ''}`}
-          />
-          {isBan && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-full h-0.5 bg-red-500 rotate-45 transform origin-center" />
+    <div className="flex items-center gap-2">
+      <div
+        className={`
+          w-10 h-10 rounded-lg overflow-hidden relative flex-shrink-0
+          ${isEmpty ? 'bg-gray-800 border border-dashed border-gray-600' : 'bg-gray-700'}
+          ${isCurrentAction ? 'ring-2 ring-yellow-400 animate-pulse' : ''}
+          ${isBan && !isEmpty ? 'opacity-50' : ''}
+        `}
+      >
+        {champion && (
+          <>
+            <Image
+              src={getChampionImageUrl(champion)}
+              alt={champion}
+              width={40}
+              height={40}
+              className={`w-full h-full object-cover ${isBan ? 'grayscale' : ''}`}
+            />
+            {isBan && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-0.5 bg-red-500 rotate-45" />
+              </div>
+            )}
+          </>
+        )}
+        {isEmpty && isCurrentAction && (
+          <div className="absolute inset-0 flex items-center justify-center text-yellow-400 text-lg">
+            ?
+          </div>
+        )}
+      </div>
+
+      {/* Champion name + role */}
+      {showName && (
+        <div className="flex-1 min-w-0">
+          {champion ? (
+            <div className="flex items-center gap-1">
+              {role && (
+                <span className="text-[10px]">{ROLE_INFO[role]?.icon || '•'}</span>
+              )}
+              <span className="text-xs text-white truncate">{champion}</span>
+            </div>
+          ) : (
+            <span className="text-xs text-gray-500">
+              {isCurrentAction ? 'Picking...' : '—'}
+            </span>
+          )}
+          {champion && !isBan && (
+            <div className="text-[10px] text-gray-500 uppercase">
+              {DAMAGE_TYPES[champion] || 'mixed'}
             </div>
           )}
-          {role && (
-            <div
-              className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full ${ROLE_COLORS[role] || 'bg-gray-500'}
-                          flex items-center justify-center text-[8px] font-bold text-white uppercase`}
-            >
-              {role.charAt(0)}
-            </div>
-          )}
-        </>
+        </div>
       )}
     </div>
   )
@@ -94,91 +116,107 @@ export function TeamColumn({ side, className = '' }: TeamColumnProps) {
   const isUserTeam = side === userSide
 
   // Calculate which slot is current
-  const getCurrentBanIndex = () => {
-    if (!isCurrentSide || !isBanPhase) return -1
-    return bans.length
-  }
+  const currentBanIndex = isCurrentSide && isBanPhase ? bans.length : -1
+  const currentPickIndex = isCurrentSide && !isBanPhase ? picks.length : -1
 
-  const getCurrentPickIndex = () => {
-    if (!isCurrentSide || isBanPhase) return -1
-    return picks.length
-  }
+  // Calculate team composition stats
+  const damageBreakdown = picks.reduce(
+    (acc, pick) => {
+      if (!pick?.champion) return acc
+      const type = DAMAGE_TYPES[pick.champion] || 'mixed'
+      if (type === 'ap') acc.ap++
+      else if (type === 'ad') acc.ad++
+      else acc.mixed++
+      return acc
+    },
+    { ap: 0, ad: 0, mixed: 0 }
+  )
 
-  const currentBanIndex = getCurrentBanIndex()
-  const currentPickIndex = getCurrentPickIndex()
-
-  // Side color
+  // Side styling
   const sideColor = side === 'blue' ? 'text-blue-400' : 'text-red-400'
-  const sideBorder = side === 'blue' ? 'border-blue-500/30' : 'border-red-500/30'
+  const sideBg = side === 'blue' ? 'bg-blue-500/5' : 'bg-red-500/5'
+  const sideBorder = side === 'blue' ? 'border-blue-500/20' : 'border-red-500/20'
 
   return (
-    <div
-      className={`flex flex-col items-center gap-2 p-2 bg-gray-900/50 rounded-lg border ${sideBorder} ${className}`}
-    >
-      {/* Team label */}
-      <div className={`text-xs font-bold uppercase ${sideColor}`}>
-        {side === 'blue' ? 'Blue' : 'Red'}
-        {isUserTeam && <span className="text-yellow-400 ml-1">★</span>}
+    <div className={`flex flex-col bg-gray-900/80 border ${sideBorder} overflow-hidden ${className}`}>
+      {/* Team header */}
+      <div className={`px-3 py-2 ${sideBg} border-b ${sideBorder}`}>
+        <div className="flex items-center justify-between">
+          <span className={`text-sm font-bold uppercase ${sideColor}`}>
+            {side}
+          </span>
+          {isUserTeam && (
+            <span className="text-[10px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded">
+              YOU
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Ban Phase 1 (3 bans) */}
-      <div className="flex gap-1">
-        {[0, 1, 2].map((i) => (
-          <ChampionSlot
-            key={`ban1-${i}`}
-            champion={bans[i]}
-            isEmpty={!bans[i]}
-            isCurrentAction={currentBanIndex === i}
-            isBan={true}
-            size="small"
-          />
-        ))}
+      {/* Bans section */}
+      <div className="px-2 py-2 border-b border-gray-800">
+        <div className="text-[10px] font-semibold text-gray-500 mb-1.5">BANS</div>
+        <div className="flex flex-wrap gap-1">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div
+              key={`ban-${i}`}
+              className={`w-7 h-7 rounded overflow-hidden ${
+                bans[i] ? 'opacity-50' : 'bg-gray-800 border border-dashed border-gray-700'
+              } ${currentBanIndex === i ? 'ring-1 ring-yellow-400 animate-pulse' : ''}`}
+            >
+              {bans[i] && (
+                <Image
+                  src={getChampionImageUrl(bans[i])}
+                  alt={bans[i]}
+                  width={28}
+                  height={28}
+                  className="w-full h-full object-cover grayscale"
+                />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Picks Phase 1 (3 picks) */}
-      <div className="flex flex-col gap-1 mt-1">
-        {[0, 1, 2].map((i) => (
+      {/* Picks section */}
+      <div className="flex-1 px-2 py-2 space-y-1.5">
+        <div className="text-[10px] font-semibold text-gray-500 mb-1.5">PICKS</div>
+        {[0, 1, 2, 3, 4].map((i) => (
           <ChampionSlot
-            key={`pick1-${i}`}
+            key={`pick-${i}`}
             champion={picks[i]?.champion}
             role={picks[i]?.role}
             isEmpty={!picks[i]}
             isCurrentAction={currentPickIndex === i}
             isBan={false}
+            showName={true}
           />
         ))}
       </div>
 
-      {/* Divider */}
-      <div className="w-full h-px bg-gray-700 my-1" />
-
-      {/* Ban Phase 2 (2 bans) */}
-      <div className="flex gap-1">
-        {[3, 4].map((i) => (
-          <ChampionSlot
-            key={`ban2-${i}`}
-            champion={bans[i]}
-            isEmpty={!bans[i]}
-            isCurrentAction={currentBanIndex === i}
-            isBan={true}
-            size="small"
-          />
-        ))}
-      </div>
-
-      {/* Picks Phase 2 (2 picks) */}
-      <div className="flex flex-col gap-1 mt-1">
-        {[3, 4].map((i) => (
-          <ChampionSlot
-            key={`pick2-${i}`}
-            champion={picks[i]?.champion}
-            role={picks[i]?.role}
-            isEmpty={!picks[i]}
-            isCurrentAction={currentPickIndex === i}
-            isBan={false}
-          />
-        ))}
-      </div>
+      {/* Team composition summary */}
+      {picks.length > 0 && (
+        <div className={`px-2 py-2 ${sideBg} border-t ${sideBorder}`}>
+          <div className="text-[10px] font-semibold text-gray-500 mb-1">DAMAGE</div>
+          <div className="flex gap-1">
+            {damageBreakdown.ap > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded">
+                AP: {damageBreakdown.ap}
+              </span>
+            )}
+            {damageBreakdown.ad > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded">
+                AD: {damageBreakdown.ad}
+              </span>
+            )}
+            {damageBreakdown.mixed > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 bg-gray-500/20 text-gray-400 rounded">
+                Mix: {damageBreakdown.mixed}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
