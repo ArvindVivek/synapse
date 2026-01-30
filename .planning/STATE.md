@@ -9,30 +9,30 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 
 ## Current Position
 
-Phase: 2 of 6 (Core Analytics) - In Progress
-Plan: 3 of 5 in current phase
-Status: In progress
-Last activity: 2026-01-30 - Completed 02-03-PLAN.md (Champion Synergies)
+Phase: 2 of 6 (Core Analytics) - Complete
+Plan: 5 of 5 in current phase
+Status: Phase complete
+Last activity: 2026-01-30 - Completed 02-05-PLAN.md (Player Pool Analytics)
 
-Progress: [██░░░░░░░░] 20% (5/25 plans complete)
+Progress: [███░░░░░░░] 32% (8/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 5 min
-- Total execution time: 0.38 hours
+- Total plans completed: 8
+- Average duration: 4 min
+- Total execution time: 0.54 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 - Data Foundation | 3/3 | 18 min | 6 min |
-| 2 - Core Analytics | 2/5 | 7 min | 3.5 min |
+| 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 6min, 6min, 3min, 4min
-- Trend: Improving velocity (analytics phase starting efficiently)
+- Last 5 plans: 6min, 3min, 4min, 2min, 4min
+- Trend: Excellent velocity (Phase 2 complete at 2.8 min/plan)
 
 *Updated after each plan completion*
 
@@ -66,6 +66,15 @@ Recent decisions affecting current work:
 - [02-03]: 8 archetype categories covering 48 champions for rare pair fallback
 - [02-03]: Minimum 5 games together for direct synergy data (balance coverage vs reliability)
 - [02-03]: Synergy delta metric (smoothed_win_rate - 0.50) for intuitive scoring
+- [02-04]: Matchup delta is directional (positive = favorable) for champion perspective
+- [02-04]: 3-game minimum threshold for matchups (lower than overall stats due to sparsity)
+- [02-04]: Pick phases classified as early (1-3), mid (4-7), late (8-10)
+- [02-04]: Blind pick success when picked before opponent, counter pick when after
+- [02-04]: Pick order recommendations: good_blind_pick (≥52% + ≥counter), better_late (counter>blind+5%), neutral
+- [02-05]: Lighter Bayesian prior for player pools (weight: 5) vs champion stats (weight: 10)
+- [02-05]: 30-day half-life for recency weighting balances recent performance with historical consistency
+- [02-05]: Comfort level thresholds: signature (10+ games, 55%+ WR), comfort (5+ games, 50%+ WR)
+- [02-05]: True flex pick requires 2+ roles with 3+ games each (filters one-off experiments)
 
 ### Pending Todos
 
@@ -78,7 +87,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 02-03-PLAN.md (Champion Synergies)
+Stopped at: Completed 02-05-PLAN.md (Player Pool Analytics) - Phase 2 Complete
 Resume file: None
 
 ## Quick Reference
