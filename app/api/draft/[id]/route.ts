@@ -49,17 +49,28 @@ export async function GET(
   try {
     const { id } = await params
 
+    // Check URL params for userSide (passed during redirect)
+    const url = new URL(request.url)
+    const userSide = url.searchParams.get('userSide') === 'red' ? 'red' : 'blue'
+
     // In production, this would query Supabase
-    // For now, check in-memory store or return mock data
-    const session = draftSessions.get(id)
+    // For now, check in-memory store or return initial state
+    let session = draftSessions.get(id)
 
     if (!session) {
-      // Return 404 for non-existent drafts
-      // In production, query Supabase to check if draft exists
-      return NextResponse.json(
-        { error: 'Draft session not found' },
-        { status: 404 }
-      )
+      // For MVP: Return initial draft state for any valid-looking ID
+      // State will be managed client-side via Zustand
+      session = {
+        id,
+        currentTurn: 0, // 0 means not started yet
+        phase: 'ban1',
+        userSide,
+        blue: { bans: [], picks: [] },
+        red: { bans: [], picks: [] },
+        isComplete: false,
+        startedAt: new Date().toISOString(),
+        completedAt: null,
+      }
     }
 
     return NextResponse.json(session, {

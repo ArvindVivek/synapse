@@ -10,37 +10,16 @@ import { nanoid } from 'nanoid'
 
 /**
  * Server action to create a draft session
+ * Generates ID directly and redirects (state managed client-side)
  */
 async function createDraft(formData: FormData) {
   'use server'
 
-  const userSide = formData.get('userSide') || 'blue'
+  const userSide = formData.get('userSide') === 'red' ? 'red' : 'blue'
+  const draftId = nanoid(12)
 
-  try {
-    // POST to API to create draft session
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/draft`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userSide: userSide === 'red' ? 'red' : 'blue',
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to create draft session')
-    }
-
-    const session = await response.json()
-
-    // Redirect to draft page
-    redirect(`/draft/${session.id}`)
-  } catch (error) {
-    console.error('[CreateDraft] Error:', error)
-    // In production, show error to user
-    redirect('/') // Fallback to home
-  }
+  // Redirect to draft page with userSide in query params
+  redirect(`/draft/${draftId}?userSide=${userSide}`)
 }
 
 /**

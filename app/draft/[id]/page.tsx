@@ -2,51 +2,28 @@
  * GET /draft/:id
  * Draft simulator page
  *
- * Server component that fetches initial draft state and passes to client component
+ * Server component that passes draft ID and side to client simulator
  */
 
-import { notFound } from 'next/navigation'
 import DraftSimulator from './draft-simulator'
 
 interface PageProps {
   params: Promise<{
     id: string
   }>
+  searchParams: Promise<{
+    userSide?: string
+  }>
 }
 
 /**
- * Fetch draft session state
+ * Draft page - renders client simulator with initial props
+ * State is managed entirely client-side via Zustand
  */
-async function getDraftState(id: string) {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/draft/${id}`,
-      {
-        cache: 'no-store', // Always fetch fresh draft state
-      }
-    )
-
-    if (!response.ok) {
-      return null
-    }
-
-    return await response.json()
-  } catch (error) {
-    console.error('[DraftPage] Error fetching draft:', error)
-    return null
-  }
-}
-
-/**
- * Draft page - loads initial state and renders client simulator
- */
-export default async function DraftPage({ params }: PageProps) {
+export default async function DraftPage({ params, searchParams }: PageProps) {
   const { id } = await params
-  const draftState = await getDraftState(id)
+  const { userSide } = await searchParams
+  const initialSide = userSide === 'red' ? 'red' : 'blue'
 
-  if (!draftState) {
-    notFound()
-  }
-
-  return <DraftSimulator draftId={id} initialSide={draftState?.userSide || 'blue'} />
+  return <DraftSimulator draftId={id} initialSide={initialSide} />
 }
