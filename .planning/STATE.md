@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 5 of 6 (Draft Simulator UI)
-Plan: 5 of 5 in current phase
-Status: Prediction panel complete
-Last activity: 2026-01-30 - Completed 05-05-PLAN.md (Prediction panel with probability bars)
+Plan: 3 of 5 in current phase
+Status: Player selection and pool analysis complete
+Last activity: 2026-01-30 - Completed 05-03-PLAN.md (Player selector and champion pool analysis)
 
-Progress: [███████░░░] 72% (18/25 plans complete)
+Progress: [███████░░░] 76% (19/25 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 3.4 min
-- Total execution time: 1.23 hours
+- Total execution time: 1.31 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [███████░░░] 72% (18/25 plans complete)
 | 2 - Core Analytics | 5/5 | 14 min | 2.8 min |
 | 3 - Draft State Machine | 3/3 | 15.4 min | 5.1 min |
 | 4 - AI/Heuristics Engine | 5/5 | 19.1 min | 3.8 min |
-| 5 - Draft Simulator UI | 2/5 | 12 min | 6 min |
+| 5 - Draft Simulator UI | 3/5 | 17 min | 5.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 2.6min, 8min, 4min
-- Trend: Plan 05-05 executed quickly (4min) with straightforward component creation
+- Last 5 plans: 2.6min, 8min, 4min, 5min
+- Trend: Plan 05-03 completed efficiently with API route and component creation
 
 *Updated after each plan completion*
 
@@ -126,6 +126,10 @@ Recent decisions affecting current work:
 - [05-05]: Refetch predictions on turn change to reflect updated draft state
 - [05-05]: Filter unavailable champions client-side using availableChampions Set
 - [05-05]: Color-coded probability bars: red >40%, orange >25%, yellow <25%
+- [05-03]: Aggregate roles across champion entries for multi-role flexibility display
+- [05-03]: Comfort level thresholds: signature (10+ games, 55%+ WR), comfort (5+ games, 50%+ WR)
+- [05-03]: 60-second cache TTL for player pool data (analytics don't change during draft)
+- [05-03]: Mock player data for demo purposes (LCK pro players)
 
 ### Pending Todos
 
@@ -142,7 +146,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-30
-Stopped at: Completed 05-05-PLAN.md (Prediction panel with probability bars)
+Stopped at: Completed 05-03-PLAN.md (Player selector and champion pool analysis)
 Resume file: None
 
 ## Quick Reference
