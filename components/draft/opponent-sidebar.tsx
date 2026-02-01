@@ -1,24 +1,22 @@
 'use client'
 
 /**
- * Enhanced opponent analysis sidebar
+ * Opponent Scouting Sidebar
  *
- * Shows detailed player stats, champion pools with win rates,
- * and pick predictions with probability bars.
+ * Shows all players on the opponent team with their champion pools visible.
+ * Each player card shows:
+ * - Role icon and player name
+ * - Top 3 signature/comfort champions with win rates
+ * - Click to expand for full champion pool
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import { useDraftStore } from '@/lib/draft/store'
-import { usePlayerPool } from '@/lib/hooks/use-player-pool'
+import { useTeams, type Team, type TeamPlayer } from '@/lib/hooks/use-teams'
+import { useTeamPools, type TeamPlayerPool } from '@/lib/hooks/use-team-pools'
 import { getChampionImageUrl } from '@/lib/draft/champion-data'
-import {
-  type Role,
-  type PlayerInfo,
-  type SelectedPlayers,
-  ROLES,
-  createEmptySelectedPlayers,
-} from './player-selector'
+import { getTurnInfo } from '@/lib/draft/sequence'
 import {
   TopIcon,
   JungleIcon,
@@ -26,41 +24,16 @@ import {
   AdcIcon,
   SupportIcon,
   UsersIcon,
-  CloseIcon,
-  ChevronRightIcon,
   ChevronDownIcon,
+  ChevronUpIcon,
+  TargetIcon,
+  StarIcon,
+  AlertTriangleIcon,
 } from '@/components/ui/icons'
 
-// Player roster with teams
-const PLAYER_ROSTER: Record<Role, PlayerInfo[]> = {
-  top: [
-    { id: 'Zeus', name: 'Zeus', team: 'T1' },
-    { id: 'Kiin', name: 'Kiin', team: 'DK' },
-    { id: 'Doran', name: 'Doran', team: 'GEN' },
-  ],
-  jungle: [
-    { id: 'Oner', name: 'Oner', team: 'T1' },
-    { id: 'Canyon', name: 'Canyon', team: 'GEN' },
-    { id: 'Peanut', name: 'Peanut', team: 'DK' },
-  ],
-  mid: [
-    { id: 'Faker', name: 'Faker', team: 'T1' },
-    { id: 'Chovy', name: 'Chovy', team: 'GEN' },
-    { id: 'ShowMaker', name: 'ShowMaker', team: 'DK' },
-  ],
-  adc: [
-    { id: 'Gumayusi', name: 'Gumayusi', team: 'T1' },
-    { id: 'Peyz', name: 'Peyz', team: 'GEN' },
-    { id: 'Aiming', name: 'Aiming', team: 'DK' },
-  ],
-  support: [
-    { id: 'Keria', name: 'Keria', team: 'T1' },
-    { id: 'Lehends', name: 'Lehends', team: 'GEN' },
-    { id: 'Kellin', name: 'Kellin', team: 'DK' },
-  ],
-}
+type Role = 'top' | 'jungle' | 'mid' | 'adc' | 'support'
 
-const ROLE_ICONS = {
+const ROLE_ICONS: Record<Role, React.ComponentType<{ className?: string }>> = {
   top: TopIcon,
   jungle: JungleIcon,
   mid: MidIcon,
@@ -68,12 +41,22 @@ const ROLE_ICONS = {
   support: SupportIcon,
 }
 
-const ROLE_LABELS: Record<Role, string> = {
-  top: 'TOP',
-  jungle: 'JGL',
-  mid: 'MID',
-  adc: 'ADC',
-  support: 'SUP',
+const ROLE_ORDER: Role[] = ['top', 'jungle', 'mid', 'adc', 'support']
+
+const ROLE_COLORS: Record<Role, string> = {
+  top: 'text-yellow-400',
+  jungle: 'text-green-400',
+  mid: 'text-blue-400',
+  adc: 'text-red-400',
+  support: 'text-cyan-400',
+}
+
+const ROLE_BG: Record<Role, string> = {
+  top: 'from-yellow-500/10 to-yellow-500/5',
+  jungle: 'from-green-500/10 to-green-500/5',
+  mid: 'from-blue-500/10 to-blue-500/5',
+  adc: 'from-red-500/10 to-red-500/5',
+  support: 'from-cyan-500/10 to-cyan-500/5',
 }
 
 interface OpponentSidebarProps {
@@ -81,175 +64,381 @@ interface OpponentSidebarProps {
 }
 
 export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
-  const [selectedPlayers, setSelectedPlayers] = useState<SelectedPlayers>(
-    createEmptySelectedPlayers()
-  )
-  const [expandedRole, setExpandedRole] = useState<Role | null>(null)
+  const [manualTeam, setManualTeam] = useState<Team | null>(null)
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null)
 
+  const { teams, loading: teamsLoading } = useTeams()
   const userSide = useDraftStore((state) => state.userSide)
+  const opponentTeam = useDraftStore((state) => state.opponentTeam)
+  const selectChampion = useDraftStore((state) => state.selectChampion)
+  const isMyTurn = useDraftStore((state) => state.isMyTurn())
+  const currentTurn = useDraftStore((state) => state.currentTurn)
   const opponentSide = userSide === 'blue' ? 'RED' : 'BLUE'
 
-  // Get pool for expanded player
-  const expandedPlayer = expandedRole ? selectedPlayers[expandedRole] : null
-  const { data: poolData, loading: isLoading } = usePlayerPool(expandedPlayer?.id || null)
-  const pool = poolData?.championPool || []
+  // Use store opponent team if available, otherwise use manual selection
+  const selectedTeam: Team | null = opponentTeam
+    ? {
+        id: opponentTeam.id,
+        name: opponentTeam.name,
+        players: opponentTeam.players,
+      }
+    : manualTeam
 
-  const handlePlayerSelect = (role: Role, player: PlayerInfo | null) => {
-    setSelectedPlayers((prev) => ({ ...prev, [role]: player }))
-    if (player) {
-      setExpandedRole(role)
-    }
+  const turnInfo = getTurnInfo(currentTurn)
+  const isBanPhase = turnInfo?.action === 'ban'
+
+  // Get players sorted by role
+  const sortedPlayers = useMemo(() => {
+    if (!selectedTeam) return []
+    return ROLE_ORDER.map((role) =>
+      selectedTeam.players.find((p) => p.role === role)
+    ).filter((p): p is TeamPlayer => p !== undefined)
+  }, [selectedTeam])
+
+  // Fetch all player pools at once
+  const playersInput = useMemo(
+    () =>
+      sortedPlayers.map((p) => ({
+        id: p.id,
+        name: p.name,
+        role: p.role,
+      })),
+    [sortedPlayers]
+  )
+  const { pools, loading: poolsLoading } = useTeamPools(playersInput)
+
+  const handleTeamSelect = (teamId: string) => {
+    const team = teams.find((t) => t.id === teamId)
+    setManualTeam(team || null)
+    setExpandedPlayerId(null)
   }
 
-  const selectedCount = Object.values(selectedPlayers).filter((p) => p !== null).length
+  const handlePlayerToggle = (playerId: string) => {
+    setExpandedPlayerId((prev) => (prev === playerId ? null : playerId))
+  }
 
-  // Calculate pool stats
-  const signatureCount = pool.filter(c => c.comfortLevel === 'signature').length
-  const comfortCount = pool.filter(c => c.comfortLevel === 'comfort').length
-  const avgWinRate = pool.length > 0
-    ? pool.reduce((sum, c) => sum + c.winRate, 0) / pool.length
-    : 0
-  const totalGames = pool.reduce((sum, c) => sum + c.gamesPlayed, 0)
+  const handleChampionClick = (champion: string) => {
+    if (!isMyTurn) return
+    selectChampion(champion)
+  }
+
+  // Get all priority bans across all players (signature picks with high WR)
+  const allPriorityBans = useMemo(() => {
+    const bans: Array<{
+      champion: string
+      playerName: string
+      role: string
+      winRate: number
+    }> = []
+
+    pools.forEach((pool) => {
+      pool.signatureChamps.forEach((champ) => {
+        if (champ.winRate >= 0.55) {
+          bans.push({
+            champion: champ.champion,
+            playerName: pool.playerName,
+            role: pool.role,
+            winRate: champ.winRate,
+          })
+        }
+      })
+    })
+
+    return bans.sort((a, b) => b.winRate - a.winRate).slice(0, 5)
+  }, [pools])
 
   return (
-    <div className={`flex flex-col bg-gray-900/90 border-r border-gray-800 overflow-hidden ${className}`}>
+    <div
+      className={`flex flex-col bg-gradient-to-b from-gray-900/95 to-gray-900 border-r border-gray-800 overflow-hidden ${className}`}
+    >
       {/* Header */}
-      <div className="px-3 py-2 bg-gray-800/50 border-b border-gray-700">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white">
-            {opponentSide} TEAM ANALYSIS
+      <div className="px-3 py-2.5 bg-gradient-to-r from-red-900/30 to-orange-900/30 border-b border-red-500/20 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <TargetIcon className="w-4 h-4 text-red-400" />
+          <h3 className="text-xs font-bold text-white tracking-wide">
+            OPPONENT SCOUTING
           </h3>
-          <span className={`text-xs px-2 py-0.5 rounded ${
-            selectedCount === 5 ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-400'
-          }`}>
-            {selectedCount}/5
-          </span>
         </div>
+        <p className="text-[10px] text-red-400/70 mt-0.5">
+          {opponentSide} Team Analysis
+        </p>
       </div>
 
-      {/* Player selectors */}
-      <div className="flex-shrink-0 p-2 space-y-1 border-b border-gray-800">
-        {ROLES.map((role) => {
-          const player = selectedPlayers[role]
-          const isExpanded = expandedRole === role
-          const RoleIcon = ROLE_ICONS[role]
-
-          return (
-            <div
-              key={role}
-              className={`flex items-center gap-2 p-1.5 rounded transition-colors ${
-                isExpanded ? 'bg-blue-500/10 border border-blue-500/30' : 'hover:bg-gray-800/50'
-              }`}
-            >
-              {/* Role icon */}
-              <div className="w-6 flex items-center justify-center">
-                <RoleIcon className="w-4 h-4 text-gray-400" />
-              </div>
-
-              {/* Player select */}
-              <select
-                value={player?.id || ''}
-                onChange={(e) => {
-                  const p = PLAYER_ROSTER[role].find((x) => x.id === e.target.value)
-                  handlePlayerSelect(role, p || null)
-                }}
-                className="flex-1 px-2 py-1 bg-gray-800 text-white text-xs rounded
-                           border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                <option value="">Select {ROLE_LABELS[role]}...</option>
-                {PLAYER_ROSTER[role].map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.team})
-                  </option>
-                ))}
-              </select>
-
-              {/* Quick view button */}
-              {player && (
-                <button
-                  onClick={() => setExpandedRole(isExpanded ? null : role)}
-                  className={`p-1 rounded transition-colors ${
-                    isExpanded
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  {isExpanded ? (
-                    <ChevronDownIcon className="w-3 h-3" />
-                  ) : (
-                    <ChevronRightIcon className="w-3 h-3" />
-                  )}
-                </button>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Expanded player details */}
-      {expandedPlayer && (
-        <div className="flex-1 overflow-y-auto">
-          {/* Player header with stats */}
-          <div className="px-3 py-2 bg-gray-800/30 border-b border-gray-700">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <span className="text-sm font-bold text-white">{expandedPlayer.name}</span>
-                <span className="text-xs text-gray-500 ml-2">{expandedPlayer.team}</span>
-              </div>
-              <button
-                onClick={() => setExpandedRole(null)}
-                className="text-gray-500 hover:text-white"
-              >
-                <CloseIcon className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Quick stats row */}
-            {!isLoading && pool.length > 0 && (
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-gray-800 rounded p-1.5">
-                  <div className="text-yellow-400 font-bold text-sm">{signatureCount}</div>
-                  <div className="text-[10px] text-gray-500">Signature</div>
-                </div>
-                <div className="bg-gray-800 rounded p-1.5">
-                  <div className="text-blue-400 font-bold text-sm">{Math.round(avgWinRate * 100)}%</div>
-                  <div className="text-[10px] text-gray-500">Avg WR</div>
-                </div>
-                <div className="bg-gray-800 rounded p-1.5">
-                  <div className="text-gray-300 font-bold text-sm">{totalGames}</div>
-                  <div className="text-[10px] text-gray-500">Games</div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Champion pool list */}
-          <div className="p-2">
-            <div className="text-xs font-semibold text-gray-400 mb-2 px-1">
-              CHAMPION POOL
-            </div>
-
-            {isLoading ? (
-              <div className="text-xs text-gray-500 text-center py-4">Loading stats...</div>
-            ) : pool.length === 0 ? (
-              <div className="text-xs text-gray-500 text-center py-4">No data available</div>
+      {/* Team Selector - only show if no team from store */}
+      {!opponentTeam && (
+        <div className="p-2 border-b border-gray-800 flex-shrink-0">
+          <select
+            value={manualTeam?.id || ''}
+            onChange={(e) => handleTeamSelect(e.target.value)}
+            className="w-full px-3 py-2 bg-gray-800 text-white text-xs rounded-lg
+                       border border-gray-700 focus:outline-none focus:ring-1 focus:ring-red-500
+                       cursor-pointer transition-colors hover:border-gray-600"
+          >
+            <option value="">Select opponent team...</option>
+            {teamsLoading ? (
+              <option disabled>Loading teams...</option>
             ) : (
-              <div className="space-y-1.5">
-                {pool.slice(0, 10).map((champ, idx) => (
-                  <ChampionPoolRow key={champ.champion} champ={champ} rank={idx + 1} />
-                ))}
-              </div>
+              teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name} ({team.players.length} players)
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+      )}
+
+      {/* Team Name Banner */}
+      {selectedTeam && (
+        <div className="px-3 py-2 border-b border-gray-800 bg-gray-800/30 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <UsersIcon className="w-3.5 h-3.5 text-gray-500" />
+              <span className="text-xs font-semibold text-white">
+                {selectedTeam.name}
+              </span>
+            </div>
+            {poolsLoading && (
+              <div className="w-3 h-3 border border-red-500/30 border-t-red-400 rounded-full animate-spin" />
             )}
           </div>
         </div>
       )}
 
-      {/* Empty state */}
-      {!expandedPlayer && (
-        <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-          <UsersIcon className="w-8 h-8 text-gray-600 mb-2" />
-          <p className="text-xs text-gray-500">
-            Select opponent players to analyze their champion pools and predict picks
+      {/* Priority Bans Summary - only show if we have data */}
+      {allPriorityBans.length > 0 && isBanPhase && (
+        <div className="px-3 py-2 border-b border-gray-800 bg-red-500/5 flex-shrink-0">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangleIcon className="w-3.5 h-3.5 text-red-400" />
+            <span className="text-[10px] font-semibold text-red-400 uppercase tracking-wider">
+              Top Priority Bans
+            </span>
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            {allPriorityBans.slice(0, 4).map((ban) => (
+              <button
+                key={`${ban.playerName}-${ban.champion}`}
+                onClick={() => handleChampionClick(ban.champion)}
+                disabled={!isMyTurn}
+                className={`relative group ${isMyTurn ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                <div
+                  className={`w-9 h-9 rounded-lg overflow-hidden ring-2 ring-red-500/50
+                              ${isMyTurn ? 'hover:ring-red-400 hover:scale-105 transition-transform' : ''}`}
+                >
+                  <Image
+                    src={getChampionImageUrl(ban.champion)}
+                    alt={ban.champion}
+                    width={36}
+                    height={36}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {/* Tooltip */}
+                <div
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-gray-900 rounded text-[9px] text-white
+                              opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10
+                              border border-gray-700 shadow-lg"
+                >
+                  <span className="text-gray-400">{ban.playerName}&apos;s</span>{' '}
+                  {ban.champion}
+                  <span className="text-green-400 ml-1">
+                    {Math.round(ban.winRate * 100)}%
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* All Players with Champion Pools */}
+      <div className="flex-1 overflow-y-auto">
+        {!selectedTeam ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-4 text-center h-full">
+            <div className="w-12 h-12 rounded-full bg-gray-800/50 flex items-center justify-center mb-3">
+              <TargetIcon className="w-6 h-6 text-gray-600" />
+            </div>
+            <p className="text-xs text-gray-400 font-medium mb-1">
+              No Team Selected
+            </p>
+            <p className="text-[10px] text-gray-500 max-w-[140px]">
+              Select an opponent team above to view their scouting report
+            </p>
+          </div>
+        ) : sortedPlayers.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-4 text-center h-full">
+            <UsersIcon className="w-8 h-8 text-gray-600 mb-2" />
+            <p className="text-xs text-gray-500">No player data available</p>
+          </div>
+        ) : (
+          <div className="p-2 space-y-2">
+            {sortedPlayers.map((player) => {
+              const pool = pools.get(player.id)
+              const isExpanded = expandedPlayerId === player.id
+              const RoleIcon = ROLE_ICONS[player.role]
+              const roleColor = ROLE_COLORS[player.role]
+              const roleBg = ROLE_BG[player.role]
+
+              return (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  pool={pool}
+                  isExpanded={isExpanded}
+                  isLoading={poolsLoading && !pool}
+                  isMyTurn={isMyTurn}
+                  RoleIcon={RoleIcon}
+                  roleColor={roleColor}
+                  roleBg={roleBg}
+                  onToggle={() => handlePlayerToggle(player.id)}
+                  onChampionClick={handleChampionClick}
+                />
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Player card showing champion pool
+ */
+function PlayerCard({
+  player,
+  pool,
+  isExpanded,
+  isLoading,
+  isMyTurn,
+  RoleIcon,
+  roleColor,
+  roleBg,
+  onToggle,
+  onChampionClick,
+}: {
+  player: TeamPlayer
+  pool: TeamPlayerPool | undefined
+  isExpanded: boolean
+  isLoading: boolean
+  isMyTurn: boolean
+  RoleIcon: React.ComponentType<{ className?: string }>
+  roleColor: string
+  roleBg: string
+  onToggle: () => void
+  onChampionClick: (champion: string) => void
+}) {
+  // Get display champions - show signature first, then top by winrate
+  const displayChamps = useMemo(() => {
+    if (!pool || pool.championPool.length === 0) return []
+
+    // Prioritize signature picks, then sort by win rate
+    const sorted = [...pool.championPool].sort((a, b) => {
+      if (a.comfortLevel === 'signature' && b.comfortLevel !== 'signature')
+        return -1
+      if (b.comfortLevel === 'signature' && a.comfortLevel !== 'signature')
+        return 1
+      return b.winRate - a.winRate
+    })
+
+    return isExpanded ? sorted.slice(0, 8) : sorted.slice(0, 3)
+  }, [pool, isExpanded])
+
+  const hasData = pool && pool.championPool.length > 0
+
+  return (
+    <div
+      className={`rounded-lg border transition-all duration-200 overflow-hidden ${
+        isExpanded
+          ? 'border-gray-600 bg-gray-800/50'
+          : 'border-gray-800 bg-gray-800/30 hover:border-gray-700'
+      }`}
+    >
+      {/* Player Header - always visible */}
+      <button
+        onClick={onToggle}
+        className={`w-full flex items-center gap-2 p-2.5 text-left transition-colors bg-gradient-to-r ${roleBg}`}
+      >
+        {/* Role icon */}
+        <div
+          className={`w-6 h-6 rounded-md flex items-center justify-center bg-gray-800/50 ${roleColor}`}
+        >
+          <RoleIcon className="w-4 h-4" />
+        </div>
+
+        {/* Player name and stats */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-white truncate">
+              {player.name}
+            </span>
+            {hasData && (
+              <span className="text-[9px] text-gray-500">
+                {Math.round((pool?.avgWinRate || 0) * 100)}% avg WR
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Loading / Expand indicator */}
+        {isLoading ? (
+          <div className="w-4 h-4 border border-gray-600 border-t-gray-400 rounded-full animate-spin" />
+        ) : (
+          <div className="text-gray-500">
+            {isExpanded ? (
+              <ChevronUpIcon className="w-4 h-4" />
+            ) : (
+              <ChevronDownIcon className="w-4 h-4" />
+            )}
+          </div>
+        )}
+      </button>
+
+      {/* Champion Pool - always show top 3, expand for more */}
+      {hasData && (
+        <div className="px-2 pb-2">
+          {/* Champion icons row */}
+          <div
+            className={`flex flex-wrap gap-1.5 ${isExpanded ? 'pt-2' : 'pt-1.5'}`}
+          >
+            {displayChamps.map((champ) => (
+              <ChampionBadge
+                key={champ.champion}
+                champ={champ}
+                isClickable={isMyTurn}
+                showDetails={isExpanded}
+                onClick={() => onChampionClick(champ.champion)}
+              />
+            ))}
+          </div>
+
+          {/* Show more indicator when collapsed */}
+          {!isExpanded && pool && pool.championPool.length > 3 && (
+            <div className="text-[9px] text-gray-500 mt-1.5 text-center">
+              +{pool.championPool.length - 3} more champions
+            </div>
+          )}
+
+          {/* Expanded view: full stats */}
+          {isExpanded && pool && (
+            <div className="mt-3 pt-2 border-t border-gray-700/50">
+              <div className="flex justify-between text-[10px] text-gray-500">
+                <span>
+                  {pool.signatureChamps.length} signature picks
+                </span>
+                <span>{pool.totalGames} total games</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* No data state */}
+      {!isLoading && !hasData && (
+        <div className="px-2 pb-2 pt-1">
+          <p className="text-[10px] text-gray-600 text-center">
+            No champion data
           </p>
         </div>
       )}
@@ -258,40 +447,91 @@ export function OpponentSidebar({ className = '' }: OpponentSidebarProps) {
 }
 
 /**
- * Individual champion row with detailed stats
+ * Champion badge with win rate
  */
-function ChampionPoolRow({
+function ChampionBadge({
   champ,
-  rank
+  isClickable,
+  showDetails,
+  onClick,
 }: {
   champ: {
     champion: string
-    gamesPlayed: number
     winRate: number
     comfortLevel: string
-    roles: string[]
+    gamesPlayed: number
   }
-  rank: number
+  isClickable: boolean
+  showDetails: boolean
+  onClick: () => void
 }) {
-  const wrPercent = Math.round(champ.winRate * 100)
-  const wrColor = wrPercent >= 60 ? 'text-green-400' : wrPercent >= 50 ? 'text-blue-400' : 'text-red-400'
-  const wrBarColor = wrPercent >= 60 ? 'bg-green-500' : wrPercent >= 50 ? 'bg-blue-500' : 'bg-red-500'
+  const wrPct = Math.round(champ.winRate * 100)
+  const isSignature = champ.comfortLevel === 'signature'
 
-  const comfortBadge = champ.comfortLevel === 'signature'
-    ? { bg: 'bg-yellow-500/20', text: 'text-yellow-400', label: '★' }
-    : champ.comfortLevel === 'comfort'
-    ? { bg: 'bg-blue-500/20', text: 'text-blue-400', label: '●' }
-    : { bg: 'bg-gray-500/20', text: 'text-gray-400', label: '○' }
+  if (showDetails) {
+    // Expanded view: show full row with details
+    return (
+      <button
+        onClick={onClick}
+        disabled={!isClickable}
+        className={`w-full flex items-center gap-2 p-1.5 rounded-lg transition-all ${
+          isSignature
+            ? 'bg-yellow-500/10 border border-yellow-500/20'
+            : 'bg-gray-800/50 border border-transparent hover:bg-gray-800'
+        } ${isClickable ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-default'}`}
+      >
+        {/* Champion icon */}
+        <div className="relative w-8 h-8 rounded overflow-hidden flex-shrink-0">
+          <Image
+            src={getChampionImageUrl(champ.champion)}
+            alt={champ.champion}
+            width={32}
+            height={32}
+            className="w-full h-full object-cover"
+          />
+          {isSignature && (
+            <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-yellow-500 rounded-full flex items-center justify-center">
+              <StarIcon className="w-2 h-2 text-yellow-900" />
+            </div>
+          )}
+        </div>
 
+        {/* Name and stats */}
+        <div className="flex-1 min-w-0">
+          <span className="text-xs font-medium text-white truncate block">
+            {champ.champion}
+          </span>
+          <div className="flex items-center gap-2 text-[9px]">
+            <span
+              className={
+                wrPct >= 60
+                  ? 'text-green-400'
+                  : wrPct >= 50
+                    ? 'text-blue-400'
+                    : 'text-red-400'
+              }
+            >
+              {wrPct}% WR
+            </span>
+            <span className="text-gray-500">{champ.gamesPlayed} games</span>
+          </div>
+        </div>
+      </button>
+    )
+  }
+
+  // Compact view: just icon with tooltip
   return (
-    <div className="flex items-center gap-2 p-1.5 bg-gray-800/50 rounded hover:bg-gray-800 transition-colors">
-      {/* Rank */}
-      <div className="w-4 text-[10px] text-gray-500 text-center">
-        #{rank}
-      </div>
-
-      {/* Champion icon */}
-      <div className="relative w-8 h-8 rounded overflow-hidden flex-shrink-0">
+    <button
+      onClick={onClick}
+      disabled={!isClickable}
+      className={`relative group ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
+    >
+      <div
+        className={`w-8 h-8 rounded-lg overflow-hidden transition-transform ${
+          isSignature ? 'ring-2 ring-yellow-500/50' : 'ring-1 ring-gray-700'
+        } ${isClickable ? 'hover:scale-110' : ''}`}
+      >
         <Image
           src={getChampionImageUrl(champ.champion)}
           alt={champ.champion}
@@ -300,35 +540,35 @@ function ChampionPoolRow({
           className="w-full h-full object-cover"
         />
       </div>
-
-      {/* Champion info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs font-medium text-white truncate">{champ.champion}</span>
-          <span className={`text-[10px] px-1 rounded ${comfortBadge.bg} ${comfortBadge.text}`}>
-            {comfortBadge.label}
-          </span>
+      {isSignature && (
+        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-yellow-500 rounded-full flex items-center justify-center">
+          <StarIcon className="w-2 h-2 text-yellow-900" />
         </div>
-
-        {/* Win rate bar */}
-        <div className="flex items-center gap-2 mt-0.5">
-          <div className="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-            <div
-              className={`h-full ${wrBarColor} transition-all`}
-              style={{ width: `${wrPercent}%` }}
-            />
-          </div>
-          <span className={`text-[10px] font-medium ${wrColor} w-8 text-right`}>
-            {wrPercent}%
-          </span>
-        </div>
+      )}
+      {/* Win rate indicator */}
+      <div
+        className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold px-1 rounded ${
+          wrPct >= 60
+            ? 'bg-green-500/80 text-white'
+            : wrPct >= 50
+              ? 'bg-blue-500/80 text-white'
+              : 'bg-gray-700/80 text-gray-300'
+        }`}
+      >
+        {wrPct}%
       </div>
-
-      {/* Games count */}
-      <div className="text-right flex-shrink-0">
-        <div className="text-xs text-gray-300">{champ.gamesPlayed}</div>
-        <div className="text-[10px] text-gray-500">games</div>
+      {/* Tooltip */}
+      <div
+        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 rounded text-[9px] text-white
+                    opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10
+                    border border-gray-700 shadow-lg"
+      >
+        {champ.champion}
+        {isSignature && (
+          <span className="text-yellow-400 ml-1">(signature)</span>
+        )}
+        {isClickable && <span className="text-gray-400 ml-1">• click to select</span>}
       </div>
-    </div>
+    </button>
   )
 }

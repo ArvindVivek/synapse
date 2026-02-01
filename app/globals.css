@@ -24,3 +24,188 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Pulsating animation for action prompts */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+  }
+  50% {
+    opacity: 0.7;
+    text-shadow: 0 0 4px currentColor, 0 0 8px currentColor;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Pulsing ring for highlighted champions */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(34, 211, 238, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* INTENSE spotlight for #1 picks */
+@keyframes spotlight-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(34, 211, 238, 0.8),
+      0 0 20px 5px rgba(34, 211, 238, 0.4),
+      0 0 40px 10px rgba(34, 211, 238, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 0 8px rgba(34, 211, 238, 0.4),
+      0 0 30px 10px rgba(34, 211, 238, 0.5),
+      0 0 60px 20px rgba(34, 211, 238, 0.3);
+  }
+}
+
+.animate-spotlight {
+  animation: spotlight-pulse 1s ease-in-out infinite;
+}
+
+/* Shimmer effect for loading/highlight states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Slide in from left */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out forwards;
+}
+
+/* Progress bar fill animation */
+@keyframes progress-fill {
+  from {
+    width: 0;
+  }
+}
+
+.animate-progress-fill {
+  animation: progress-fill 0.8s ease-out forwards;
+}
+
+/* Glow pulse for important stats */
+@keyframes stat-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+}
+
+.animate-stat-glow {
+  animation: stat-glow 3s ease-in-out infinite;
+}
+
+/* Bounce attention animation */
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 1.5s ease-in-out infinite;
+}
+
+/* Rotating loader */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Card hover lift */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Gradient border animation */
+@keyframes gradient-border {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-border {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 300% 100%;
+  animation: gradient-border 3s ease infinite;
+}

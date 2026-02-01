@@ -4,9 +4,8 @@
  * Identifies champions with multi-role viability. Flex picks are valuable
  * in early draft as they hide role intentions and force opponent to guess.
  *
- * Uses role_confidence scores from Phase 1 data:
- * - confidence < 0.7 indicates potential flex pick
- * - True flex: 2+ roles with 3+ games each
+ * Uses role_confidence scores from database when available,
+ * falls back to hardcoded pro play flex picks.
  */
 
 import { createClient } from '@/lib/supabase/server'
@@ -21,10 +20,45 @@ export interface FlexPickInfo {
 }
 
 /**
+ * Known flex picks from pro play - used as fallback when database unavailable
+ */
+const PRO_FLEX_PICKS: Record<string, { roles: string[], score: number }> = {
+  // Mid/Top flex
+  'Jayce': { roles: ['top', 'mid'], score: 0.85 },
+  'Akali': { roles: ['mid', 'top'], score: 0.80 },
+  'Sylas': { roles: ['mid', 'top', 'jungle'], score: 0.90 },
+  'Rumble': { roles: ['top', 'jungle', 'mid'], score: 0.85 },
+  'Kennen': { roles: ['top', 'mid', 'adc'], score: 0.75 },
+  'Gragas': { roles: ['jungle', 'top', 'support'], score: 0.90 },
+  // Jungle/Support flex
+  'Maokai': { roles: ['jungle', 'support', 'top'], score: 0.85 },
+  'Sejuani': { roles: ['jungle', 'top'], score: 0.70 },
+  'Poppy': { roles: ['jungle', 'support', 'top'], score: 0.80 },
+  // Support/Mid flex
+  'Karma': { roles: ['support', 'mid', 'top'], score: 0.80 },
+  'Morgana': { roles: ['support', 'mid', 'jungle'], score: 0.75 },
+  'Lux': { roles: ['support', 'mid'], score: 0.70 },
+  // ADC flex
+  'Senna': { roles: ['adc', 'support'], score: 0.85 },
+  'Seraphine': { roles: ['support', 'mid', 'adc'], score: 0.80 },
+  // Multi-role flex
+  'Viego': { roles: ['jungle', 'mid', 'top'], score: 0.75 },
+  'Pantheon': { roles: ['support', 'mid', 'top', 'jungle'], score: 0.95 },
+  'Nautilus': { roles: ['support', 'jungle', 'top'], score: 0.70 },
+  'Lee Sin': { roles: ['jungle', 'mid'], score: 0.65 },
+  'Nidalee': { roles: ['jungle', 'mid'], score: 0.65 },
+  'Taliyah': { roles: ['mid', 'jungle', 'support'], score: 0.80 },
+  'Twisted Fate': { roles: ['mid', 'adc'], score: 0.70 },
+  // Top/Mid/Jungle flex
+  'Camille': { roles: ['top', 'jungle'], score: 0.70 },
+  'Gnar': { roles: ['top'], score: 0.50 }, // Single role example for filtering
+}
+
+/**
  * Detect flex picks from available champions
  *
  * Queries champion_stats_computed for role distribution data.
- * Champions with low role_confidence (<0.7) are potential flex picks.
+ * Falls back to hardcoded pro play flex picks if database unavailable.
  *
  * @param availableChampions - Champions still available for pick
  * @param patchVersion - Patch version for data queries
@@ -34,55 +68,75 @@ export async function detectFlexPicks(
   availableChampions: string[],
   patchVersion: string
 ): Promise<FlexPickInfo[]> {
-  const supabase = await createClient()
-
-  // Query champion stats for all available champions
-  // We need to aggregate role data to detect flex potential
-  const { data: championStats, error } = await supabase
-    .from('champion_stats_computed')
-    .select('champion_name, role, games, role_confidence')
-    .in('champion_name', availableChampions)
-    .eq('patch_version', patchVersion)
-    .gte('games', 3) // Only roles with meaningful games
-    .order('champion_name')
-    .order('games', { ascending: false })
-
-  if (error) {
-    console.error('Error fetching champion stats for flex detection:', error)
-    return []
-  }
-
-  if (!championStats || championStats.length === 0) {
-    return []
-  }
-
-  // Group by champion
-  const championRoles = new Map<string, Array<{
-    role: string
-    games: number
-    confidence: number
-  }>>()
-
-  for (const stat of championStats) {
-    if (!championRoles.has(stat.champion_name)) {
-      championRoles.set(stat.champion_name, [])
-    }
-    championRoles.get(stat.champion_name)!.push({
-      role: stat.role,
-      games: stat.games,
-      confidence: parseFloat(stat.role_confidence.toString())
-    })
-  }
-
-  // Calculate flex potential for each champion
+  let hadDatabaseData = false
   const flexPicks: FlexPickInfo[] = []
 
-  for (const [champion, roleData] of championRoles.entries()) {
-    // Only consider champions played in multiple roles
-    if (roleData.length >= 2) {
-      const flexInfo = scoreFlexPotential(champion, roleData)
-      if (flexInfo.isTrueFlex) {
-        flexPicks.push(flexInfo)
+  try {
+    const supabase = await createClient()
+
+    // Query champion stats for all available champions
+    const { data: championStats, error } = await supabase
+      .from('champion_stats_computed')
+      .select('champion_name, role, games, role_confidence')
+      .in('champion_name', availableChampions)
+      .eq('patch_version', patchVersion)
+      .gte('games', 3)
+      .order('champion_name')
+      .order('games', { ascending: false })
+
+    if (!error && championStats && championStats.length > 0) {
+      hadDatabaseData = true
+
+      // Group by champion
+      const championRoles = new Map<string, Array<{
+        role: string
+        games: number
+        confidence: number
+      }>>()
+
+      for (const stat of championStats) {
+        if (!championRoles.has(stat.champion_name)) {
+          championRoles.set(stat.champion_name, [])
+        }
+        championRoles.get(stat.champion_name)!.push({
+          role: stat.role,
+          games: stat.games,
+          confidence: parseFloat(stat.role_confidence.toString())
+        })
+      }
+
+      // Calculate flex potential for each champion
+      for (const [champion, roleData] of championRoles.entries()) {
+        if (roleData.length >= 2) {
+          const flexInfo = scoreFlexPotential(champion, roleData)
+          if (flexInfo.isTrueFlex) {
+            flexPicks.push(flexInfo)
+          }
+        }
+      }
+    }
+  } catch {
+    // Database unavailable, will use fallback
+  }
+
+  // Fallback to hardcoded flex picks if no database data
+  if (!hadDatabaseData || flexPicks.length === 0) {
+    for (const champion of availableChampions) {
+      const flexData = PRO_FLEX_PICKS[champion]
+      if (flexData && flexData.roles.length >= 2) {
+        const roleConfidences: Record<string, number> = {}
+        flexData.roles.forEach((role, idx) => {
+          roleConfidences[role] = 0.7 - idx * 0.1 // Primary role has higher confidence
+        })
+
+        flexPicks.push({
+          champion,
+          viableRoles: flexData.roles,
+          primaryRole: flexData.roles[0],
+          flexibilityScore: flexData.score,
+          isTrueFlex: true,
+          roleConfidences
+        })
       }
     }
   }

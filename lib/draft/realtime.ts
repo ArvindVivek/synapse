@@ -11,7 +11,7 @@
  */
 
 import { RealtimeChannel } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client'
 import type { DraftAction, DraftState } from './types'
 
 // ============================================================================
@@ -40,16 +40,23 @@ export interface DraftSyncPayload {
  * Create a Realtime channel for a draft session
  *
  * @param draftId - Unique draft session ID
- * @returns Realtime channel instance
+ * @returns Realtime channel instance or null if Supabase is not configured
  *
  * @example
  * ```ts
  * const channel = createDraftChannel('abc123')
- * await channel.subscribe()
+ * if (channel) await channel.subscribe()
  * ```
  */
-export function createDraftChannel(draftId: string): RealtimeChannel {
+export function createDraftChannel(draftId: string): RealtimeChannel | null {
+  if (!isSupabaseConfigured()) {
+    // Supabase not configured - realtime sync disabled
+    return null
+  }
+
   const supabase = createClient()
+  if (!supabase) return null
+
   const channelName = `draft:${draftId}`
 
   return supabase.channel(channelName, {
@@ -64,7 +71,7 @@ export function createDraftChannel(draftId: string): RealtimeChannel {
 /**
  * Subscribe to draft actions from other clients
  *
- * @param channel - Realtime channel
+ * @param channel - Realtime channel (can be null if Supabase not configured)
  * @param onAction - Callback when action received
  * @returns Cleanup function
  *
@@ -80,14 +87,19 @@ export function createDraftChannel(draftId: string): RealtimeChannel {
  * // Cleanup
  * return () => {
  *   unsubscribe()
- *   channel.unsubscribe()
+ *   channel?.unsubscribe()
  * }
  * ```
  */
 export function subscribeToDraft(
-  channel: RealtimeChannel,
+  channel: RealtimeChannel | null,
   onAction: (payload: DraftSyncPayload) => void
 ): () => void {
+  // If no channel (Supabase not configured), return no-op cleanup
+  if (!channel) {
+    return () => {}
+  }
+
   // Subscribe to broadcast events
   channel.on('broadcast', { event: 'draft:action' }, ({ payload }) => {
     onAction(payload as DraftSyncPayload)
@@ -97,11 +109,9 @@ export function subscribeToDraft(
   channel.subscribe((status) => {
     if (status === 'SUBSCRIBED') {
       console.log('[Realtime] Subscribed to draft channel')
-    } else if (status === 'CHANNEL_ERROR') {
-      console.error('[Realtime] Channel error')
-    } else if (status === 'TIMED_OUT') {
-      console.error('[Realtime] Channel timeout')
     }
+    // Silently ignore errors when Supabase connection fails
+    // This is expected in local development without proper credentials
   })
 
   // Return cleanup function

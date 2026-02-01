@@ -105,6 +105,15 @@ export function useWinRate(): UseWinRateResult {
   const userSide = useDraftStore((state) => state.userSide)
   const bluePicks = useDraftStore((state) => state.blue.picks)
   const redPicks = useDraftStore((state) => state.red.picks)
+  const blueBans = useDraftStore((state) => state.blue.bans)
+  const redBans = useDraftStore((state) => state.red.bans)
+
+  // Create stable primitive dependencies from pick/ban data
+  // This ensures React's dependency comparison works correctly
+  const bluePicksStr = bluePicks.map(p => p.champion).join(',')
+  const redPicksStr = redPicks.map(p => p.champion).join(',')
+  const blueBansStr = blueBans.join(',')
+  const redBansStr = redBans.join(',')
 
   const [data, setData] = useState<WinRateProjection | null>(null)
   const [loading, setLoading] = useState(false)
@@ -124,7 +133,8 @@ export function useWinRate(): UseWinRateResult {
     }
 
     // If no picks yet, return with blue side advantage
-    if (bluePicks.length === 0 && redPicks.length === 0) {
+    // Note: Win rate projection is based on picks (team composition), not bans
+    if (!bluePicksStr && !redPicksStr) {
       setData({
         blueWinRate: 0.52,
         redWinRate: 0.48,
@@ -143,8 +153,8 @@ export function useWinRate(): UseWinRateResult {
       try {
         const params = new URLSearchParams({
           userSide,
-          bluePicks: bluePicks.map(p => p.champion).join(','),
-          redPicks: redPicks.map(p => p.champion).join(','),
+          bluePicks: bluePicksStr,
+          redPicks: redPicksStr,
         })
 
         const res = await fetch(`/api/draft/${draftId}/winrate?${params}`)
@@ -163,7 +173,7 @@ export function useWinRate(): UseWinRateResult {
     }
 
     fetchWinRate()
-  }, [draftId, currentTurn, userSide, bluePicks, redPicks])
+  }, [draftId, currentTurn, userSide, bluePicksStr, redPicksStr, blueBansStr, redBansStr])
 
   // Calculate user-perspective win rate
   const userWinRate = data

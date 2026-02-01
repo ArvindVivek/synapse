@@ -208,7 +208,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
         {/* Footer */}
         <div className="p-4 border-t border-gray-800 bg-gray-900/50">
           <p className="text-gray-500 text-xs text-center">
-            Synapse - AI-Powered Draft Assistant | Cloud9 x JetBrains Hackathon 2026
+            Synapse - AI-Powered Draft Assistant
           </p>
         </div>
       </div>

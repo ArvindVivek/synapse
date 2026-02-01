@@ -5,7 +5,11 @@
       "Bash(docker restart:*)",
       "WebFetch(domain:grid.gg)",
       "Bash(pnpm etl:test:*)",
-      "Bash(./node_modules/.bin/tsx:*)"
+      "Bash(./node_modules/.bin/tsx:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run build:*)",
+      "Bash(pnpm run build:*)",
+      "Bash(export PATH=\"$PATH:/usr/local/bin:/opt/homebrew/bin:$HOME/.nvm/versions/node/*/bin\")"
     ]
   }
 }

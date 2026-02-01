@@ -15,6 +15,14 @@
 export type Role = 'top' | 'jungle' | 'mid' | 'adc' | 'support'
 
 /**
+ * Draft format types
+ * - tournament: Standard pro draft (5 bans, 5 picks per side)
+ * - fearless: Champions can only be picked once per series (tracked separately)
+ * - scrim: Practice mode with relaxed rules
+ */
+export type DraftFormat = 'tournament' | 'fearless' | 'scrim'
+
+/**
  * Four phases of the draft sequence
  */
 export type DraftPhase = 'ban1' | 'pick1' | 'ban2' | 'pick2'
@@ -47,6 +55,19 @@ export type TeamComposition = {
 }
 
 /**
+ * Opponent team info for scouting
+ */
+export interface OpponentTeam {
+  id: string
+  name: string
+  players: Array<{
+    id: string
+    name: string
+    role: Role
+  }>
+}
+
+/**
  * Complete draft state
  */
 export interface DraftState {
@@ -61,6 +82,12 @@ export interface DraftState {
 
   /** Which side the user is playing */
   userSide: 'blue' | 'red'
+
+  /** Draft format (tournament, fearless, scrim) */
+  format: DraftFormat
+
+  /** Opponent team info for scouting (optional) */
+  opponentTeam: OpponentTeam | null
 
   /** Blue team composition */
   blue: TeamComposition

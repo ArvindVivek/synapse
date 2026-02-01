@@ -78,6 +78,8 @@ export async function POST(
       currentTurn: session.currentTurn,
       phase: session.phase,
       userSide: session.userSide,
+      format: 'tournament', // Default format
+      opponentTeam: null, // No opponent team data in session
       blue: {
         bans: session.blue.bans,
         picks: session.blue.picks.map(p => ({

@@ -43,6 +43,13 @@ export function PhaseHeader({
   const currentTurn = useDraftStore((state) => state.currentTurn)
   const userSide = useDraftStore((state) => state.userSide)
   const isComplete = useDraftStore((state) => state.isComplete)
+  const format = useDraftStore((state) => state.format)
+
+  const formatLabels = {
+    tournament: 'Tournament',
+    fearless: 'Fearless',
+    scrim: 'Scrim',
+  }
 
   const turnInfo = getTurnInfo(currentTurn)
   const isBanPhase = turnInfo?.action === 'ban'
@@ -117,8 +124,12 @@ export function PhaseHeader({
           >
             {phaseText}
           </h1>
-          <p className="text-sm text-gray-400">
-            Turn {currentTurn}/20 —{' '}
+          <p className="text-sm text-gray-400 flex items-center justify-center gap-2">
+            <span className="px-2 py-0.5 bg-gray-800 rounded text-xs font-medium text-gray-300">
+              {formatLabels[format]}
+            </span>
+            <span>Turn {currentTurn}/20</span>
+            <span>—</span>
             <span
               className={`font-semibold ${
                 currentSide === 'blue' ? 'text-blue-400' : 'text-red-400'
@@ -127,7 +138,7 @@ export function PhaseHeader({
               {sideLabel}
             </span>
             {isMyTurn && (
-              <span className="ml-2 text-yellow-400">(Your Turn)</span>
+              <span className="text-yellow-400">(Your Turn)</span>
             )}
           </p>
         </div>

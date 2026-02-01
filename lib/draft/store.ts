@@ -8,7 +8,7 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { enableMapSet } from 'immer'
-import type { DraftState, DraftPhase, TeamComposition, Role } from './types'
+import type { DraftState, DraftPhase, TeamComposition, Role, DraftFormat, OpponentTeam } from './types'
 import { getTurnInfo, getNextTurn, isUserTurn, DRAFT_SEQUENCE } from './sequence'
 import { validateAction, ValidationError } from './validation'
 import type { DraftSyncPayload } from './realtime'
@@ -24,6 +24,8 @@ const createInitialState = (): DraftState => ({
   currentTurn: 0,
   phase: 'ban1',
   userSide: 'blue',
+  format: 'tournament',
+  opponentTeam: null,
   blue: { bans: [], picks: [] },
   red: { bans: [], picks: [] },
   availableChampions: new Set(),
@@ -46,6 +48,8 @@ interface DraftStore extends DraftState {
     id: string
     userSide: 'blue' | 'red'
     allChampions: string[]
+    format?: DraftFormat
+    opponentTeam?: OpponentTeam | null
   }) => void
 
   executeBan: (champion: string, isOpponentAction?: boolean) => boolean
@@ -127,10 +131,12 @@ export const useDraftStore = create<DraftStore>()(
     /**
      * Initialize a new draft session
      */
-    initializeDraft: ({ id, userSide, allChampions }) =>
+    initializeDraft: ({ id, userSide, allChampions, format, opponentTeam }) =>
       set((state) => {
         state.id = id
         state.userSide = userSide
+        state.format = format || 'tournament'
+        state.opponentTeam = opponentTeam || null
         state.currentTurn = 1
         state.phase = 'ban1'
         state.availableChampions = new Set(allChampions)
@@ -297,7 +303,8 @@ export const useDraftStore = create<DraftStore>()(
      */
     reset: () =>
       set((state) => {
-        Object.assign(state, createInitialState())
+        const initialState = createInitialState()
+        Object.assign(state, initialState)
         state.lastValidationError = null
         state.selectedChampion = null
       }),

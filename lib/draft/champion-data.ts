@@ -42,15 +42,13 @@ export const DDRAGON_NAME_MAP: Record<string, string> = {
   'Nunu & Willump': 'Nunu',
 }
 
-// Latest patch version with all champions
-const DDRAGON_VERSION = '14.24.1'
-
 /**
- * Get the ddragon image URL for a champion
+ * Get the local image URL for a champion
+ * Uses locally downloaded assets in /public/champions/
  */
 export function getChampionImageUrl(champion: string): string {
-  const ddragonName = DDRAGON_NAME_MAP[champion] || champion
-  return `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/champion/${ddragonName}.png`
+  const ddragonName = DDRAGON_NAME_MAP[champion] || champion.replace(/['\s]/g, '')
+  return `/champions/${ddragonName}.png`
 }
 
 // Get all champion names from DAMAGE_TYPES

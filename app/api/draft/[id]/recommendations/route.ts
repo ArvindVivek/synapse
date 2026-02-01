@@ -1,11 +1,16 @@
 /**
- * GET /api/draft/:id/recommendations
+ * GET/POST /api/draft/:id/recommendations
  *
- * Returns top 5 pick recommendations with scores and reasoning.
+ * Returns top 5 pick/ban recommendations with scores and reasoning.
  *
- * Query params:
- * - role?: string - Filter to specific role
- * - userSide?: 'blue' | 'red' - User's side (default: blue)
+ * POST body (preferred - ensures accurate state):
+ * {
+ *   currentTurn: number,
+ *   phase: 'ban1' | 'pick1' | 'ban2' | 'pick2',
+ *   userSide: 'blue' | 'red',
+ *   blue: { bans: string[], picks: string[] },
+ *   red: { bans: string[], picks: string[] }
+ * }
  *
  * Response:
  * {
@@ -13,7 +18,8 @@
  *   meta: {
  *     responseTime: number,
  *     turnNumber: number,
- *     weights: ScoringWeights
+ *     weights: ScoringWeights,
+ *     candidatesScored: number
  *   }
  * }
  */
@@ -23,55 +29,38 @@ import { scoreAllChampions, getWeightsForTurn } from '@/lib/recommendations/pick
 import type { DraftContext } from '@/lib/recommendations/types'
 import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
 
-// Import getDraftSession from the parent route (Phase 3 pattern)
-// This accesses the in-memory draftSessions Map
-import { getDraftSession } from '../route'
-
 export const runtime = 'nodejs' // Node runtime for full Supabase support
 
 // All champions from champion-properties DAMAGE_TYPES
 const ALL_CHAMPIONS = Object.keys(DAMAGE_TYPES)
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+interface DraftStateBody {
+  currentTurn: number
+  phase: 'ban1' | 'pick1' | 'ban2' | 'pick2'
+  userSide: 'blue' | 'red'
+  blue: { bans: string[]; picks: string[] }
+  red: { bans: string[]; picks: string[] }
+}
+
+async function computeRecommendations(
+  id: string,
+  state: DraftStateBody
+): Promise<Response> {
   const startTime = Date.now()
-  const { id } = await params
-  const role = request.nextUrl.searchParams.get('role')
-  const userSide = request.nextUrl.searchParams.get('userSide') === 'red' ? 'red' : 'blue'
 
   try {
-    // Get current draft state, or use initial state for new drafts
-    let draftState = getDraftSession(id)
-
-    // If no session exists, use default initial state
-    if (!draftState) {
-      draftState = {
-        id,
-        currentTurn: 1,
-        phase: 'ban1' as const,
-        userSide,
-        blue: { bans: [], picks: [] },
-        red: { bans: [], picks: [] },
-        isComplete: false,
-        startedAt: new Date().toISOString(),
-        completedAt: null
-      }
-    }
-
     // Determine opponent side
-    const opponentSide = draftState.userSide === 'blue' ? 'red' : 'blue'
+    const opponentSide = state.userSide === 'blue' ? 'red' : 'blue'
 
     // Build draft context from state
     const context: DraftContext = {
-      currentTurn: draftState.currentTurn,
-      phase: draftState.phase,
-      userSide: draftState.userSide,
-      userPicks: draftState[draftState.userSide].picks.map(p => p.champion),
-      userBans: draftState[draftState.userSide].bans,
-      opponentPicks: draftState[opponentSide].picks.map(p => p.champion),
-      opponentBans: draftState[opponentSide].bans,
+      currentTurn: state.currentTurn,
+      phase: state.phase,
+      userSide: state.userSide,
+      userPicks: state[state.userSide].picks,
+      userBans: state[state.userSide].bans,
+      opponentPicks: state[opponentSide].picks,
+      opponentBans: state[opponentSide].bans,
       availableChampions: new Set() // Will populate below
     }
 
@@ -86,10 +75,7 @@ export async function GET(
     const availableChampions = ALL_CHAMPIONS.filter(c => !unavailable.has(c))
     context.availableChampions = new Set(availableChampions)
 
-    // Filter by role if specified
-    // Note: Role filtering would require champion role data, skipping for MVP
-    // TODO: Add role filtering using champion stats role_confidence
-    let candidates = availableChampions
+    const candidates = availableChampions
 
     if (candidates.length === 0) {
       return NextResponse.json({
@@ -97,6 +83,7 @@ export async function GET(
         meta: {
           responseTime: Date.now() - startTime,
           turnNumber: context.currentTurn,
+          phase: context.phase,
           weights: getWeightsForTurn(context.currentTurn),
           candidatesScored: 0
         }
@@ -119,27 +106,78 @@ export async function GET(
       meta: {
         responseTime: elapsed,
         turnNumber: context.currentTurn,
+        phase: context.phase,
         weights: getWeightsForTurn(context.currentTurn),
         candidatesScored: candidates.length
       }
     }, {
       headers: {
-        'Cache-Control': 'private, max-age=5' // Short cache
+        'Cache-Control': 'no-store' // Don't cache since state changes frequently
       }
     })
 
   } catch (error) {
-    console.error('[GET /api/draft/:id/recommendations] Error:', error)
-    // Return empty recommendations on error
+    console.error('[/api/draft/:id/recommendations] Error:', error)
     return NextResponse.json({
       recommendations: [],
       meta: {
         responseTime: Date.now() - startTime,
-        turnNumber: 1,
-        weights: getWeightsForTurn(1),
+        turnNumber: state.currentTurn,
+        phase: state.phase,
+        weights: getWeightsForTurn(state.currentTurn),
         candidatesScored: 0,
         error: error instanceof Error ? error.message : 'Unknown error'
       }
-    }, { status: 200 }) // Return 200 with empty array, not 500
+    }, { status: 200 })
   }
+}
+
+/**
+ * POST handler - receives current state from client for accurate recommendations
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  try {
+    const body: DraftStateBody = await request.json()
+    return computeRecommendations(id, body)
+  } catch (error) {
+    console.error('[POST /api/draft/:id/recommendations] Parse error:', error)
+    return NextResponse.json({
+      recommendations: [],
+      meta: {
+        responseTime: 0,
+        turnNumber: 1,
+        phase: 'ban1',
+        weights: getWeightsForTurn(1),
+        candidatesScored: 0,
+        error: 'Invalid request body'
+      }
+    }, { status: 400 })
+  }
+}
+
+/**
+ * GET handler - fallback for simple requests (less accurate without state)
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+  const userSide = request.nextUrl.searchParams.get('userSide') === 'red' ? 'red' : 'blue'
+
+  // Use default initial state for GET requests
+  const defaultState: DraftStateBody = {
+    currentTurn: 1,
+    phase: 'ban1',
+    userSide,
+    blue: { bans: [], picks: [] },
+    red: { bans: [], picks: [] }
+  }
+
+  return computeRecommendations(id, defaultState)
 }
