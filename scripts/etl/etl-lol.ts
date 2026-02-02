@@ -251,6 +251,94 @@ async function insertChampionPick(supabase: SupabaseClient, pick: {
   }
 }
 
+/**
+ * Update player primary_role based on their most frequently inferred role from champion_picks
+ */
+async function updatePlayerRolesFromPicks(supabase: SupabaseClient): Promise<number> {
+  if (dryRun) return 0
+
+  console.log('\nStep 4: Updating player roles from champion picks...')
+
+  // Query to get each player's most common role from champion_picks
+  // Uses a subquery to find the role with highest count per player
+  const { data: playerRoles, error: queryError } = await supabase
+    .schema('synapse')
+    .rpc('get_player_primary_roles')
+
+  if (queryError) {
+    // If the RPC doesn't exist, fall back to manual query
+    console.log('  RPC not found, using manual query...')
+
+    // Get all champion picks with player info
+    const { data: picks, error: picksError } = await supabase
+      .schema('synapse')
+      .from('champion_picks')
+      .select('player_id, role')
+
+    if (picksError) {
+      console.error('  [error] Failed to fetch champion picks:', picksError.message)
+      return 0
+    }
+
+    // Count roles per player
+    const playerRoleCounts = new Map<string, Map<string, number>>()
+    for (const pick of picks || []) {
+      if (!pick.player_id || !pick.role) continue
+
+      if (!playerRoleCounts.has(pick.player_id)) {
+        playerRoleCounts.set(pick.player_id, new Map())
+      }
+      const roleCounts = playerRoleCounts.get(pick.player_id)!
+      roleCounts.set(pick.role, (roleCounts.get(pick.role) || 0) + 1)
+    }
+
+    // Determine primary role for each player (most frequent)
+    let updatedCount = 0
+    for (const [playerId, roleCounts] of playerRoleCounts) {
+      let maxCount = 0
+      let primaryRole: string = 'mid'
+
+      for (const [role, count] of roleCounts) {
+        if (count > maxCount) {
+          maxCount = count
+          primaryRole = role
+        }
+      }
+
+      // Update player's primary_role
+      const { error: updateError } = await supabase
+        .schema('synapse')
+        .from('players')
+        .update({ primary_role: primaryRole })
+        .eq('id', playerId)
+
+      if (updateError) {
+        console.error(`  [error] Failed to update player ${playerId}:`, updateError.message)
+      } else {
+        updatedCount++
+      }
+    }
+
+    console.log(`  Updated ${updatedCount} player roles`)
+    return updatedCount
+  }
+
+  // If RPC worked, update based on results
+  let updatedCount = 0
+  for (const row of playerRoles || []) {
+    const { error: updateError } = await supabase
+      .schema('synapse')
+      .from('players')
+      .update({ primary_role: row.primary_role })
+      .eq('id', row.player_id)
+
+    if (!updateError) updatedCount++
+  }
+
+  console.log(`  Updated ${updatedCount} player roles`)
+  return updatedCount
+}
+
 // ==========================================
 // MAIN ETL
 // ==========================================
@@ -565,6 +653,9 @@ async function runETL() {
 
   await grid.disconnect()
 
+  // Update player roles based on their champion picks
+  const playersUpdated = await updatePlayerRolesFromPicks(supabase)
+
   // Print stats
   console.log('\n========================================')
   console.log('ETL COMPLETE')
@@ -572,7 +663,7 @@ async function runETL() {
   console.log(`Tournaments:      ${stats.tournaments}`)
   console.log(`Series:           ${stats.series}`)
   console.log(`Teams:            ${stats.teams.size} unique`)
-  console.log(`Players:          ${stats.players.size} unique`)
+  console.log(`Players:          ${stats.players.size} unique (${playersUpdated} roles updated)`)
   console.log(`Games:            ${stats.games}`)
   console.log(`Drafts:           ${stats.drafts}`)
   console.log(`Champion Picks:   ${stats.picks}`)

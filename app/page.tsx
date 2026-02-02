@@ -63,25 +63,6 @@ export default function Home() {
     router.push(`/draft/${draftId}`)
   }
 
-  const handleSkipTeam = async () => {
-    if (isNavigating) return
-    setIsNavigating(true)
-
-    const draftId = nanoid(12)
-
-    // Initialize the draft store without opponent team
-    initializeDraft({
-      id: draftId,
-      userSide: selectedSide,
-      allChampions: ALL_CHAMPIONS,
-      format: selectedFormat,
-      opponentTeam: null,
-    })
-
-    // Navigate to draft
-    router.push(`/draft/${draftId}`)
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white overflow-hidden">
       {/* Animated Background */}
@@ -184,13 +165,6 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">Select Opponent Team</h2>
-            <button
-              onClick={handleSkipTeam}
-              disabled={isNavigating}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white bg-gray-800/50 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
-            >
-              Skip → Generic Analysis
-            </button>
           </div>
 
           {loading ? (
@@ -203,13 +177,7 @@ export default function Home() {
           ) : error ? (
             <div className="text-center py-16">
               <p className="text-red-400 mb-2">Failed to load teams</p>
-              <button
-                onClick={handleSkipTeam}
-                disabled={isNavigating}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-medium transition-colors disabled:opacity-50"
-              >
-                Continue without team data
-              </button>
+              <p className="text-gray-500 text-sm">Please check your connection and try again</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

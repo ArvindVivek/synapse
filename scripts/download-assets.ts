@@ -45,6 +45,7 @@ const CHAMPIONS = [
   // AP mids
   'Azir', 'Orianna', 'Syndra', 'Viktor', 'Ahri', 'Corki', 'Taliyah', 'Zoe',
   'Neeko', 'Lissandra', 'Sylas', 'LeBlanc', 'Aurora', 'Hwei', 'Naafiri',
+  'Annie', 'Cassiopeia', 'Malzahar', 'Veigar', 'Xerath', 'Ziggs', 'Anivia',
   // AD mids
   'Yone', 'Yasuo', 'Jayce', 'Akshan', 'Zed', 'Talon', 'Qiyana',
   // ADCs
