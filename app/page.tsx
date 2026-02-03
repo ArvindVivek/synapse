@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { nanoid } from 'nanoid'
+import { motion } from 'framer-motion'
 import { useDraftStore } from '@/lib/draft/store'
 import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
 import { useTeams, Team } from '@/lib/hooks/use-teams'
@@ -65,39 +66,112 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white overflow-hidden">
-      {/* Animated Background */}
+      {/* Animated Background with Floating Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-blue-500/5 to-transparent rounded-full" />
+        {/* Floating Orbs with Motion */}
+        <motion.div
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.15, 0.25, 0.15],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-500 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            y: [0, 30, 0],
+            opacity: [0.15, 0.25, 0.15],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1,
+          }}
+          className="absolute bottom-1/4 -right-32 w-96 h-96 bg-cyan-500 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.05, 0.1, 0.05],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-blue-500 to-transparent rounded-full"
+        />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        {/* Header */}
-        <header className="text-center mb-10">
+        {/* Header with Staggered Animation */}
+        <motion.header
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="text-center mb-10"
+        >
           <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl blur-xl opacity-50 animate-pulse" />
-              <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden bg-white/5">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="relative"
+            >
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.5, 0.8, 0.5],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl blur-xl"
+              />
+              <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 border border-cyan-500/30">
                 <Image src="/c9-logo.png" alt="Cloud9" width={48} height={48} className="object-contain" />
               </div>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent"
+            >
               SYNAPSE
-            </h1>
+            </motion.h1>
           </div>
-          <p className="text-lg text-gray-400 font-light">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-lg text-gray-400 font-light"
+          >
             AI-Powered Draft Assistant for League of Legends
-          </p>
-        </header>
+          </motion.p>
+        </motion.header>
 
-        {/* Draft Setup Row */}
-        <section className="mb-10">
-          <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-gray-800 p-6">
+        {/* Draft Setup Row with Animation */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="mb-10"
+        >
+          <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-gray-800 p-6 shadow-xl shadow-black/20">
             <div className="flex flex-col md:flex-row gap-8 items-center justify-center">
               {/* Side Selection */}
               <div>
-                <h3 className="text-sm font-medium text-gray-400 mb-3 text-center">Your Side</h3>
+                <h3 className="text-sm font-semibold text-gray-400 mb-3 text-center uppercase tracking-wider">
+                  Your Side
+                </h3>
                 <div className="flex gap-3">
                   <SideButton
                     side="blue"
@@ -113,97 +187,172 @@ export default function Home() {
               </div>
 
               {/* Divider */}
-              <div className="hidden md:block w-px h-20 bg-gray-700" />
+              <div className="hidden md:block w-px h-20 bg-gradient-to-b from-transparent via-gray-700 to-transparent" />
 
               {/* Format Selection */}
               <div>
-                <h3 className="text-sm font-medium text-gray-400 mb-3 text-center">Draft Format</h3>
+                <h3 className="text-sm font-semibold text-gray-400 mb-3 text-center uppercase tracking-wider">
+                  Draft Format
+                </h3>
                 <div className="flex gap-2">
-                  {DRAFT_FORMATS.map((format) => (
-                    <button
+                  {DRAFT_FORMATS.map((format, index) => (
+                    <motion.button
                       key={format.value}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 + index * 0.1 }}
                       onClick={() => setSelectedFormat(format.value)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                         selectedFormat === format.value
-                          ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
-                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                          ? 'bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-lg shadow-cyan-500/30'
+                          : 'bg-gray-800/80 text-gray-400 hover:bg-gray-700 hover:text-white hover:scale-105'
                       }`}
                       title={format.description}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       {format.label}
-                    </button>
+                      {selectedFormat === format.value && (
+                        <motion.div
+                          layoutId="activeFormat"
+                          className="absolute inset-0 rounded-lg border-2 border-cyan-400/50"
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </motion.button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 mt-2 text-center">
+                <motion.p
+                  key={selectedFormat}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-gray-500 mt-2 text-center"
+                >
                   {DRAFT_FORMATS.find(f => f.value === selectedFormat)?.description}
-                </p>
+                </motion.p>
               </div>
             </div>
 
-            {/* Side Info */}
-            <div className="text-center mt-4">
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${
+            {/* Side Info with Animation */}
+            <motion.div
+              key={selectedSide}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-center mt-4"
+            >
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm border backdrop-blur-sm ${
                 selectedSide === 'blue'
-                  ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30'
-                  : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 shadow-lg shadow-blue-500/10'
+                  : 'bg-red-500/10 text-red-400 border-red-500/30 shadow-lg shadow-red-500/10'
               }`}>
                 <TeamIcon className="w-4 h-4" />
-                <span>
+                <span className="font-medium">
                   {selectedSide === 'blue'
                     ? 'Blue side bans first and gets first pick'
                     : 'Red side gets counter-pick advantage'
                   }
                 </span>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
-        {/* Team Selection */}
-        <section>
+        {/* Team Selection with Animation */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white">Select Opponent Team</h2>
+            <div>
+              <h2 className="text-2xl font-bold text-white tracking-wide">Select Opponent Team</h2>
+              <p className="text-sm text-gray-500 mt-1">Choose your opponent to begin draft analysis</p>
+            </div>
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="flex items-center gap-3">
-                <LoadingSpinner />
-                <span className="text-gray-400">Loading teams...</span>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center justify-center py-16"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <LoadingSpinner />
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 bg-cyan-500/20 rounded-full blur-xl"
+                  />
+                </div>
+                <span className="text-gray-400 font-medium">Loading teams...</span>
               </div>
-            </div>
+            </motion.div>
           ) : error ? (
-            <div className="text-center py-16">
-              <p className="text-red-400 mb-2">Failed to load teams</p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-16 bg-red-500/10 border border-red-500/30 rounded-xl"
+            >
+              <p className="text-red-400 mb-2 font-semibold">Failed to load teams</p>
               <p className="text-gray-500 text-sm">Please check your connection and try again</p>
-            </div>
+            </motion.div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {teams.map((team) => (
-                <TeamCard
+              {teams.map((team, index) => (
+                <motion.div
                   key={team.id}
-                  team={team}
-                  onClick={() => handleSelectTeam(team)}
-                  disabled={isNavigating}
-                />
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: 0.8 + index * 0.05,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <TeamCard
+                    team={team}
+                    onClick={() => handleSelectTeam(team)}
+                    disabled={isNavigating}
+                  />
+                </motion.div>
               ))}
             </div>
           )}
-        </section>
+        </motion.section>
 
-        {/* Role Icons Footer */}
-        <footer className="mt-16 text-center">
+        {/* Role Icons Footer with Animation */}
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="mt-16 text-center"
+        >
           <div className="flex items-center justify-center gap-6 mb-4">
-            <TopIcon className="w-5 h-5 text-yellow-400/60" />
-            <JungleIcon className="w-5 h-5 text-green-400/60" />
-            <MidIcon className="w-5 h-5 text-blue-400/60" />
-            <AdcIcon className="w-5 h-5 text-red-400/60" />
-            <SupportIcon className="w-5 h-5 text-cyan-400/60" />
+            {[
+              { Icon: TopIcon, color: 'text-yellow-400/60', hoverColor: 'hover:text-yellow-400', delay: 0 },
+              { Icon: JungleIcon, color: 'text-green-400/60', hoverColor: 'hover:text-green-400', delay: 0.1 },
+              { Icon: MidIcon, color: 'text-blue-400/60', hoverColor: 'hover:text-blue-400', delay: 0.2 },
+              { Icon: AdcIcon, color: 'text-red-400/60', hoverColor: 'hover:text-red-400', delay: 0.3 },
+              { Icon: SupportIcon, color: 'text-cyan-400/60', hoverColor: 'hover:text-cyan-400', delay: 0.4 },
+            ].map(({ Icon, color, hoverColor, delay }, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 1.3 + delay }}
+                whileHover={{ scale: 1.2, y: -5 }}
+                className={`${color} ${hoverColor} transition-colors cursor-pointer`}
+              >
+                <Icon className="w-5 h-5" />
+              </motion.div>
+            ))}
           </div>
           <p className="text-gray-600 text-sm">
             Powered by professional match data
           </p>
-        </footer>
+        </motion.footer>
       </div>
     </div>
   )
@@ -228,54 +377,65 @@ function TeamCard({
   })
 
   return (
-    <button
+    <motion.button
       onClick={onClick}
       disabled={disabled}
-      className="group relative bg-gray-900/80 hover:bg-gray-800 border border-gray-700 hover:border-purple-500/50
-                 rounded-xl p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/10
-                 disabled:opacity-50 disabled:cursor-not-allowed text-left h-full flex flex-col"
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      className="group relative bg-gray-900/80 border border-gray-800 rounded-xl p-4 transition-all duration-300
+                 disabled:opacity-50 disabled:cursor-not-allowed text-left h-full flex flex-col
+                 hover:bg-gray-800/90 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-500/20
+                 backdrop-blur-sm overflow-hidden"
     >
+      {/* Animated Glow Effect on Hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-blue-500/0 to-cyan-500/0
+                      group-hover:from-cyan-500/10 group-hover:via-blue-500/5 group-hover:to-cyan-500/10
+                      transition-all duration-500 rounded-xl pointer-events-none" />
+
       {/* Team Header with Icon */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="relative flex items-center gap-3 mb-4">
         <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden
-                        bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/20
-                        group-hover:border-purple-500/40 transition-colors">
+                        bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20
+                        group-hover:border-cyan-500/50 group-hover:shadow-lg group-hover:shadow-cyan-500/20
+                        transition-all duration-300">
           {iconUrl ? (
             <Image
               src={iconUrl}
               alt={team.name}
               width={48}
               height={48}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             />
           ) : (
-            <span className="text-purple-400 font-bold text-lg">
+            <span className="text-cyan-400 font-bold text-lg group-hover:text-cyan-300 transition-colors">
               {abbreviation.slice(0, 2)}
             </span>
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-semibold truncate group-hover:text-purple-300 transition-colors">
+          <h3 className="text-white font-semibold truncate group-hover:text-cyan-300 transition-colors">
             {team.name}
           </h3>
-          <p className="text-gray-500 text-xs">{team.players.length} players</p>
+          <p className="text-gray-500 text-xs group-hover:text-gray-400 transition-colors">
+            {team.players.length} players
+          </p>
         </div>
       </div>
 
       {/* Players List - Symmetrical 5-row layout */}
-      <div className="flex-1 space-y-1">
+      <div className="relative flex-1 space-y-1.5">
         {sortedPlayers.map((playerName, idx) => (
           <div
             key={idx}
-            className={`flex items-center gap-2 py-1 px-2 rounded-md transition-colors ${
+            className={`flex items-center gap-2 py-1.5 px-2 rounded-md transition-all duration-200 ${
               playerName
-                ? 'bg-gray-800/50 group-hover:bg-gray-700/50'
-                : 'bg-gray-800/20'
+                ? 'bg-gray-800/60 group-hover:bg-gray-700/60 border border-gray-700/50 group-hover:border-cyan-500/20'
+                : 'bg-gray-800/20 border border-transparent'
             }`}
           >
             <RoleIndicator role={ROLE_ORDER[idx]} />
             <span className={`text-xs truncate flex-1 ${
-              playerName ? 'text-gray-300' : 'text-gray-600 italic'
+              playerName ? 'text-gray-300 group-hover:text-gray-200' : 'text-gray-600 italic'
             }`}>
               {playerName || '—'}
             </span>
@@ -283,9 +443,14 @@ function TeamCard({
         ))}
       </div>
 
-      {/* Hover indicator */}
-      <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-purple-500/30 transition-colors pointer-events-none" />
-    </button>
+      {/* Animated Border Glow */}
+      <div className="absolute inset-0 rounded-xl border-2 border-transparent
+                      group-hover:border-cyan-500/30 transition-all duration-300 pointer-events-none" />
+
+      {/* Corner Accent */}
+      <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-cyan-500/0 to-transparent
+                      group-hover:from-cyan-500/20 transition-all duration-500 rounded-bl-full pointer-events-none" />
+    </motion.button>
   )
 }
 
@@ -325,43 +490,82 @@ function SideButton({
   const isBlue = side === 'blue'
 
   return (
-    <button
+    <motion.button
       onClick={onClick}
-      className={`relative group px-6 py-3 rounded-xl border-2 transition-all duration-200 ${
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className={`relative group px-6 py-3 rounded-xl border-2 transition-all duration-300 overflow-hidden ${
         selected
           ? isBlue
-            ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/20'
-            : 'border-red-500 bg-red-500/20 shadow-lg shadow-red-500/20'
+            ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/30'
+            : 'border-red-500 bg-red-500/20 shadow-lg shadow-red-500/30'
           : 'border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800'
       }`}
     >
-      <div className="flex items-center gap-2">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-          selected
-            ? isBlue ? 'bg-blue-500' : 'bg-red-500'
-            : 'bg-gray-700'
-        }`}>
+      {/* Animated Background Gradient */}
+      {selected && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={`absolute inset-0 bg-gradient-to-r ${
+            isBlue
+              ? 'from-blue-500/10 via-blue-500/5 to-cyan-500/10'
+              : 'from-red-500/10 via-red-500/5 to-rose-500/10'
+          }`}
+        />
+      )}
+
+      <div className="relative flex items-center gap-2">
+        <motion.div
+          animate={selected ? { scale: [1, 1.1, 1] } : {}}
+          transition={{ duration: 0.3 }}
+          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+            selected
+              ? isBlue
+                ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50'
+                : 'bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/50'
+              : 'bg-gray-700 group-hover:bg-gray-600'
+          }`}
+        >
           <TeamIcon className="w-4 h-4 text-white" />
-        </div>
+        </motion.div>
         <span className={`font-bold transition-colors ${
           selected
             ? isBlue ? 'text-blue-400' : 'text-red-400'
-            : 'text-gray-400'
+            : 'text-gray-400 group-hover:text-gray-300'
         }`}>
           {isBlue ? 'Blue' : 'Red'}
         </span>
       </div>
 
       {selected && (
-        <div className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center ${
-          isBlue ? 'bg-blue-500' : 'bg-red-500'
-        }`}>
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+          className={`absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center ${
+            isBlue
+              ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50'
+              : 'bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/50'
+          }`}
+        >
           <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
-        </div>
+        </motion.div>
       )}
-    </button>
+
+      {/* Border Pulse Effect */}
+      {selected && (
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className={`absolute inset-0 rounded-xl border-2 ${
+            isBlue ? 'border-blue-400/30' : 'border-red-400/30'
+          } pointer-events-none`}
+        />
+      )}
+    </motion.button>
   )
 }
 
@@ -375,9 +579,48 @@ function TeamIcon({ className }: { className?: string }) {
 
 function LoadingSpinner() {
   return (
-    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-    </svg>
+    <div className="relative w-12 h-12">
+      {/* Outer Ring */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-0"
+      >
+        <svg className="w-full h-full" fill="none" viewBox="0 0 24 24">
+          <circle
+            className="text-cyan-500/30"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
+          <path
+            className="text-cyan-500"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
+      </motion.div>
+
+      {/* Inner Ring */}
+      <motion.div
+        animate={{ rotate: -360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        className="absolute inset-2"
+      >
+        <svg className="w-full h-full" fill="none" viewBox="0 0 24 24">
+          <circle
+            className="text-blue-500"
+            cx="12"
+            cy="12"
+            r="8"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeDasharray="4 4"
+          />
+        </svg>
+      </motion.div>
+    </div>
   )
 }

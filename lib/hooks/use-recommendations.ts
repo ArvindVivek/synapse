@@ -37,6 +37,7 @@ export function useRecommendations() {
   const userSide = useDraftStore((state) => state.userSide)
   const blue = useDraftStore((state) => state.blue)
   const red = useDraftStore((state) => state.red)
+  const opponentTeam = useDraftStore((state) => state.opponentTeam)
   const isMyTurn = useDraftStore((state) => state.isMyTurn())
 
   const [data, setData] = useState<RecommendationsResponse | null>(null)
@@ -74,6 +75,7 @@ export function useRecommendations() {
             bans: red.bans,
             picks: red.picks.map(p => p.champion),
           },
+          opponentTeam: opponentTeam || null,
         }),
       })
 
@@ -86,7 +88,7 @@ export function useRecommendations() {
     } finally {
       setLoading(false)
     }
-  }, [draftId, currentTurn, phase, userSide, blue, red, isMyTurn])
+  }, [draftId, currentTurn, phase, userSide, blue, red, opponentTeam, isMyTurn])
 
   // Fetch when turn changes or when it becomes user's turn
   useEffect(() => {

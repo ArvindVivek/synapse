@@ -22,8 +22,8 @@ export async function POST(
     const body = await request.json();
     const { blue, red, userSide } = body;
 
-    // For now, use mock data. Uncomment OpenAI integration when API key is available
-    const useMockData = !process.env.OPENAI_API_KEY || true; // Toggle this to enable/disable OpenAI
+    // Use OpenAI when API key is available, otherwise fall back to mock data
+    const useMockData = !process.env.OPENAI_API_KEY;
 
     if (useMockData) {
       // Return mock report matching DraftReportModal structure
@@ -31,12 +31,11 @@ export async function POST(
       return NextResponse.json(mockReport);
     }
 
-    // OpenAI Integration (uncomment when ready)
-    /*
+    // OpenAI Integration
     const prompt = buildDraftAnalysisPrompt(blue, red, userSide);
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
@@ -58,7 +57,6 @@ export async function POST(
     // Map OpenAI response to our modal structure
     const report = mapOpenAIToReportStructure(analysis, userSide);
     return NextResponse.json(report);
-    */
   } catch (error) {
     console.error('Draft report generation error:', error);
 
@@ -230,4 +228,95 @@ Return analysis in this JSON structure matching our modal requirements:
     "lateGame": ["tip 1", "tip 2", "tip 3", "tip 4"]
   }
 }`;
+}
+
+/**
+ * Map OpenAI response to DraftReportModal structure
+ */
+function mapOpenAIToReportStructure(analysis: any, userSide: 'blue' | 'red') {
+  return {
+    summary: {
+      winProbability: analysis.summary?.winProbability || 50,
+      draftGrade: analysis.summary?.draftGrade || 'B',
+      keyStrengths: analysis.summary?.keyStrengths || [
+        'Balanced team composition',
+        'Strong scaling potential',
+        'Multiple win conditions'
+      ],
+    },
+    strategicAnalysis: {
+      teamComp: analysis.strategicAnalysis?.teamComp || 'Standard team composition with balanced damage profile.',
+      winConditions: analysis.strategicAnalysis?.winConditions || [
+        'Establish early game advantage',
+        'Secure objective control',
+        'Win team fights'
+      ],
+      powerSpikes: analysis.strategicAnalysis?.powerSpikes || [
+        'Level 6 ultimate abilities',
+        'Two item power spike',
+        'Late game scaling'
+      ],
+    },
+    matchupInsights: {
+      lanes: analysis.matchupInsights?.lanes || [
+        {
+          role: 'Top Lane',
+          matchup: 'Skill matchup',
+          advantage: 'even' as const,
+          tips: 'Focus on farming and scaling.'
+        },
+        {
+          role: 'Jungle',
+          matchup: 'Neutral matchup',
+          advantage: 'even' as const,
+          tips: 'Track enemy jungler and secure objectives.'
+        },
+        {
+          role: 'Mid Lane',
+          matchup: 'Skill matchup',
+          advantage: 'even' as const,
+          tips: 'Maintain wave control and roam when possible.'
+        },
+        {
+          role: 'Bot Lane',
+          matchup: 'Scaling matchup',
+          advantage: 'even' as const,
+          tips: 'Play safe and farm until power spikes.'
+        },
+        {
+          role: 'Support',
+          matchup: 'Vision matchup',
+          advantage: 'even' as const,
+          tips: 'Establish vision control and look for roams.'
+        },
+      ],
+      junglePathing: analysis.matchupInsights?.junglePathing || 'Standard clear with objective priority.',
+      objectivePriorities: analysis.matchupInsights?.objectivePriorities || [
+        'First Drake',
+        'Rift Herald',
+        'Third Drake for soul point',
+        'Baron with advantage'
+      ],
+    },
+    recommendations: {
+      earlyGame: analysis.recommendations?.earlyGame || [
+        'Secure vision control',
+        'Focus on farming',
+        'Look for gank opportunities',
+        'Contest early objectives'
+      ],
+      midGame: analysis.recommendations?.midGame || [
+        'Group for objectives',
+        'Establish vision control',
+        'Look for picks',
+        'Secure soul point'
+      ],
+      lateGame: analysis.recommendations?.lateGame || [
+        'Setup for Baron',
+        'Contest Elder Drake',
+        'Force favorable fights',
+        'Close out the game'
+      ],
+    },
+  };
 }

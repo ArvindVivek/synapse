@@ -28,6 +28,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { scoreAllChampions, getWeightsForTurn } from '@/lib/recommendations/pick-scorer'
 import type { DraftContext } from '@/lib/recommendations/types'
 import { DAMAGE_TYPES } from '@/lib/recommendations/champion-properties'
+import {
+  applyTeamAwareAdjustments,
+  type OpponentPlayer,
+  type TeamAwareContext
+} from '@/lib/recommendations/team-aware-scorer'
 
 export const runtime = 'nodejs' // Node runtime for full Supabase support
 
@@ -40,6 +45,11 @@ interface DraftStateBody {
   userSide: 'blue' | 'red'
   blue: { bans: string[]; picks: string[] }
   red: { bans: string[]; picks: string[] }
+  opponentTeam?: {
+    id: string
+    name: string
+    players: OpponentPlayer[]
+  } | null
 }
 
 async function computeRecommendations(
@@ -92,12 +102,27 @@ async function computeRecommendations(
 
     // Score all candidates in parallel
     const patchVersion = '15.2' // TODO: Get from draft/tournament config
-    const recommendations = await scoreAllChampions(
+    let recommendations = await scoreAllChampions(
       candidates,
       context,
       patchVersion,
       5 // Top 5
     )
+
+    // Apply team-aware adjustments if opponent team data is provided
+    if (state.opponentTeam?.players && state.opponentTeam.players.length > 0) {
+      const teamAwareContext: TeamAwareContext = {
+        opponentPlayers: state.opponentTeam.players,
+        phase: state.phase,
+        isUserTurn: state.userSide === (context.currentTurn % 2 === 1 ? 'blue' : 'red')
+      }
+
+      // Apply team-aware scoring adjustments
+      recommendations = await applyTeamAwareAdjustments(recommendations, teamAwareContext)
+
+      // Take top 5 after re-sorting
+      recommendations = recommendations.slice(0, 5)
+    }
 
     const elapsed = Date.now() - startTime
 
@@ -108,7 +133,8 @@ async function computeRecommendations(
         turnNumber: context.currentTurn,
         phase: context.phase,
         weights: getWeightsForTurn(context.currentTurn),
-        candidatesScored: candidates.length
+        candidatesScored: candidates.length,
+        teamAwareEnabled: !!state.opponentTeam?.players
       }
     }, {
       headers: {
