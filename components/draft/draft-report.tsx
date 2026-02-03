@@ -7,9 +7,8 @@
 
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/toast';
-import ReactMarkdown from 'react-markdown';
-import { Download, Share2, Loader2, TrendingUp, TrendingDown, Target } from '@/components/ui/icons';
+import { Button } from '@/components/ui/button';
+import { Download, Share2, Loader2, TrendingUp, TrendingDown, Target } from 'lucide-react';
 import type { DraftState } from '@/lib/draft/types';
 
 interface DraftReportProps {
