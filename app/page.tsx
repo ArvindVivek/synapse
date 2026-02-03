@@ -78,10 +78,8 @@ export default function Home() {
           <div className="flex items-center justify-center gap-4 mb-4">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl blur-xl opacity-50 animate-pulse" />
-              <div className="relative w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center shadow-2xl">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+              <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden bg-white/5">
+                <Image src="/c9.svg" alt="Cloud9" width={48} height={48} className="object-contain" />
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
