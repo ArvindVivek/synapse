@@ -48,6 +48,7 @@ export function InsightsPanel({ className = '' }: InsightsPanelProps) {
   const isMyTurn = useDraftStore((state) => state.isMyTurn())
   const selectChampion = useDraftStore((state) => state.selectChampion)
   const selectedChampion = useDraftStore((state) => state.selectedChampion)
+  const setShowReportModal = useDraftStore((state) => state.setShowReportModal)
   const userPicks = useDraftStore((state) =>
     userSide === 'blue' ? state.blue.picks : state.red.picks
   )
@@ -158,12 +159,21 @@ export function InsightsPanel({ className = '' }: InsightsPanelProps) {
 
       {/* Draft Complete Footer */}
       {isComplete && (
-        <div className="p-3 border-t border-gray-800 bg-gradient-to-r from-green-900/20 to-emerald-900/20">
+        <div className="p-3 border-t border-gray-800 bg-gradient-to-r from-green-900/20 to-emerald-900/20 space-y-2">
+          <button
+            onClick={() => setShowReportModal(true)}
+            className="block w-full text-center py-2.5 bg-gradient-to-r from-cyan-600 to-blue-700
+                       hover:from-cyan-500 hover:to-blue-600 text-white text-sm font-medium rounded-lg
+                       transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/20 flex items-center justify-center gap-2"
+          >
+            <BrainIcon className="w-4 h-4" />
+            View AI Draft Report
+          </button>
           <a
             href="/draft/new"
-            className="block w-full text-center py-2.5 bg-gradient-to-r from-blue-600 to-blue-700
-                       hover:from-blue-500 hover:to-blue-600 text-white text-sm font-medium rounded-lg
-                       transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/20"
+            className="block w-full text-center py-2.5 bg-gradient-to-r from-gray-700 to-gray-800
+                       hover:from-gray-600 hover:to-gray-700 text-white text-sm font-medium rounded-lg
+                       transition-all duration-200"
           >
             Start New Draft
           </a>

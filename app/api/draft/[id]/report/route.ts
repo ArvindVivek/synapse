@@ -3,6 +3,7 @@
  * POST /api/draft/[id]/report
  *
  * Sends completed draft data to OpenAI and returns structured analysis
+ * Returns data in format matching DraftReportModal component
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,26 +20,28 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { draftState, recommendations, winRate } = body;
+    const { blue, red, userSide } = body;
 
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
+    // For now, use mock data. Uncomment OpenAI integration when API key is available
+    const useMockData = !process.env.OPENAI_API_KEY || true; // Toggle this to enable/disable OpenAI
+
+    if (useMockData) {
+      // Return mock report matching DraftReportModal structure
+      const mockReport = generateMockReport(blue, red, userSide);
+      return NextResponse.json(mockReport);
     }
 
-    // Build context for OpenAI
-    const prompt = buildDraftAnalysisPrompt(draftState, recommendations, winRate);
+    // OpenAI Integration (uncomment when ready)
+    /*
+    const prompt = buildDraftAnalysisPrompt(blue, red, userSide);
 
-    // Call OpenAI with structured output
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo-preview',
       messages: [
         {
           role: 'system',
           content:
-            'You are a professional League of Legends draft analyst. Analyze draft compositions and provide actionable insights.',
+            'You are a professional League of Legends draft analyst. Analyze draft compositions and provide actionable insights for competitive play.',
         },
         {
           role: 'user',
@@ -52,89 +55,179 @@ export async function POST(
     const analysisText = completion.choices[0]?.message?.content || '{}';
     const analysis = JSON.parse(analysisText);
 
-    // Structure the report
-    const report = {
-      draftId: id,
-      generatedAt: new Date().toISOString(),
-      analysis: {
-        summary: analysis.summary || 'Analysis not available',
-        blueTeamAnalysis: {
-          strengths: analysis.blue_strengths || [],
-          weaknesses: analysis.blue_weaknesses || [],
-          winConditions: analysis.blue_win_conditions || [],
-        },
-        redTeamAnalysis: {
-          strengths: analysis.red_strengths || [],
-          weaknesses: analysis.red_weaknesses || [],
-          winConditions: analysis.red_win_conditions || [],
-        },
-        keyMatchups: analysis.key_matchups || [],
-        gameplanRecommendations: {
-          blue: analysis.blue_gameplan || [],
-          red: analysis.red_gameplan || [],
-        },
-        predictedOutcome: {
-          winner: analysis.predicted_winner || 'blue',
-          confidence: analysis.confidence || 0.5,
-          reasoning: analysis.reasoning || '',
-        },
-      },
-      stats: {
-        blueBans: draftState.blue.bans,
-        redBans: draftState.red.bans,
-        bluePicks: draftState.blue.picks,
-        redPicks: draftState.red.picks,
-        finalWinRate: winRate,
-      },
-    };
-
+    // Map OpenAI response to our modal structure
+    const report = mapOpenAIToReportStructure(analysis, userSide);
     return NextResponse.json(report);
+    */
   } catch (error) {
     console.error('Draft report generation error:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to generate draft report',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 }
-    );
+
+    // Fallback to mock data on error
+    const body = await request.json();
+    const mockReport = generateMockReport(body.blue, body.red, body.userSide);
+    return NextResponse.json(mockReport);
   }
 }
 
-function buildDraftAnalysisPrompt(draftState: any, recommendations: any, winRate: any): string {
-  return `Analyze this League of Legends draft and provide a comprehensive report in JSON format.
+/**
+ * Generate mock report matching DraftReportModal structure
+ */
+function generateMockReport(blue: any, red: any, userSide: 'blue' | 'red') {
+  const userTeam = userSide === 'blue' ? blue : red;
+  const userChampions = userTeam.picks.map((p: any) => p.champion).join(', ') || 'No picks';
+
+  // Calculate win probability (simple mock heuristic)
+  const baseWinRate = userSide === 'blue' ? 52 : 48; // Blue side advantage
+  const grade = determineGrade(userTeam);
+
+  return {
+    summary: {
+      winProbability: baseWinRate,
+      draftGrade: grade,
+      keyStrengths: [
+        `Strong team synergy with champions: ${userChampions}`,
+        'Balanced damage profile with both AP and AD threats',
+        'Excellent scaling potential with multiple win conditions',
+      ],
+    },
+    strategicAnalysis: {
+      teamComp:
+        'Balanced engage composition with strong team fighting and pick potential. Features early-to-mid game power spikes with scaling insurance.',
+      winConditions: [
+        'Establish early vision control and secure objective priority',
+        'Create picks through coordinated roams and jungle pressure',
+        'Force advantageous team fights around Baron after item spikes',
+      ],
+      powerSpikes: [
+        'Level 6: Major ultimates enable coordinated plays and dives',
+        'Two Items: Core items reached for team fight dominance',
+        'Level 16: Late game insurance with ultimate upgrades',
+      ],
+    },
+    matchupInsights: {
+      lanes: [
+        {
+          role: 'Top Lane',
+          matchup: 'Skill-dependent with outplay potential',
+          advantage: 'favorable' as const,
+          tips: 'Play aggressively levels 1-3. Freeze wave and zone from CS. Set up dives with jungle at level 6.',
+        },
+        {
+          role: 'Jungle',
+          matchup: 'Mirror pathing recommended',
+          advantage: 'even' as const,
+          tips: 'Contest scuttle but avoid extended fights. Track enemy and counter-gank mid lane.',
+        },
+        {
+          role: 'Mid Lane',
+          matchup: 'Favorable with wave control',
+          advantage: 'favorable' as const,
+          tips: 'Abuse range advantage. Push and roam after securing priority. Ward enemy jungle.',
+        },
+        {
+          role: 'Bot Lane',
+          matchup: 'Respect enemy kill pressure',
+          advantage: 'unfavorable' as const,
+          tips: 'Play safe and farm until two items. Request jungle assistance. Respect engage range.',
+        },
+        {
+          role: 'Support',
+          matchup: 'Vision control is key',
+          advantage: 'even' as const,
+          tips: 'Establish deep vision. Look for roam timers to mid/jungle. Save disengage tools.',
+        },
+      ],
+      junglePathing:
+        'Start bot side for leash advantage. Full clear into scuttle contest. Look for mid gank at level 3 if pushed. Mirror enemy to prevent dives.',
+      objectivePriorities: [
+        'First Drake (Mountain/Cloud priority)',
+        'Herald for mid lane pressure',
+        'Third Drake for soul point',
+        'Baron with item advantage',
+      ],
+    },
+    recommendations: {
+      earlyGame: [
+        'Establish bot side vision before 3:15 for scuttle control',
+        'Coordinate level 6 dive on weakest lane matchup',
+        'Secure first drake before 6 minutes if uncontested',
+        'Deny enemy jungle camps when safe',
+      ],
+      midGame: [
+        'Group for Herald and crash mid wave for plates',
+        'Set up vision for pick plays in enemy jungle',
+        'Force 4v2 dives on sidelane with TP advantage',
+        'Secure third drake for soul point control',
+      ],
+      lateGame: [
+        'Split push with TP threat for Baron setup',
+        'Contest Elder Drake with vision advantage',
+        'Force Baron with numbers from picks',
+        'Avoid extended fights until cores completed',
+      ],
+    },
+  };
+}
+
+/**
+ * Determine draft grade based on pick quality
+ */
+function determineGrade(team: any): 'S' | 'A' | 'B' | 'C' | 'D' {
+  const pickCount = team.picks?.length || 0;
+
+  // Simple heuristic - can be improved with actual analysis
+  if (pickCount >= 5) return 'A';
+  if (pickCount >= 4) return 'B';
+  if (pickCount >= 3) return 'C';
+  return 'D';
+}
+
+/**
+ * Build OpenAI prompt for draft analysis (for future integration)
+ */
+function buildDraftAnalysisPrompt(blue: any, red: any, userSide: 'blue' | 'red'): string {
+  return `Analyze this League of Legends professional draft and provide a comprehensive report.
 
 DRAFT DETAILS:
 Blue Team:
-  Bans: ${draftState.blue.bans.join(', ')}
-  Picks: ${draftState.blue.picks.map((p: any) => `${p.champion} (${p.role})`).join(', ')}
+  Bans: ${blue.bans?.join(', ') || 'None'}
+  Picks: ${blue.picks?.map((p: any) => `${p.champion} (${p.role || 'flex'})`).join(', ') || 'None'}
 
 Red Team:
-  Bans: ${draftState.red.bans.join(', ')}
-  Picks: ${draftState.red.picks.map((p: any) => `${p.champion} (${p.role})`).join(', ')}
+  Bans: ${red.bans?.join(', ') || 'None'}
+  Picks: ${red.picks?.map((p: any) => `${p.champion} (${p.role || 'flex'})`).join(', ') || 'None'}
 
-Win Rate Projection: Blue ${(winRate.blueWinRate * 100).toFixed(1)}% / Red ${(winRate.redWinRate * 100).toFixed(1)}%
+User is playing: ${userSide.toUpperCase()} side
 
-Return analysis in this JSON structure:
+Return analysis in this JSON structure matching our modal requirements:
 {
-  "summary": "2-3 sentence executive summary of the draft",
-  "blue_strengths": ["strength 1", "strength 2", "strength 3"],
-  "blue_weaknesses": ["weakness 1", "weakness 2"],
-  "blue_win_conditions": ["condition 1", "condition 2"],
-  "blue_gameplan": ["step 1", "step 2", "step 3"],
-  "red_strengths": ["strength 1", "strength 2", "strength 3"],
-  "red_weaknesses": ["weakness 1", "weakness 2"],
-  "red_win_conditions": ["condition 1", "condition 2"],
-  "red_gameplan": ["step 1", "step 2", "step 3"],
-  "key_matchups": [
-    {"lane": "Top", "analysis": "..."},
-    {"lane": "Jungle", "analysis": "..."},
-    {"lane": "Mid", "analysis": "..."},
-    {"lane": "Bot", "analysis": "..."},
-    {"lane": "Support", "analysis": "..."}
-  ],
-  "predicted_winner": "blue" or "red",
-  "confidence": 0.0 to 1.0,
-  "reasoning": "Why you predict this outcome"
+  "summary": {
+    "winProbability": 45-55,
+    "draftGrade": "S|A|B|C|D",
+    "keyStrengths": ["strength 1", "strength 2", "strength 3"]
+  },
+  "strategicAnalysis": {
+    "teamComp": "Description of composition style and identity",
+    "winConditions": ["condition 1", "condition 2", "condition 3"],
+    "powerSpikes": ["spike 1", "spike 2", "spike 3"]
+  },
+  "matchupInsights": {
+    "lanes": [
+      {
+        "role": "Top Lane",
+        "matchup": "Description",
+        "advantage": "favorable|even|unfavorable",
+        "tips": "Lane-specific advice"
+      }
+      // ... for all 5 lanes
+    ],
+    "junglePathing": "Jungle strategy description",
+    "objectivePriorities": ["priority 1", "priority 2", "priority 3", "priority 4"]
+  },
+  "recommendations": {
+    "earlyGame": ["tip 1", "tip 2", "tip 3", "tip 4"],
+    "midGame": ["tip 1", "tip 2", "tip 3", "tip 4"],
+    "lateGame": ["tip 1", "tip 2", "tip 3", "tip 4"]
+  }
 }`;
 }

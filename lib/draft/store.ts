@@ -43,6 +43,11 @@ interface DraftStore extends DraftState {
   selectChampion: (champion: string | null) => void
   confirmAction: (role?: Role) => boolean // Execute the selected champion
 
+  // Draft Report Modal state
+  showReportModal: boolean
+  setShowReportModal: (show: boolean) => void
+  draftReportGenerated: boolean
+
   // Actions
   initializeDraft: (params: {
     id: string
@@ -85,6 +90,8 @@ export const useDraftStore = create<DraftStore>()(
     ...createInitialState(),
     lastValidationError: null,
     selectedChampion: null,
+    showReportModal: false,
+    draftReportGenerated: false,
 
     /**
      * Select a champion (first step of two-step action flow)
@@ -98,6 +105,14 @@ export const useDraftStore = create<DraftStore>()(
         } else {
           state.selectedChampion = champion
         }
+      }),
+
+    /**
+     * Control Draft Report Modal visibility
+     */
+    setShowReportModal: (show: boolean) =>
+      set((state) => {
+        state.showReportModal = show
       }),
 
     /**
@@ -255,6 +270,8 @@ export const useDraftStore = create<DraftStore>()(
         } else {
           draft.isComplete = true
           draft.completedAt = new Date()
+          // Auto-trigger report modal on draft completion
+          draft.showReportModal = true
         }
       })
 

@@ -28,6 +28,7 @@ import { ActionBar } from '@/components/draft/action-bar'
 import { OpponentSidebar } from '@/components/draft/opponent-sidebar'
 import { SideSelector } from '@/components/draft/side-selector'
 import { InsightsPanel } from '@/components/draft/insights-panel'
+import { DraftReportModal } from '@/components/draft/draft-report-modal'
 
 interface DraftSimulatorProps {
   draftId: string
@@ -42,6 +43,8 @@ export default function DraftSimulator({
   // Draft store state
   const currentTurn = useDraftStore((state) => state.currentTurn)
   const applyRemoteAction = useDraftStore((state) => state.applyRemoteAction)
+  const showReportModal = useDraftStore((state) => state.showReportModal)
+  const setShowReportModal = useDraftStore((state) => state.setShowReportModal)
 
   // Search and filter state (controlled by PhaseHeader)
   const [searchQuery, setSearchQuery] = useState('')
@@ -115,6 +118,13 @@ export default function DraftSimulator({
 
       {/* Bottom Action Bar */}
       <ActionBar draftId={draftId} />
+
+      {/* AI Draft Report Modal */}
+      <DraftReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        draftId={draftId}
+      />
     </div>
   )
 }
