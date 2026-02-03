@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { calculateWinRateForState } from '@/lib/recommendations/win-rate-projector';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -27,7 +28,7 @@ export async function POST(
 
     if (useMockData) {
       // Return mock report matching DraftReportModal structure
-      const mockReport = generateMockReport(blue, red, userSide);
+      const mockReport = await generateMockReport(blue, red, userSide);
       return NextResponse.json(mockReport);
     }
 
@@ -62,7 +63,7 @@ export async function POST(
 
     // Fallback to mock data on error
     const body = await request.json();
-    const mockReport = generateMockReport(body.blue, body.red, body.userSide);
+    const mockReport = await generateMockReport(body.blue, body.red, body.userSide);
     return NextResponse.json(mockReport);
   }
 }
@@ -70,17 +71,39 @@ export async function POST(
 /**
  * Generate mock report matching DraftReportModal structure
  */
-function generateMockReport(blue: any, red: any, userSide: 'blue' | 'red') {
+async function generateMockReport(blue: any, red: any, userSide: 'blue' | 'red') {
   const userTeam = userSide === 'blue' ? blue : red;
   const userChampions = userTeam.picks.map((p: any) => p.champion).join(', ') || 'No picks';
 
-  // Calculate win probability (simple mock heuristic)
-  const baseWinRate = userSide === 'blue' ? 52 : 48; // Blue side advantage
-  const grade = determineGrade(userTeam);
+  // Calculate ACTUAL win probability using the win rate projector
+  const bluePicks = blue.picks?.map((p: any) => p.champion) || [];
+  const blueRoles = blue.picks?.map((p: any) => p.role) || [];
+  const redPicks = red.picks?.map((p: any) => p.champion) || [];
+  const redRoles = red.picks?.map((p: any) => p.role) || [];
+
+  let winProbability = 50; // Default
+  try {
+    const projection = await calculateWinRateForState(
+      bluePicks,
+      blueRoles,
+      redPicks,
+      redRoles,
+      '15.2'
+    );
+    // Convert to user's perspective and percentage
+    const userWinRate = userSide === 'blue' ? projection.blueWinRate : projection.redWinRate;
+    winProbability = Math.round(userWinRate * 100);
+  } catch (error) {
+    console.error('Failed to calculate win rate for report:', error);
+    // Fallback to side advantage only
+    winProbability = userSide === 'blue' ? 52 : 48;
+  }
+
+  const grade = determineGrade(userTeam, winProbability);
 
   return {
     summary: {
-      winProbability: baseWinRate,
+      winProbability,
       draftGrade: grade,
       keyStrengths: [
         `Strong team synergy with champions: ${userChampions}`,
@@ -168,16 +191,20 @@ function generateMockReport(blue: any, red: any, userSide: 'blue' | 'red') {
 }
 
 /**
- * Determine draft grade based on pick quality
+ * Determine draft grade based on composition quality (win probability)
  */
-function determineGrade(team: any): 'S' | 'A' | 'B' | 'C' | 'D' {
+function determineGrade(team: any, winProbability: number): 'S' | 'A' | 'B' | 'C' | 'D' {
   const pickCount = team.picks?.length || 0;
 
-  // Simple heuristic - can be improved with actual analysis
-  if (pickCount >= 5) return 'A';
-  if (pickCount >= 4) return 'B';
-  if (pickCount >= 3) return 'C';
-  return 'D';
+  // Incomplete draft gets poor grade
+  if (pickCount < 5) return 'D';
+
+  // Grade based on calculated win probability
+  if (winProbability >= 58) return 'S';  // Dominant draft (58%+)
+  if (winProbability >= 54) return 'A';  // Strong draft (54-57%)
+  if (winProbability >= 50) return 'B';  // Solid draft (50-53%)
+  if (winProbability >= 46) return 'C';  // Weak draft (46-49%)
+  return 'D';                            // Poor draft (<46%)
 }
 
 /**

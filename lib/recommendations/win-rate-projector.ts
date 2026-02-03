@@ -356,9 +356,9 @@ export class WinRateProjector {
     }
 
     // Fallback: Use hardcoded win rates from pro play approximations
-    // Higher weight (0.5) to make champion strength more visible
+    // Higher weight (1.0) to make champion strength more visible
     const fallbackWinRate = BASE_WIN_RATES[champion] ?? BASE_WIN_RATES['_default']
-    const delta = (fallbackWinRate - 0.50) * 0.5 // 50% weight - if champ is 55% wr, add +2.5%
+    const delta = (fallbackWinRate - 0.50) * 1.0 // 100% weight - if champ is 55% wr, add +5%
     return delta
   }
 
