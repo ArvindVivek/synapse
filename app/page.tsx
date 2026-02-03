@@ -79,7 +79,7 @@ export default function Home() {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl blur-xl opacity-50 animate-pulse" />
               <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl overflow-hidden bg-white/5">
-                <Image src="/c9.svg" alt="Cloud9" width={48} height={48} className="object-contain" />
+                <Image src="/c9.png" alt="Cloud9" width={48} height={48} className="object-contain" />
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
