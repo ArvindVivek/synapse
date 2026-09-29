@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Synapse: two nodes joined by a signal, lime on the night tile. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#232A40"/>
+      <stop offset="1" stop-color="#0B0F1A"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="url(#g)"/>
+  <path d="M9.5 21.5 C 14 21.5, 13 10.5, 22.5 10.5" fill="none" stroke="#B5CC18" stroke-width="2.8" stroke-linecap="round"/>
+  <circle cx="9" cy="22" r="3.6" fill="#B5CC18"/>
+  <circle cx="23" cy="10" r="3.6" fill="#B5CC18"/>
+</svg>
