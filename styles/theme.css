@@ -1,0 +1,33 @@
+/* Synapse's accent: "spark lime". Kit-owned tokens live in kl-tokens.css; this file is ours and
+   the sync script never overwrites it. Web-only palette, derived with the script in
+   kitchenlabs-kit/docs/brand/palettes.md from #B5CC18 (CIEDE2000 >= 20.9 from every other
+   Kitchen Labs accent). Lime is a light colour, so the button label is a dark olive ink
+   (8.3:1), and lime text in light mode uses --accent-text #68750E (4.6:1 on --bg).
+   Every text pair is measured by lib/tokens.test.ts. */
+
+:root {
+  --accent: #b5cc18;
+  --accent-strong: #b5cc18;
+  --accent-deep: #6f7e0f;
+  --accent-text: #68750e;
+  --accent-soft: #f5f8df;
+  --on-accent: #232a04;
+
+  /* Draft sides (not the accent): blue side and red side, as in the game. Fills are for bars
+     and slot rings; -text colours pass 4.5:1 on bg, surface and their -soft tint. */
+  --blue-side: #2f6feb;
+  --blue-text: #1f58c7;
+  --blue-soft: #e4edff;
+  --red-side: #e5484d;
+  --red-text: #bb2a32;
+  --red-soft: #fde8e9;
+}
+
+[data-theme="dark"] {
+  --accent-text: #b5cc18;
+  --accent-soft: #384124;
+  --blue-text: #8db6ff;
+  --blue-soft: #1b2b4f;
+  --red-text: #ff8f93;
+  --red-soft: #43222b;
+}

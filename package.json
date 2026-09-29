@@ -1,40 +1,50 @@
 {
-  "name": "nextjs",
-  "version": "0.1.0",
+  "name": "synapse",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3187",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
+    "fixtures": "node scripts/build-fixtures.mjs",
+    "screenshots": "node \"/Users/arvind/Documents/Kitchen Labs/kitchenlabs-kit/tools/capture/capture-web.mjs\" docs/marketing/capture.json",
+    "sync": "bash \"/Users/arvind/Documents/Kitchen Labs/kitchenlabs-kit/scripts/sync-web-kit.sh\" . --with-tests",
+    "kit:check": "bash \"/Users/arvind/Documents/Kitchen Labs/kitchenlabs-kit/scripts/sync-web-kit.sh\" . --with-tests --check",
+    "leak-check": "node scripts/leak-check.mjs",
+    "gate": "npm run kit:check && npm run typecheck && npm run lint && npm run test && npm run build && npm run leak-check"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.50.0",
-    "bottleneck": "^2.19.5",
-    "framer-motion": "^12.29.2",
-    "immer": "^11.0.0",
-    "lucide-react": "^0.563.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.28.0",
+    "motion": "^12.43.0",
     "nanoid": "^5.1.6",
-    "next": "16.1.6",
-    "openai": "^6.17.0",
-    "p-retry": "^6.2.1",
-    "react": "19.2.3",
-    "react-circular-progressbar": "^2.2.0",
-    "react-dom": "19.2.3",
-    "zod": "^3.24.1",
+    "next": "16.3.6",
+    "next-themes": "^0.4.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.6.5",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "dotenv": "^16.4.7",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "16.3.6",
     "tailwindcss": "^4",
-    "tsx": "^4.19.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
+  },
+  "overrides": {
+    "typescript-eslint": "8.70.1"
   }
 }
