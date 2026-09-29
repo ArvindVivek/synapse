@@ -1,0 +1,231 @@
+{
+  "app": "synapse",
+  "baseUrl": "https://synapse-henna-eight.vercel.app",
+  "captured": "2026-09-29T09:00:53.363Z",
+  "shots": [
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "name": "01-home",
+      "file": "desktop-light/01-home.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "name": "02-setup",
+      "file": "desktop-light/02-setup.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "name": "03-draft",
+      "file": "desktop-light/03-draft.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "name": "04-recommendations",
+      "file": "desktop-light/04-recommendations.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "name": "05-scouting",
+      "file": "desktop-light/05-scouting.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "name": "06-complete",
+      "file": "desktop-light/06-complete.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "name": "07-report",
+      "file": "desktop-light/07-report.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "name": "01-home",
+      "file": "desktop-dark/01-home.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "name": "02-setup",
+      "file": "desktop-dark/02-setup.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "name": "03-draft",
+      "file": "desktop-dark/03-draft.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "name": "04-recommendations",
+      "file": "desktop-dark/04-recommendations.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "name": "05-scouting",
+      "file": "desktop-dark/05-scouting.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "name": "06-complete",
+      "file": "desktop-dark/06-complete.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "name": "07-report",
+      "file": "desktop-dark/07-report.png",
+      "px": "2880x1800",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "light",
+      "name": "01-home",
+      "file": "phone-light/01-home.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "light",
+      "name": "02-setup",
+      "file": "phone-light/02-setup.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "light",
+      "name": "03-draft",
+      "file": "phone-light/03-draft.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "light",
+      "name": "04-recommendations",
+      "file": "phone-light/04-recommendations.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "light",
+      "name": "05-scouting",
+      "file": "phone-light/05-scouting.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "light",
+      "name": "06-complete",
+      "file": "phone-light/06-complete.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "light",
+      "name": "07-report",
+      "file": "phone-light/07-report.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "dark",
+      "name": "01-home",
+      "file": "phone-dark/01-home.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "dark",
+      "name": "02-setup",
+      "file": "phone-dark/02-setup.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "dark",
+      "name": "03-draft",
+      "file": "phone-dark/03-draft.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "dark",
+      "name": "04-recommendations",
+      "file": "phone-dark/04-recommendations.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "dark",
+      "name": "05-scouting",
+      "file": "phone-dark/05-scouting.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "dark",
+      "name": "06-complete",
+      "file": "phone-dark/06-complete.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    },
+    {
+      "viewport": "phone",
+      "theme": "dark",
+      "name": "07-report",
+      "file": "phone-dark/07-report.png",
+      "px": "1290x2796",
+      "consoleErrors": 0
+    }
+  ]
+}
