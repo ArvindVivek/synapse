@@ -1,119 +1,60 @@
 /**
- * Type definitions for the draft state machine
+ * The draft's data model.
  *
- * Models the League of Legends professional draft sequence:
- * - Ban Phase 1: 3 bans per side (turns 1-6)
- * - Pick Phase 1: 3 picks per side (turns 7-12)
- * - Ban Phase 2: 2 bans per side (turns 13-16)
- * - Pick Phase 2: 2 picks per side (turns 17-20)
+ * The professional draft is 20 turns (lib/draft/sequence.ts):
+ * - Ban phase 1: 3 bans per side (turns 1-6)
+ * - Pick phase 1: 3 picks per side (turns 7-12)
+ * - Ban phase 2: 2 bans per side (turns 13-16)
+ * - Pick phase 2: 2 picks per side (turns 17-20)
+ *
+ * A Draft stores only what happened (bans and picks in order); the turn, phase and the champions
+ * still open are derived from it, so they can never drift out of step.
  */
 
-/**
- * Role assignment for champion picks
- * Matches database schema from Phase 1
- */
+export type Side = 'blue' | 'red'
+
 export type Role = 'top' | 'jungle' | 'mid' | 'adc' | 'support'
 
+export const ROLES: readonly Role[] = ['top', 'jungle', 'mid', 'adc', 'support']
+
 /**
- * Draft format types
- * - tournament: Standard pro draft (5 bans, 5 picks per side)
- * - fearless: Champions can only be picked once per series (tracked separately)
- * - scrim: Practice mode with relaxed rules
+ * - tournament: the standard pro draft
+ * - fearless: a series; champions picked in earlier games can't be picked again
+ * - scrim: practice; you can take back your last move
  */
 export type DraftFormat = 'tournament' | 'fearless' | 'scrim'
 
-/**
- * Four phases of the draft sequence
- */
 export type DraftPhase = 'ban1' | 'pick1' | 'ban2' | 'pick2'
 
-/**
- * Represents a single turn in the draft sequence (1-20)
- */
 export type DraftTurn = {
-  /** Turn number (1-20) */
+  /** 1-20 */
   turnNumber: number
-  /** Which phase this turn belongs to */
   phase: DraftPhase
-  /** Which team has the turn */
-  side: 'blue' | 'red'
-  /** What action is performed */
+  side: Side
   action: 'ban' | 'pick'
 }
 
-/**
- * Team's draft composition (picks and bans)
- */
-export type TeamComposition = {
-  /** Champions banned by this team */
+export interface TeamDraft {
+  /** In the order they were banned. */
   bans: string[]
-  /** Champions picked by this team with role assignments */
-  picks: Array<{
-    champion: string
-    role: Role | null  // null until role is assigned
-  }>
+  /** In the order they were picked. */
+  picks: string[]
 }
 
-/**
- * Opponent team info for scouting
- */
-export interface OpponentTeam {
+export interface Draft {
   id: string
-  name: string
-  players: Array<{
-    id: string
-    name: string
-    role: Role
-  }>
-}
-
-/**
- * Complete draft state
- */
-export interface DraftState {
-  /** Draft session ID (null if not initialized) */
-  id: string | null
-
-  /** Current turn number (0 = not started, 1-20 = active, 21+ = complete) */
-  currentTurn: number
-
-  /** Current draft phase */
-  phase: DraftPhase
-
-  /** Which side the user is playing */
-  userSide: 'blue' | 'red'
-
-  /** Draft format (tournament, fearless, scrim) */
+  userSide: Side
   format: DraftFormat
-
-  /** Opponent team info for scouting (optional) */
-  opponentTeam: OpponentTeam | null
-
-  /** Blue team composition */
-  blue: TeamComposition
-
-  /** Red team composition */
-  red: TeamComposition
-
-  /** Champions that can still be picked/banned (all - picked - banned) */
-  availableChampions: Set<string>
-
-  /** Whether the draft is complete */
-  isComplete: boolean
-
-  /** When the draft started */
-  startedAt: Date | null
-
-  /** When the draft completed */
-  completedAt: Date | null
+  /** Sample opponent team from lib/fixtures/teams.json, or null for no scouting. */
+  opponentTeamId: string | null
+  /** Game number in a fearless series (1 otherwise). */
+  game: number
+  /** Fearless only: champions picked in earlier games of the series. */
+  locked: string[]
+  blue: TeamDraft
+  red: TeamDraft
+  startedAt: string
+  completedAt: string | null
 }
 
-/**
- * Actions that can be performed on the draft state
- * Discriminated union for type-safe action handling
- */
-export type DraftAction =
-  | { type: 'BAN'; champion: string }
-  | { type: 'PICK'; champion: string; role?: Role }
-  | { type: 'UNDO' }
-  | { type: 'RESET' }
+export type DraftAction = { type: 'BAN' | 'PICK'; champion: string }
