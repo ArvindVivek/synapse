@@ -1,0 +1,110 @@
+{
+  "app": "synapse",
+  "baseUrl": "https://synapse-henna-eight.vercel.app",
+  "out": "web",
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "themeStrategy": "media",
+  "viewports": [
+    "desktop",
+    "phone"
+  ],
+  "initStorage": {
+    "synapse-drafts": "{\"state\": {\"drafts\": {\"sample-final\": {\"userSide\": \"blue\", \"format\": \"tournament\", \"opponentTeamId\": \"harbor-owls\", \"locked\": [], \"blue\": {\"bans\": [\"Viego\", \"Kalista\", \"Rell\", \"Zeri\", \"Yuumi\"], \"picks\": [\"Gnar\", \"Sejuani\", \"Orianna\", \"Jinx\", \"Lulu\"]}, \"red\": {\"bans\": [\"Azir\", \"Ahri\", \"Corki\", \"Vi\", \"Braum\"], \"picks\": [\"Aatrox\", \"Lee Sin\", \"Syndra\", \"Kai'Sa\", \"Nautilus\"]}, \"id\": \"sample-final\", \"game\": 1, \"startedAt\": \"2026-09-29T17:00:00.000Z\", \"completedAt\": \"2026-09-29T17:09:00.000Z\"}, \"sample-live\": {\"id\": \"sample-live\", \"userSide\": \"blue\", \"format\": \"tournament\", \"opponentTeamId\": \"ironpeak\", \"game\": 1, \"locked\": [], \"blue\": {\"bans\": [\"Viego\", \"Kalista\", \"Rell\", \"Zeri\", \"Yuumi\"], \"picks\": [\"Sejuani\", \"Orianna\", \"Gnar\"]}, \"red\": {\"bans\": [\"Azir\", \"Jinx\", \"Maokai\", \"Vi\", \"Braum\"], \"picks\": [\"Aatrox\", \"Lee Sin\", \"Syndra\", \"Kai'Sa\"]}, \"startedAt\": \"2026-09-29T17:00:00.000Z\", \"completedAt\": null}}, \"reports\": {\"sample-final\": {\"source\": \"fallback\", \"facts\": {\"side\": \"blue\", \"winProbability\": 63, \"grade\": \"S\", \"you\": {\"picks\": [\"Gnar\", \"Sejuani\", \"Orianna\", \"Jinx\", \"Lulu\"], \"roles\": {\"top\": \"Gnar\", \"jungle\": \"Sejuani\", \"mid\": \"Orianna\", \"adc\": \"Jinx\", \"support\": \"Lulu\"}, \"engage\": 1, \"frontline\": 2, \"peel\": 1, \"damage\": {\"ap\": 3, \"ad\": 2, \"mixed\": 0}, \"needs\": []}, \"enemy\": {\"picks\": [\"Aatrox\", \"Lee Sin\", \"Syndra\", \"Kai'Sa\", \"Nautilus\"], \"roles\": {\"top\": \"Aatrox\", \"jungle\": \"Lee Sin\", \"mid\": \"Syndra\", \"adc\": \"Kai'Sa\", \"support\": \"Nautilus\"}, \"engage\": 1, \"frontline\": 2, \"peel\": 0, \"damage\": {\"ap\": 2, \"ad\": 2, \"mixed\": 1}, \"needs\": []}, \"lanes\": [{\"role\": \"top\", \"yours\": \"Gnar\", \"theirs\": \"Aatrox\", \"edge\": 0.035, \"advantage\": \"favorable\"}, {\"role\": \"jungle\", \"yours\": \"Sejuani\", \"theirs\": \"Lee Sin\", \"edge\": 0.015, \"advantage\": \"even\"}, {\"role\": \"mid\", \"yours\": \"Orianna\", \"theirs\": \"Syndra\", \"edge\": 0.005, \"advantage\": \"even\"}, {\"role\": \"adc\", \"yours\": \"Jinx\", \"theirs\": \"Kai'Sa\", \"edge\": 0.015, \"advantage\": \"even\"}, {\"role\": \"support\", \"yours\": \"Lulu\", \"theirs\": \"Nautilus\", \"edge\": 0.055, \"advantage\": \"favorable\"}]}, \"summary\": {\"winProbability\": 63, \"grade\": \"S\", \"keyStrengths\": [\"Fight starter on Sejuani\", \"A frontline in Gnar and Sejuani\", \"Both magic and physical damage, so armor alone won\\u2019t stop you\"]}, \"strategicAnalysis\": {\"teamComp\": \"This is a front-to-back team that protects its carries.\", \"winConditions\": [\"Snowball top lane and move that lead to objectives\", \"Keep vision around the next objective a minute before it spawns\", \"Group after two items, when your team fights best\"], \"powerSpikes\": [\"Level 6: ultimates come online, so look for your first coordinated play\", \"Two items on Jinx: your strongest window to force fights\"]}, \"matchupInsights\": {\"lanes\": [{\"role\": \"top\", \"yours\": \"Gnar\", \"theirs\": \"Aatrox\", \"edge\": 0.035, \"advantage\": \"favorable\", \"label\": \"Top\", \"tip\": \"Gnar has the edge over Aatrox. Play forward early and turn lane pressure into objectives.\"}, {\"role\": \"jungle\", \"yours\": \"Sejuani\", \"theirs\": \"Lee Sin\", \"edge\": 0.015, \"advantage\": \"even\", \"label\": \"Jungle\", \"tip\": \"Sejuani and Lee Sin are close. Whoever uses their jungler's timings better wins it.\"}, {\"role\": \"mid\", \"yours\": \"Orianna\", \"theirs\": \"Syndra\", \"edge\": 0.005, \"advantage\": \"even\", \"label\": \"Mid\", \"tip\": \"Orianna and Syndra are close. Whoever uses their jungler's timings better wins it.\"}, {\"role\": \"adc\", \"yours\": \"Jinx\", \"theirs\": \"Kai'Sa\", \"edge\": 0.015, \"advantage\": \"even\", \"label\": \"Bot\", \"tip\": \"Jinx and Kai'Sa are close. Whoever uses their jungler's timings better wins it.\"}, {\"role\": \"support\", \"yours\": \"Lulu\", \"theirs\": \"Nautilus\", \"edge\": 0.055, \"advantage\": \"favorable\", \"label\": \"Support\", \"tip\": \"Lulu has the edge over Nautilus. Play forward early and turn lane pressure into objectives.\"}], \"objectivePriorities\": [\"First dragon: your bot lane can move first\", \"Rift Herald or Grubs to spread your lane lead\", \"Take the third dragon only with vision set up first\", \"Baron after you win a fight, never before\"]}, \"recommendations\": {\"earlyGame\": [\"Play through top, your strongest lane\", \"Ward the enemy jungle entrance on the side your jungler starts\"], \"midGame\": [\"Group for objectives and start fights from vision, not face-checks\", \"Send the side-laner with the best matchup to split while four hold mid\"], \"lateGame\": [\"Fight around Baron and Elder with vision set, never through a blind choke\", \"Keep Jinx safe: one death here can lose the game\"]}}}}, \"version\": 1}"
+  },
+  "shots": [
+    {
+      "name": "01-home",
+      "path": "/",
+      "waitFor": "text=Practice pro drafts",
+      "settle": 600
+    },
+    {
+      "name": "02-setup",
+      "path": "/draft/new",
+      "waitFor": "text=Opponent to scout",
+      "settle": 400
+    },
+    {
+      "name": "03-draft",
+      "path": "/draft/sample-live",
+      "steps": [
+        {
+          "waitFor": "[data-testid=draft-screen]"
+        },
+        {
+          "click": "[aria-label$=', suggestion 1']"
+        },
+        {
+          "wait": 400
+        },
+        {
+          "scroll": 0
+        },
+        {
+          "wait": 300
+        }
+      ]
+    },
+    {
+      "name": "04-recommendations",
+      "path": "/draft/sample-live",
+      "steps": [
+        {
+          "waitFor": "[data-testid=draft-screen]"
+        },
+        {
+          "click": "[data-testid=tab-advice], [data-testid=advice] h2"
+        },
+        {
+          "wait": 300
+        },
+        {
+          "click": "[data-testid=advice-1]"
+        },
+        {
+          "hover": "[data-testid=advice-2]"
+        },
+        {
+          "wait": 400
+        }
+      ]
+    },
+    {
+      "name": "05-scouting",
+      "path": "/draft/sample-live",
+      "steps": [
+        {
+          "waitFor": "[data-testid=draft-screen]"
+        },
+        {
+          "click": "[data-testid=tab-scouting], [data-testid=scouting] h2"
+        },
+        {
+          "wait": 300
+        },
+        {
+          "hover": "[data-testid=scouting] article >> nth=1"
+        },
+        {
+          "wait": 400
+        }
+      ]
+    },
+    {
+      "name": "06-complete",
+      "path": "/draft/sample-final",
+      "waitFor": "[data-testid=complete]",
+      "settle": 500
+    },
+    {
+      "name": "07-report",
+      "path": "/draft/sample-final",
+      "fullPage": true,
+      "waitFor": "[data-testid=report]",
+      "settle": 500
+    }
+  ]
+}
