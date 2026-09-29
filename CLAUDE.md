@@ -13,9 +13,13 @@ Playwright. Live: https://synapse-henna-eight.vercel.app (Vercel project `synaps
   America/Los_Angeles, phone + desktop, OpenAI key blanked so no test spends money).
 - AI report: code path done and unit-tested with a stubbed OpenAI. **The live AI check is pending**:
   the org key was out of credits (429 insufficient_quota) on 2026-09-29, so production serves the
-  code-written report. When credits return, finish a draft on the live site, tap **Write the coach's
-  report**, and check the source line says "Written by AI" and the runtime log shows
-  `[ai] provider: openai label=draft-report`.
+  code-written report.
+- **No real OpenAI calls in tests (owner rule, 2026-09-29).** `vitest.setup.ts` makes any unstubbed
+  call to api.openai.com throw (pinned by `lib/ai/no-real-calls.test.ts`); Playwright blanks the key
+  for its server. The only spending check is opt-in, run once when credits are back:
+  `E2E_LIVE_AI=1 E2E_BASE_URL=https://synapse-henna-eight.vercel.app npx playwright test e2e/ai-live.spec.ts --project=desktop`
+  (one call; passes when `report.source` is "ai"; the runtime log then shows
+  `[ai] provider: openai label=draft-report`). No evals or model comparisons.
 
 ## Map
 
@@ -85,5 +89,5 @@ Dead since the Supabase instance was deleted (owner can delete on Vercel):
 
 - Publish `docs/PRIVACY.md` and `docs/SUPPORT.md` on the studio site at
   `/apps/synapse/privacy` and `/apps/synapse/support` (the footer links point there).
-- Top up OpenAI credits, then run the live AI check above.
+- Top up OpenAI credits, then run the opt-in live AI check above (the lead runs it at the end).
 - Delete the five dead env vars on Vercel.
