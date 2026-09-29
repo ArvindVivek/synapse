@@ -1,4 +1,4 @@
-// KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/lib/ai.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/lib/ai.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 // The one file in a Kitchen Labs web app that talks to a model.
 //
 // Org rule: every AI call uses OpenAI through the shared OPENAI_API_KEY, from server code only
@@ -59,6 +59,7 @@ export interface JSONRequest extends TextRequest {
 export type AIErrorCode =
   | "not_configured"
   | "busy"
+  | "paused"
   | "unavailable"
   | "timeout"
   | "cancelled"
@@ -70,6 +71,7 @@ export type AIErrorCode =
 const MESSAGES: Record<AIErrorCode, string> = {
   not_configured: "The AI service isn't set up yet.",
   busy: "The AI service is busy right now. Try again in a minute.",
+  paused: "AI features are paused right now. Everything else still works.",
   unavailable: "The AI service is having trouble. Try again in a minute.",
   timeout: "The AI took too long to answer. Please try again.",
   cancelled: "The request was cancelled.",
@@ -83,6 +85,7 @@ const MESSAGES: Record<AIErrorCode, string> = {
 const STATUS: Record<AIErrorCode, number> = {
   not_configured: 503,
   busy: 503,
+  paused: 503,
   unavailable: 503,
   timeout: 504,
   cancelled: 499,
@@ -113,6 +116,12 @@ export class AIError extends Error {
 /** Maps a non-2xx OpenAI response to an AIError. */
 export function errorFromStatus(status: number, body = ""): AIError {
   if (status === 401 || status === 403) return new AIError("not_configured", `${status} ${body}`);
+  // 429 means two different things: a rate limit (retry soon) or an empty balance (retrying
+  // can't help). Tell them apart so people aren't told to "try again in a minute".
+  if (status === 429 && /insufficient_quota|credit_balance_exhausted|billing_hard_limit/.test(body)) {
+    console.error("[ai] OpenAI balance is empty (insufficient_quota): AI features are paused");
+    return new AIError("paused", body);
+  }
   if (status === 429) return new AIError("busy", body);
   if (status >= 500) return new AIError("unavailable", `${status} ${body}`);
   return new AIError("failed", `${status} ${body}`);

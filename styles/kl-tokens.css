@@ -1,4 +1,4 @@
-/* KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/styles/tokens.css. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh. */
+/* KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/styles/tokens.css. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh. */
 /* KL Web tokens: the studio neutrals, role colours, type, radii and motion rules shared by
    every Kitchen Labs web app. Light values = KLColor.swift light; dark = KLColor.swift dark.
    Import right after `@import "tailwindcss";`, then the app's own theme.css (the accent).
@@ -167,9 +167,13 @@ h3,
 
 /* One focus ring everywhere. It uses accent-text, not the raw accent: a light accent (mint
    #14B874 is 2.3:1 on bg) would miss the 3:1 needed for a non-text indicator. */
-:focus-visible {
-  outline: 3px solid var(--accent-text);
-  outline-offset: 2px;
+/* In the base layer so a Tailwind utility (focus-visible:outline-none on a wrapper that draws
+   its own ring) can override it; unlayered CSS always beat utilities and gave double rings. */
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--accent-text);
+    outline-offset: 2px;
+  }
 }
 
 ::selection {

@@ -1,6 +1,6 @@
 # KL Web, vendored from kitchenlabs-kit by scripts/sync-web-kit.sh. Do not edit.
-version=1.0.1
-content=f970803f8e5e
+version=1.0.2
+content=ad5e9841815c
 files:
 components/kl/Button.tsx
 components/kl/Card.tsx

@@ -1,4 +1,4 @@
-// KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/components/PageShell.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/components/PageShell.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/kl/cn";
@@ -9,7 +9,7 @@ export const STUDIO_SITE = "https://kitchenlabs-one.vercel.app";
 export const privacyUrl = (slug: string) => `${STUDIO_SITE}/apps/${slug}/privacy`;
 export const supportUrl = (slug: string) => `${STUDIO_SITE}/apps/${slug}/support`;
 
-const WIDTHS = { narrow: "max-w-2xl", wide: "max-w-5xl" } as const;
+const WIDTHS = { narrow: "max-w-2xl", wide: "max-w-5xl", full: "max-w-[75rem]" } as const;
 
 /**
  * The frame every page sits in: a header with the app's icon and name (a link home), the
@@ -21,6 +21,9 @@ export function PageShell({
   appSlug,
   icon,
   actions,
+  nav,
+  homeHref = "/",
+  footerNote,
   width = "narrow",
   showThemeToggle = true,
   children,
@@ -33,6 +36,13 @@ export function PageShell({
   icon?: ReactNode;
   /** Extra header controls (sign in, settings). Keep each at 44px. */
   actions?: ReactNode;
+  /** Section navigation under the header (tabs or links). Dashboards use it with width="full". */
+  nav?: ReactNode;
+  /** Where the logo links: "/" normally, "/demo" inside a demo. */
+  homeHref?: string;
+  /** A line above "Made by Kitchen Labs", e.g. a required legal notice (Riot's fan-project text). */
+  footerNote?: ReactNode;
+  /** narrow (reading), wide (tools), full (dashboards, 1200px). */
   width?: keyof typeof WIDTHS;
   showThemeToggle?: boolean;
   children: ReactNode;
@@ -49,7 +59,7 @@ export function PageShell({
       </a>
       <header className="pt-[env(safe-area-inset-top)]">
         <div className={cn(frame, "flex h-16 items-center justify-between gap-3")}>
-          <Link href="/" className="-ml-1 flex min-h-11 min-w-0 items-center gap-2.5 rounded-sm px-1">
+          <Link href={homeHref} className="-ml-1 flex min-h-11 min-w-0 items-center gap-2.5 rounded-sm px-1">
             {icon && <span className="shrink-0 overflow-hidden rounded-[9px]">{icon}</span>}
             <span className="truncate font-display text-title3 font-semibold text-ink">{appName}</span>
           </Link>
@@ -58,6 +68,7 @@ export function PageShell({
             {showThemeToggle && <ThemeToggle />}
           </div>
         </div>
+        {nav && <div className={cn(frame, "pb-2")}>{nav}</div>}
       </header>
 
       <main id="main" className={cn(frame, "flex-1 pb-12 pt-2", className)}>
@@ -65,6 +76,7 @@ export function PageShell({
       </main>
 
       <footer className="pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        {footerNote && <div className={cn(frame, "pb-3 text-center text-xs text-ink-2")}>{footerNote}</div>}
         <div className={cn(frame, "flex flex-col items-center gap-1 border-t border-line pt-5 text-sm text-ink-2 sm:flex-row sm:justify-between")}>
           <p>
             Made by <span className="font-bold text-ink">Kitchen Labs</span>

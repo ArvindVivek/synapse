@@ -1,4 +1,4 @@
-// KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/lib/contrast.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/lib/contrast.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 import { describe, expect, it } from "vitest";
 import { bestLabel, contrast, parseHex } from "./contrast";
 

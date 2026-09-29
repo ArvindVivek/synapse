@@ -1,4 +1,4 @@
-// KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/components/Dialog.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/components/Dialog.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 "use client";
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
@@ -48,7 +48,8 @@ export function Dialog({
       aria-labelledby={titleId}
       aria-describedby={description ? descriptionId : undefined}
       // Escape and form[method=dialog] close the element directly; tell the owner.
-      onClose={() => open && onClose()}
+      // A nested Dialog's close event bubbles up the React tree; only react to our own.
+      onClose={(e) => e.target === e.currentTarget && open && onClose()}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose(); // the backdrop, not the sheet
       }}

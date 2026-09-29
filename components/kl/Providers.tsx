@@ -1,4 +1,4 @@
-// KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/components/Providers.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/components/Providers.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 "use client";
 
 import type { ComponentProps, ReactNode } from "react";
@@ -18,15 +18,21 @@ export function MotionProvider({ children }: { children: ReactNode }) {
 export function KLProviders({
   children,
   forcedTheme,
+  defaultTheme,
+  toastOffset,
 }: {
   children: ReactNode;
   /** "light" or "dark" for an app that has only one look (Overdraft, Cosmiq). */
   forcedTheme?: ComponentProps<typeof ThemeProvider>["forcedTheme"];
+  /** First-visit theme when the app prefers one ("dark" for a canvas tool); still switchable. Default "system". */
+  defaultTheme?: "light" | "dark" | "system";
+  /** Lift toasts above a pinned bottom bar, e.g. "5rem" (Flux's transport). */
+  toastOffset?: string;
 }) {
   return (
-    <ThemeProvider forcedTheme={forcedTheme}>
+    <ThemeProvider forcedTheme={forcedTheme} {...(defaultTheme ? { defaultTheme } : {})}>
       <MotionProvider>
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider bottomOffset={toastOffset}>{children}</ToastProvider>
       </MotionProvider>
     </ThemeProvider>
   );

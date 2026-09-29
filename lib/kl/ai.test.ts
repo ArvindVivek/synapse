@@ -1,4 +1,4 @@
-// KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/lib/ai.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/lib/ai.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ai.ts starts with `import "server-only"`, which throws outside a React Server environment.
@@ -106,6 +106,20 @@ describe("error mapping", () => {
     expect(toAIError(new Error("?")).code).toBe("failed");
     const e = new AIError("busy");
     expect(toAIError(e)).toBe(e);
+  });
+
+  it("an empty OpenAI balance says the AI is paused, not busy", () => {
+    for (const body of [
+      '{"error":{"code":"insufficient_quota","type":"insufficient_quota","message":"You exceeded your current quota"}}',
+      '{"error":{"code":"credit_balance_exhausted","type":"insufficient_quota","message":"You have no credits remaining."}}',
+    ]) {
+      const e = errorFromStatus(429, body);
+      expect(e.code).toBe("paused");
+      expect(e.status).toBe(503);
+      expect(e.userMessage).toBe("AI features are paused right now. Everything else still works.");
+      expect(e.userMessage).not.toMatch(/try again|minute/i);
+    }
+    expect(errorFromStatus(429, '{"error":{"code":"rate_limit_exceeded"}}').code).toBe("busy");
   });
 
   it("builds a route response that never leaks the detail", async () => {

@@ -1,4 +1,4 @@
-// KL Web 1.0.1, from kitchenlabs-kit/web/kl-web/components/Toast.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/components/Toast.tsx. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -37,7 +37,7 @@ export function useToast(): ToastApi {
   return api;
 }
 
-export function ToastProvider({ children }: { children: ReactNode }) {
+export function ToastProvider({ children, bottomOffset }: { children: ReactNode; bottomOffset?: string }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const nextId = useRef(1);
   const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
@@ -72,6 +72,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         role="status"
         aria-live="polite"
         className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+        style={bottomOffset ? { bottom: bottomOffset } : undefined}
       >
         <AnimatePresence initial={false}>
           {toasts.map((t) => (
