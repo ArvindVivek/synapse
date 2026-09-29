@@ -83,12 +83,6 @@
           "click": "[data-testid=tab-scouting], [data-testid=scouting] h2"
         },
         {
-          "wait": 300
-        },
-        {
-          "hover": "[data-testid=scouting] article >> nth=1"
-        },
-        {
           "wait": 400
         }
       ]

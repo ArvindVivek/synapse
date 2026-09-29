@@ -7,14 +7,14 @@ live in `styles/theme.css`; every text pair is measured by `lib/tokens.test.ts`.
 
 | Colour | Token | Means | Never |
 |---|---|---|---|
-| Spark lime `#B5CC18` | `--accent*` | Synapse's advice and your action: suggestion ranks and rings, the Lock in button, "Your pick" status, the grade | decoration, the sides |
-| Olive text `#68750E` / lime (dark) | `--accent-text` | accent-coloured text, focus ring, suggestion rings on the light page (lime fill is only 1.6:1 there) | |
+| Deep plum `#592673` | `--accent*` | Synapse's advice and your action: suggestion ranks and rings, the Lock in button, "Your pick" status, the grade | decoration, the sides |
+| Plum / lavender `#BB84D8` (dark) | `--accent-text` | accent-coloured text, focus ring, suggestion rings (plum fill is only 1.8:1 on the dark page, so rings use the lavender there) | |
 | Blue `#2F6FEB` | `--blue-side`, `--blue-text`, `--blue-soft` | blue side | advice |
 | Red `#E5484D` | `--red-side`, `--red-text`, `--red-soft` | red side | errors (those use `--danger`) |
 | Danger | kit `--danger*` | the Ban button, crossed-out bans, "their edge" | |
 | Success / warning | kit | positive breakdown points and "your edge" / signature picks, missing team needs | |
 
-The lime button face carries a dark olive label (`--on-accent #232A04`, 8.3:1): white on lime is 1.8:1.
+White on the plum button face is 10.8:1. The palette moved from lime to plum on 2026-09-29: Thrifty shipped a lime (#A3C614) ΔE 3.2 from Synapse's, and keeps it.
 
 ## Layout
 

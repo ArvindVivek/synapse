@@ -78,7 +78,14 @@ describe("Synapse side colours", () => {
     }
   });
 
-  it("dark-olive ink on the lime button face reaches 4.5:1", () => {
+  it("white on the plum button face reaches 4.5:1", () => {
+    expect(light["on-accent"].toLowerCase()).toBe("#ffffff");
     expect(contrast(light["on-accent"], light["accent-strong"])).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("dark-mode accent text (lavender) passes on every dark surface", () => {
+    for (const bg of ["bg", "surface", "surface-2", "accent-soft"]) {
+      expect(contrast(dark["accent-text"], dark[bg])).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });

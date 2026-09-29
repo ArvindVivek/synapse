@@ -1,17 +1,17 @@
-/* Synapse's accent: "spark lime". Kit-owned tokens live in kl-tokens.css; this file is ours and
+/* Synapse's accent: "deep plum". Kit-owned tokens live in kl-tokens.css; this file is ours and
    the sync script never overwrites it. Web-only palette, derived with the script in
-   kitchenlabs-kit/docs/brand/palettes.md from #B5CC18 (CIEDE2000 >= 20.9 from every other
-   Kitchen Labs accent). Lime is a light colour, so the button label is a dark olive ink
-   (8.3:1), and lime text in light mode uses --accent-text #68750E (4.6:1 on --bg).
+   kitchenlabs-kit/docs/brand/palettes.md from #592673 (CIEDE2000 19.3 from Flow, the nearest app).
+   White on the plum button is 10.8:1; plum text is 9.8:1 on --bg. In dark mode accent text is the
+   lavender #BB84D8 (6.1:1 on the dark surface; 15.8 from Cosmiq, so the two apps stay apart).
    Every text pair is measured by lib/tokens.test.ts. */
 
 :root {
-  --accent: #b5cc18;
-  --accent-strong: #b5cc18;
-  --accent-deep: #6f7e0f;
-  --accent-text: #68750e;
-  --accent-soft: #f5f8df;
-  --on-accent: #232a04;
+  --accent: #592673;
+  --accent-strong: #592673;
+  --accent-deep: #3b1950;
+  --accent-text: #592673;
+  --accent-soft: #e8e1eb;
+  --on-accent: #ffffff;
 
   /* Draft sides (not the accent): blue side and red side, as in the game. Fills are for bars
      and slot rings; -text colours pass 4.5:1 on bg, surface and their -soft tint. */
@@ -24,8 +24,8 @@
 }
 
 [data-theme="dark"] {
-  --accent-text: #b5cc18;
-  --accent-soft: #384124;
+  --accent-text: #bb84d8;
+  --accent-soft: #241d38;
   --blue-text: #8db6ff;
   --blue-soft: #1b2b4f;
   --red-text: #ff8f93;

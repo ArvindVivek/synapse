@@ -18,7 +18,7 @@ export const site = {
   /** Must equal --bg in kl-tokens.css (light, dark) so browser chrome never flashes. */
   themeColor: { light: "#F2F4F9", dark: "#0B0F1A" },
   /** Share-card colours (Satori can't read CSS variables): the app's accent and neutrals. */
-  card: { bg: "#0B0F1A", ink: "#EEF1F7", ink2: "#A0A9BC", accent: "#B5CC18" },
+  card: { bg: "#0B0F1A", ink: "#EEF1F7", ink2: "#A0A9BC", accent: "#BB84D8" },
 } as const;
 
 /** Riot Games' "Legal Jibber Jabber" fan-project notice (riotgames.com/en/legal), word for word. */
