@@ -7,6 +7,7 @@ test("home explains the app and links to a new draft", async ({ page }) => {
   await expect(page).toHaveTitle(/Synapse/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Practice pro drafts");
   await expect(page.getByTestId("riot-notice")).toContainText("Legal Jibber Jabber");
+  await expect(page.getByText(/© \d{4} Kitchen Labs/)).toBeVisible();
   await expect(page.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", /\/apps\/synapse\/privacy$/);
   await page.getByTestId("cta-start").click();
   await expect(page).toHaveURL(/\/draft\/new$/);
@@ -58,3 +59,28 @@ test("the theme toggle switches to dark", async ({ page }) => {
   await page.getByTestId("theme-toggle").click();
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", theme!);
 });
+
+// Owner rule (2026-10-02): the main action is visible without scrolling. Every choice has a
+// default, so the start button is pinned in view on a laptop and a phone.
+for (const [width, height] of [
+  [1280, 800],
+  [1440, 900],
+  [430, 932],
+] as const) {
+  test(`setup fits at ${width}x${height}: the start button is in view at load`, async ({ page }, info) => {
+    test.skip((width < 500) !== (info.project.name === "phone"), "each size runs in its matching project");
+    await page.setViewportSize({ width, height });
+    await page.goto("/draft/new");
+    // Regression: the team fieldset kept its content width (481px) and the page scrolled sideways.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    const start = page.getByTestId("start-draft");
+    await expect(start).toBeInViewport();
+    const box = (await start.boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(height);
+    // The last choice can still be reached and picked above the pinned bar.
+    await page.getByTestId("team-none").click();
+    await expect(page.getByTestId("team-none").locator("input")).toBeChecked();
+    await start.click();
+    await expect(page.getByTestId("draft-screen")).toBeVisible();
+  });
+}

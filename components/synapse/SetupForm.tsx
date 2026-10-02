@@ -89,9 +89,12 @@ export function SetupForm({ draftId }: { draftId?: string }) {
     else router.push(`/draft/${id}`);
   }
 
+  // The team cards' one-line player lists made the page 481px wide on a 430px phone (sideways
+  // scrolling): a fieldset's default min-width is its content, and so is an implicit grid column.
+  // Hence min-w-0 on each fieldset and grid-cols-[minmax(0,1fr)] on the team grid.
   return (
     <form onSubmit={start} className="flex flex-col gap-8" aria-label="Set up a draft">
-      <fieldset>
+      <fieldset className="min-w-0">
         <Legend>Your side</Legend>
         <div className="grid gap-3 sm:grid-cols-2">
           {SIDES.map((s) => (
@@ -106,7 +109,7 @@ export function SetupForm({ draftId }: { draftId?: string }) {
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset className="min-w-0">
         <Legend>Format</Legend>
         <div className="grid gap-3 sm:grid-cols-3">
           {FORMATS.map((f) => (
@@ -120,11 +123,11 @@ export function SetupForm({ draftId }: { draftId?: string }) {
         </div>
       </fieldset>
 
-      <fieldset>
+      <fieldset className="min-w-0">
         <Legend hint="Synapse scouts their players' favourite champions and plays like them. These teams are made-up samples.">
           Opponent to scout
         </Legend>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {TEAMS.map((t) => (
             <Choice key={t.id} name="team" checked={teamId === t.id} onChange={() => setTeamId(t.id)} testId={`team-${t.id}`}>
               <TeamBadge tag={t.tag} />
@@ -149,9 +152,11 @@ export function SetupForm({ draftId }: { draftId?: string }) {
         </div>
       </fieldset>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[15px] text-ink-2">Your draft is saved in this browser. No account needed.</p>
-        <Button type="submit" size="lg" iconRight={ArrowRight} loading={starting} className="sm:min-w-56" data-testid="start-draft">
+      {/* Pinned to the bottom of the screen while the form scrolls: every choice has a default, so
+          the start button is always in view (owner's minimal-scrolling rule; e2e "setup fits"). */}
+      <div className="sticky bottom-0 z-20 -mx-5 flex items-center justify-between gap-3 border-t border-line bg-surface/95 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-lift)] backdrop-blur sm:rounded-t-md">
+        <p className="hidden text-[15px] text-ink-2 sm:block">Your draft is saved in this browser. No account needed.</p>
+        <Button type="submit" size="lg" iconRight={ArrowRight} loading={starting} className="w-full sm:w-auto sm:min-w-56" data-testid="start-draft">
           Start the draft
         </Button>
       </div>
