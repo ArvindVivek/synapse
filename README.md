@@ -3,7 +3,7 @@
 Practice League of Legends pro drafts against a sparring opponent, with pick and ban advice that
 explains itself, a live win chance, scouting of a sample opponent, and a coach's report at the end.
 
-**Live:** https://synapse-henna-eight.vercel.app · Made by Kitchen Labs · Started at the Cloud9 ×
+**Live:** https://synapse-henna-eight.vercel.app · © 2026 Kitchen Labs · Started at the Cloud9 ×
 JetBrains hackathon (2026).
 
 ## What it does

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ThemeToggle, privacyUrl, supportUrl } from "@/components/kl";
+import { COPYRIGHT, ThemeToggle, privacyUrl, supportUrl } from "@/components/kl";
 import { cn } from "@/lib/kl/cn";
 import { RIOT_NOTICE, site } from "@/lib/site";
 
@@ -52,9 +52,7 @@ export function AppShell({
       <footer className="pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <div className={cn(frame, "border-t border-line pt-5 text-sm text-ink-2")}>
           <div className="flex flex-col items-center gap-1 sm:flex-row sm:justify-between">
-            <p>
-              Made by <span className="font-bold text-ink">Kitchen Labs</span>
-            </p>
+            <p>{COPYRIGHT}</p>
             <nav aria-label="About this app" className="flex items-center">
               <a href={privacyUrl(site.slug)} className="inline-flex min-h-11 items-center px-3 font-bold text-ink-2 underline-offset-4 hover:text-ink hover:underline">
                 Privacy
