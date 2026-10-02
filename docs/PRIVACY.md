@@ -51,5 +51,5 @@ Synapse is not directed at children under 13 and collects no personal informatio
 
 ## Changes and contact
 
-If this policy changes, we'll update the date above. Questions:
-**arvind.vivekk@gmail.com**.
+If this policy changes, we'll update the date above. Questions? Send
+them through [our contact page](https://kitchenlabs-one.vercel.app/contact).

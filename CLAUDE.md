@@ -91,3 +91,15 @@ Dead since the Supabase instance was deleted (owner can delete on Vercel):
   `/apps/synapse/privacy` and `/apps/synapse/support` (the footer links point there).
 - Top up OpenAI credits, then run the opt-in live AI check above (the lead runs it at the end).
 - Delete the five dead env vars on Vercel.
+
+## Owner sweep (2026-10-02)
+- KL Web 1.0.3. The studio credit is "© 2026 Kitchen Labs" (`COPYRIGHT`), never "Made by"; e2e
+  matches `/© \d{4} Kitchen Labs/` so the year can roll over. No email address anywhere in the app
+  or its docs: `docs/PRIVACY.md` and `docs/SUPPORT.md` link https://kitchenlabs-one.vercel.app/contact.
+- Minimal scrolling (owner rule): the "Start the draft" row on `/draft/new` is `sticky bottom-0`
+  (every choice has a default; the button used to sit at y=899 on a laptop and y=1755 on a phone).
+  Pinned by "setup fits at WxH" in `e2e/pages.spec.ts`. The draft board already fits.
+- **The setup page scrolled sideways on phones** (481px on a 430px screen): a `<fieldset>`'s default
+  min-width is its content, and so is an implicit grid column, so the team cards' one-line
+  (`truncate`) player lists set the width. Fieldsets are `min-w-0`, the team grid is
+  `grid-cols-[minmax(0,1fr)]`; the same e2e checks scrollWidth.
