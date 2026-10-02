@@ -1,4 +1,4 @@
-// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/lib/demo.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.3, from kitchenlabs-kit/web/kl-web/lib/demo.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 import { describe, expect, it, vi } from "vitest";
 import { assertNotDemo, chooseDataLayer, daysAgo, daysFromNow, demoModeFrom, loadFixture } from "./demo";
 

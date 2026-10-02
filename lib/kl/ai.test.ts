@@ -1,4 +1,4 @@
-// KL Web 1.0.2, from kitchenlabs-kit/web/kl-web/lib/ai.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
+// KL Web 1.0.3, from kitchenlabs-kit/web/kl-web/lib/ai.test.ts. Kit-owned: change it in the kit, then run scripts/sync-web-kit.sh.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // ai.ts starts with `import "server-only"`, which throws outside a React Server environment.
