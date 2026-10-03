@@ -1,6 +1,6 @@
 # Synapse Privacy Policy
 
-_Last updated: 29 September 2026_
+_Last updated: 2 October 2026_
 
 Synapse is made by Kitchen Labs. It's a free website for practising League of Legends drafts. This
 page says, in plain English, what happens to your information.
@@ -24,9 +24,8 @@ browser's site data deletes them.
 draft (side, format, the sample team's name, and the champions banned and picked) over an encrypted
 connection to Kitchen Labs' server (hosted by Vercel). The server works out the numbers (win chance,
 grade, lane matchups) and, when the AI writer is available, sends those numbers and the champion
-names to OpenAI's AI service to write the report's sentences. OpenAI processes them under its API
-terms, which say API data isn't used to train its models and may be kept for up to 30 days for abuse
-monitoring. No name, email, account or device identifier is ever part of a draft. To answer the same
+names to a third-party AI service to write the report's sentences. Our AI provider does not use
+this data to train its models, and may keep it for up to 30 days for abuse monitoring. No name, email, account or device identifier is ever part of a draft. To answer the same
 draft instantly next time, the server may keep the written report in memory for a short while; it's
 tied to the champions picked, not to you.
 
