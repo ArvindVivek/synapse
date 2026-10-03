@@ -5,8 +5,8 @@ import { defineConfig, devices } from "@playwright/test";
 // sees empty values).
 loadEnvConfig(process.cwd());
 
-/** E2E runs against the production build (`npm run build` first). Own port: 3188. */
-const PORT = process.env.E2E_PORT ?? "3188";
+/** E2E runs against the production build (`npm run build` first). Own port: 3563. */
+const PORT = process.env.E2E_PORT ?? "3563";
 /** Set to a deployed URL to run specs against it (no local server). */
 const BASE_URL = process.env.E2E_BASE_URL;
 /**

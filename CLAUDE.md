@@ -9,7 +9,7 @@ Playwright. Live: https://synapse-henna-eight.vercel.app (Vercel project `synaps
 
 - Every page and API route runs on bundled fixtures (`lib/fixtures/*.json`); no database.
 - Gate: `npm run gate` = kit check, typecheck, eslint 0 warnings, vitest, build, leak-check.
-- E2E: `npm run build && npm run e2e` (production server on port 3188, TZ=UTC, browser in
+- E2E: `npm run build && npm run e2e` (production server on port 3563, TZ=UTC, browser in
   America/Los_Angeles, phone + desktop, OpenAI key blanked so no test spends money).
 - AI report: code path done and unit-tested with a stubbed OpenAI. **The live AI check is pending**:
   the org key was out of credits (429 insufficient_quota) on 2026-09-29, so production serves the
