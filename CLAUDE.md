@@ -63,9 +63,9 @@ API over the same pure functions and are covered by `e2e/api.spec.ts`.
 |---|---|---|
 | `OPENAI_API_KEY` | Vercel production + preview (sensitive), `.env.local` | AI report. Absent = code-written reports |
 
-Dead since the Supabase instance was deleted (owner can delete on Vercel):
-`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-`DATABASE_URL`, `GRID_API_KEY`.
+`OPENAI_API_KEY` is the only Vercel variable. The five dead since the Supabase instance was deleted
+(`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+`DATABASE_URL`, `GRID_API_KEY`) were removed from Vercel on 2026-10-02.
 
 ## Gotchas (with causes)
 
@@ -90,7 +90,6 @@ Dead since the Supabase instance was deleted (owner can delete on Vercel):
 - Publish `docs/PRIVACY.md` and `docs/SUPPORT.md` on the studio site at
   `/apps/synapse/privacy` and `/apps/synapse/support` (the footer links point there).
 - Top up OpenAI credits, then run the opt-in live AI check above (the lead runs it at the end).
-- Delete the five dead env vars on Vercel.
 
 ## Owner sweep (2026-10-02)
 - KL Web 1.0.3. The studio credit is "© 2026 Kitchen Labs" (`COPYRIGHT`), never "Made by"; e2e
