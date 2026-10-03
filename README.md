@@ -17,7 +17,7 @@ JetBrains hackathon (2026).
 - **Win chance** with a readable breakdown: champion strength, teamwork, head-to-head, side.
 - **Scouting:** eight fictional sample teams; each player's pool and their likely next pick.
 - **Report:** grade, lane-by-lane edges, then (on request) a coach's report written by
-  OpenAI `gpt-5.4-mini`, or by code from the same numbers when AI isn't available.
+  AI, or by code from the same numbers when AI isn't available.
 
 ## Data
 
