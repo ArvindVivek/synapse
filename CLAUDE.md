@@ -8,7 +8,8 @@ Playwright. Live: https://synapse-henna-eight.vercel.app (Vercel project `synaps
 ## Status (true as of 2026-09-29)
 
 - Every page and API route runs on bundled fixtures (`lib/fixtures/*.json`); no database.
-- Gate: `npm run gate` = kit check, typecheck, eslint 0 warnings, vitest, build, leak-check.
+- Gate: `npm run gate` = kit check, typecheck, eslint 0 warnings, vitest, build, leak-check
+  (secrets + AI vendor/model names in client output).
 - E2E: `npm run build && npm run e2e` (production server on port 3563, TZ=UTC, browser in
   America/Los_Angeles, phone + desktop, OpenAI key blanked so no test spends money).
 - AI report: code path done and unit-tested with a stubbed OpenAI. **The live AI check is pending**:
@@ -47,6 +48,10 @@ API over the same pure functions and are covered by `e2e/api.spec.ts`.
   Riot, league or team logos, no player photos. Teams are three-letter badges.
 - **Sample data only:** teams and players are fictional. Never attach invented stats to real players
   or teams.
+- **Never name the AI vendor or model to users** (owner rule 2026-10-02): UI, error JSON, README
+  intro, `docs/PRIVACY.md` and `docs/SUPPORT.md` say "AI" or "a third-party AI service". Server
+  code, env names and these manuals may name it. `scripts/leak-check.mjs` (in the gate) fails if
+  `.next/static` or a prerendered `.next/server/app/**/*.html` page matches `/openai|gpt-/i`.
 - **No recurring AI cost:** the report is written only when someone taps the button. Nothing
   scheduled. Tokens (measured 2026-09-29): system prompt 262 chars (~65 tokens), facts 464 chars
   (~120 tokens), strict schema 1,068 chars (~250 tokens), so ~450 tokens in; answer ~400 tokens,

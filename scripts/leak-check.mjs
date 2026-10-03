@@ -3,6 +3,9 @@
 // 1. Key-shaped strings: OpenAI (sk-…), Supabase secret, service_role, GitHub tokens, AWS keys.
 // 2. The real values of this app's server secrets (read from .env.local / the environment),
 //    so even an oddly shaped key is caught. Values are never printed.
+// 3. The AI vendor or a model id ("openai", "gpt-…") in client chunks or prerendered HTML (owner
+//    rule 2026-10-02: users only ever see "AI"). Server code under .next/server legitimately names
+//    the vendor, so only .next/static and the rendered .html pages are scanned for this.
 // Usage: node scripts/leak-check.mjs [dir]   (default .next/static)
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -51,8 +54,21 @@ for (const file of files(root)) {
   for (const [name, value] of secrets) if (text.includes(value)) problems.push(`${file}: contains the value of ${name}`);
 }
 
+// Prerendered pages are what a visitor reads, so they get the vendor-name check too.
+const VENDOR = /openai|gpt-/i;
+const htmlRoot = ".next/server/app";
+const vendorFiles = [...files(root)];
+if (root === ".next/static" && existsSync(htmlRoot)) vendorFiles.push(...[...files(htmlRoot)].filter((f) => f.endsWith(".html")));
+for (const file of vendorFiles) {
+  const m = readFileSync(file, "utf8").match(VENDOR);
+  if (m) problems.push(`${file}: names the AI vendor or a model ("${m[0]}"); users should only see "AI"`);
+}
+
 if (problems.length) {
   console.error(`leak-check: FAILED\n${problems.join("\n")}`);
   process.exit(1);
 }
-console.log(`leak-check: ${scanned} files in ${root}, ${PATTERNS.length} key patterns and ${secrets.size} real secret values checked, nothing found.`);
+console.log(
+  `leak-check: ${scanned} files in ${root}, ${PATTERNS.length} key patterns and ${secrets.size} real secret values checked; ` +
+    `${vendorFiles.length} client files and pages free of AI vendor/model names. Nothing found.`,
+);
