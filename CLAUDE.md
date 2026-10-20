@@ -14,7 +14,9 @@ Playwright. Live: https://synapse-henna-eight.vercel.app (Vercel project `synaps
   America/Los_Angeles, phone + desktop, both AI keys blanked so no test spends money).
 - AI report: Claude first (`claude-haiku-5-5`), OpenAI (`gpt-5.4-mini`) fallback, then the
   code-written report, all through `lib/kl/ai.ts` (KL Web 1.1.6). Unit-tested with stubbed replies
-  from both services; live check status below in "Owner-only actions".
+  from both services. Live check 2026-10-20 on production (deploy `dpl_BSFeBGsGS1rtwYFMiEzNW6d4rhnW`):
+  `e2e/ai-live.spec.ts` passed in 7.1 s, log `[ai] provider: anthropic label=draft-report
+  model=claude-haiku-5-5 in=1062 out=634 ms=6517`.
 - **No real AI calls in tests (owner rule, 2026-09-29).** `vitest.setup.ts` makes any unstubbed
   call to api.anthropic.com or api.openai.com throw (pinned by `lib/ai/no-real-calls.test.ts`); Playwright blanks both keys
   for its server. The only spending check is opt-in, run once when credits are back:
@@ -95,10 +97,9 @@ These two are the only Vercel variables. The five dead since the Supabase instan
 
 - Publish `docs/PRIVACY.md` and `docs/SUPPORT.md` on the studio site at
   `/apps/synapse/privacy` and `/apps/synapse/support` (the footer links point there).
-- Top up OpenAI credits, then run the opt-in live AI check above (the lead runs it at the end).
 
 ## Owner sweep (2026-10-02)
-- KL Web 1.0.3. The studio credit is "© 2026 Kitchen Labs" (`COPYRIGHT`), never "Made by"; e2e
+- KL Web 1.0.3 (now 1.1.6). The studio credit is "© 2026 Kitchen Labs" (`COPYRIGHT`), never "Made by"; e2e
   matches `/© \d{4} Kitchen Labs/` so the year can roll over. No email address anywhere in the app
   or its docs: `docs/PRIVACY.md` and `docs/SUPPORT.md` link https://kitchenlabs-one.vercel.app/contact.
 - Minimal scrolling (owner rule): the "Start the draft" row on `/draft/new` is `sticky bottom-0`
