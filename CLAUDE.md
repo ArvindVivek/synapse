@@ -5,7 +5,7 @@ web release on 2026-09-29. Next 16.3.6, React 19, Tailwind v4, KL Web 1.0.1, zus
 Playwright. Live: https://synapse-henna-eight.vercel.app (Vercel project `synapse`, scope
 `arvindviveks-projects`, deploys from `main` of ArvindVivek/synapse).
 
-## Status (true as of 2026-09-29)
+## Status (true as of 2026-10-20)
 
 - Every page and API route runs on bundled fixtures (`lib/fixtures/*.json`); no database.
 - Gate: `npm run gate` = kit check, typecheck, eslint 0 warnings, vitest, build, leak-check
