@@ -11,16 +11,16 @@ Playwright. Live: https://synapse-henna-eight.vercel.app (Vercel project `synaps
 - Gate: `npm run gate` = kit check, typecheck, eslint 0 warnings, vitest, build, leak-check
   (secrets + AI vendor/model names in client output).
 - E2E: `npm run build && npm run e2e` (production server on port 3563, TZ=UTC, browser in
-  America/Los_Angeles, phone + desktop, OpenAI key blanked so no test spends money).
-- AI report: code path done and unit-tested with a stubbed OpenAI. **The live AI check is pending**:
-  the org key was out of credits (429 insufficient_quota) on 2026-09-29, so production serves the
-  code-written report.
-- **No real OpenAI calls in tests (owner rule, 2026-09-29).** `vitest.setup.ts` makes any unstubbed
-  call to api.openai.com throw (pinned by `lib/ai/no-real-calls.test.ts`); Playwright blanks the key
+  America/Los_Angeles, phone + desktop, both AI keys blanked so no test spends money).
+- AI report: Claude first (`claude-haiku-5-5`), OpenAI (`gpt-5.4-mini`) fallback, then the
+  code-written report, all through `lib/kl/ai.ts` (KL Web 1.1.6). Unit-tested with stubbed replies
+  from both services; live check status below in "Owner-only actions".
+- **No real AI calls in tests (owner rule, 2026-09-29).** `vitest.setup.ts` makes any unstubbed
+  call to api.anthropic.com or api.openai.com throw (pinned by `lib/ai/no-real-calls.test.ts`); Playwright blanks both keys
   for its server. The only spending check is opt-in, run once when credits are back:
   `E2E_LIVE_AI=1 E2E_BASE_URL=https://synapse-henna-eight.vercel.app npx playwright test e2e/ai-live.spec.ts --project=desktop`
   (one call; passes when `report.source` is "ai"; the runtime log then shows
-  `[ai] provider: openai label=draft-report`). No evals or model comparisons.
+  `[ai] provider: anthropic label=draft-report`). No evals or model comparisons.
 
 ## Map
 
@@ -51,7 +51,7 @@ API over the same pure functions and are covered by `e2e/api.spec.ts`.
 - **Never name the AI vendor or model to users** (owner rule 2026-10-02): UI, error JSON, README
   intro, `docs/PRIVACY.md` and `docs/SUPPORT.md` say "AI" or "a third-party AI service". Server
   code, env names and these manuals may name it. `scripts/leak-check.mjs` (in the gate) fails if
-  `.next/static` or a prerendered `.next/server/app/**/*.html` page matches `/openai|gpt-/i`.
+  `.next/static` or a prerendered `.next/server/app/**/*.html` page matches `/openai|gpt-|anthropic|claude/i`.
 - **No recurring AI cost:** the report is written only when someone taps the button. Nothing
   scheduled. Tokens (measured 2026-09-29): system prompt 262 chars (~65 tokens), facts 464 chars
   (~120 tokens), strict schema 1,068 chars (~250 tokens), so ~450 tokens in; answer ~400 tokens,
@@ -66,9 +66,10 @@ API over the same pure functions and are covered by `e2e/api.spec.ts`.
 
 | Name | Where | Why |
 |---|---|---|
-| `OPENAI_API_KEY` | Vercel production + preview (sensitive), `.env.local` | AI report. Absent = code-written reports |
+| `ANTHROPIC_API_KEY` | Vercel production + preview (sensitive), `.env.local` | AI report, tried first |
+| `OPENAI_API_KEY` | Vercel production + preview (sensitive), `.env.local` | AI report fallback. Neither key = code-written reports |
 
-`OPENAI_API_KEY` is the only Vercel variable. The five dead since the Supabase instance was deleted
+These two are the only Vercel variables. The five dead since the Supabase instance was deleted
 (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
 `DATABASE_URL`, `GRID_API_KEY`) were removed from Vercel on 2026-10-02.
 

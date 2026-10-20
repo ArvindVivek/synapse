@@ -7,12 +7,13 @@ import 'server-only'
  * Cost controls, in order:
  * 1. Same finished draft, same report: answers are cached by side and picks (no second call).
  * 2. A per-visitor speed bump: 4 AI reports per 10 minutes, then the code-written report.
- * 3. If OpenAI says the account is out of credit (429 insufficient_quota) or the key is refused,
- *    AI pauses for 15 minutes. No retries: a failed call gets the code-written report at once.
+ * 3. If both AI services fail and the last says the account is out of credit (429
+ *    insufficient_quota) or the key is refused, AI pauses for 15 minutes. No retries: a failed call gets the code-written report at once.
  * The code-written report (fallbackReport) uses the same computed facts, so people always get one.
  */
 
 import { AIError, generateJSON, toAIError } from '@/lib/kl/ai'
+// lib/kl/ai.ts tries Claude first, then OpenAI; either key turns AI on.
 import { createRateLimiter } from '@/lib/kl/rate-limit'
 import type { Draft } from '@/lib/draft/types'
 import {
@@ -63,7 +64,7 @@ export async function writeReport(draft: Draft, opts: { visitor: string; signal?
   const cached = cache.get(key)
   if (cached) return { report: { ...cached, facts }, notice: null }
 
-  if (!process.env.OPENAI_API_KEY || now < pausedUntil) {
+  if ((!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) || now < pausedUntil) {
     return { report: fallbackReport(facts), notice: 'ai_unavailable' }
   }
   if (!limiter.check(opts.visitor).ok) {
@@ -88,7 +89,7 @@ export async function writeReport(draft: Draft, opts: { visitor: string; signal?
     const e = toAIError(err)
     if (outOfCredit(e)) {
       pausedUntil = now + PAUSE_MS
-      console.error('[ai] draft-report: OpenAI refused the key or the account is out of credit; AI paused for 15 minutes', e.code)
+      console.error('[ai] draft-report: the AI service refused the key or the account is out of credit; AI paused for 15 minutes', e.code)
     } else {
       console.error(`[ai] draft-report failed (${e.code}); sent the code-written report`, e.detail)
     }

@@ -41,7 +41,7 @@ npm run gate           # kit check, typecheck, lint (0 warnings), unit tests, bu
 npm run build && npm run e2e   # Playwright on the production build, phone + desktop
 ```
 
-`OPENAI_API_KEY` (server only, in `.env.local`) turns on AI-written reports; without it every report
+`ANTHROPIC_API_KEY` (tried first) or `OPENAI_API_KEY` (fallback), server only, in `.env.local`, turns on AI-written reports; without either every report
 is code-written. See `CLAUDE.md` for the operating manual, `DESIGN.md` for the look, and
 `docs/CREDITS.md` for Riot's assets and the fan-project notice.
 

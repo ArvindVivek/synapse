@@ -38,8 +38,8 @@ export default defineConfig({
     url: `http://127.0.0.1:${PORT}`,
     reuseExistingServer: false,
     timeout: 120_000,
-    // Never spend on OpenAI by default: an empty key sends the report down the code-written path
+    // Never spend on AI by default: empty keys send the report down the code-written path
     // (the AI path is unit-tested with a stubbed fetch in lib/ai/draft-report.test.ts).
-    env: LIVE_AI ? { TZ: "UTC" } : { TZ: "UTC", OPENAI_API_KEY: "" },
+    env: LIVE_AI ? { TZ: "UTC" } : { TZ: "UTC", ANTHROPIC_API_KEY: "", OPENAI_API_KEY: "" },
   },
 });

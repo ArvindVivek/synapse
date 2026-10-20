@@ -4,6 +4,7 @@ vi.mock('server-only', () => ({}))
 
 import { newDraft } from '@/lib/draft/draft'
 import type { Draft } from '@/lib/draft/types'
+import { CLAUDE_MODEL, OPENAI_MODEL } from '@/lib/kl/ai'
 import { resetReportState, writeReport } from './draft-report'
 
 const done: Draft = {
@@ -36,6 +37,8 @@ beforeEach(() => {
   resetReportState()
   fetchMock = vi.fn()
   vi.stubGlobal('fetch', fetchMock)
+  // No Claude key by default, so the helper goes straight to the mocked OpenAI reply.
+  vi.stubEnv('ANTHROPIC_API_KEY', '')
   vi.stubEnv('OPENAI_API_KEY', 'test-key-not-real')
   vi.spyOn(console, 'info').mockImplementation(() => {})
   vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -48,13 +51,28 @@ afterEach(() => {
 })
 
 describe('writeReport', () => {
-  it('asks gpt-5.4-mini at low effort with a strict schema and a token cap', async () => {
+  it('asks Claude first when its key is set', async () => {
+    vi.stubEnv('ANTHROPIC_API_KEY', 'test-key-not-real')
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ content: [{ type: 'text', text: JSON.stringify(aiText) }], stop_reason: 'end_turn', usage: { input_tokens: 240, output_tokens: 380 } }),
+        { status: 200 },
+      ),
+    )
+    const r = await writeReport(done, { visitor: 'v0' })
+    expect(r.report.source).toBe('ai')
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0][0]).toContain('api.anthropic.com')
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).model).toBe(CLAUDE_MODEL)
+  })
+
+  it('asks the OpenAI fallback at low effort with a strict schema and a token cap', async () => {
     fetchMock.mockResolvedValueOnce(okResponse())
     const r = await writeReport(done, { visitor: 'v1' })
     expect(r.report.source).toBe('ai')
     expect(r.report.strategicAnalysis.teamComp).toBe('A dive team.')
     const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-    expect(body.model).toBe('gpt-5.4-mini')
+    expect(body.model).toBe(OPENAI_MODEL)
     expect(body.reasoning_effort).toBe('low')
     expect(body.max_completion_tokens).toBe(1600)
     expect(body.response_format.json_schema.strict).toBe(true)
@@ -82,7 +100,7 @@ describe('writeReport', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1) // paused: nothing sent
   })
 
-  it('never calls OpenAI without a key', async () => {
+  it('never calls a model without a key', async () => {
     vi.stubEnv('OPENAI_API_KEY', '')
     const r = await writeReport(done, { visitor: 'v4' })
     expect(r.report.source).toBe('fallback')

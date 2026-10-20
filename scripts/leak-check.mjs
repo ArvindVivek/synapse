@@ -3,7 +3,7 @@
 // 1. Key-shaped strings: OpenAI (sk-…), Supabase secret, service_role, GitHub tokens, AWS keys.
 // 2. The real values of this app's server secrets (read from .env.local / the environment),
 //    so even an oddly shaped key is caught. Values are never printed.
-// 3. The AI vendor or a model id ("openai", "gpt-…") in client chunks or prerendered HTML (owner
+// 3. The AI vendor or a model id ("openai", "gpt-…", "anthropic", "claude…") in client chunks or prerendered HTML (owner
 //    rule 2026-10-02: users only ever see "AI"). Server code under .next/server legitimately names
 //    the vendor, so only .next/static and the rendered .html pages are scanned for this.
 // Usage: node scripts/leak-check.mjs [dir]   (default .next/static)
@@ -26,7 +26,7 @@ const PATTERNS = [
 ];
 
 // Add any other server-only env var this app uses.
-const SECRET_NAMES = ["OPENAI_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SECRET_KEY", "GITHUB_TOKEN"];
+const SECRET_NAMES = ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SECRET_KEY", "GITHUB_TOKEN"];
 const secrets = new Map();
 for (const file of [".env.local", ".env", ".env.production.local"]) {
   if (!existsSync(file)) continue;
@@ -55,7 +55,7 @@ for (const file of files(root)) {
 }
 
 // Prerendered pages are what a visitor reads, so they get the vendor-name check too.
-const VENDOR = /openai|gpt-/i;
+const VENDOR = /openai|gpt-|anthropic|claude/i;
 const htmlRoot = ".next/server/app";
 const vendorFiles = [...files(root)];
 if (root === ".next/static" && existsSync(htmlRoot)) vendorFiles.push(...[...files(htmlRoot)].filter((f) => f.endsWith(".html")));
