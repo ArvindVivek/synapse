@@ -10,7 +10,7 @@ page says, in plain English, what happens to your information.
 - There are no accounts, no ads and no tracking.
 - Your drafts stay in your browser.
 - If you ask for a coach's report, the finished draft (champions only) is sent to our server, and
-  it may be passed to an AI service to write the report. Nothing about you is sent with it.
+  it may be passed to an AI service (or a second one if the first is unavailable) to write the report. Nothing about you is sent with it.
 
 ## What we handle, and why
 
@@ -24,8 +24,8 @@ browser's site data deletes them.
 draft (side, format, the sample team's name, and the champions banned and picked) over an encrypted
 connection to Kitchen Labs' server (hosted by Vercel). The server works out the numbers (win chance,
 grade, lane matchups) and, when the AI writer is available, sends those numbers and the champion
-names to a third-party AI service to write the report's sentences. Our AI provider does not use
-this data to train its models, and may keep it for up to 30 days for abuse monitoring. No name, email, account or device identifier is ever part of a draft. To answer the same
+names to a third-party AI service (or, if that one is unavailable, a second one) to write the report's sentences. Our AI providers do not use
+this data to train their models, and may keep it for up to 30 days for abuse monitoring. No name, email, account or device identifier is ever part of a draft. To answer the same
 draft instantly next time, the server may keep the written report in memory for a short while; it's
 tied to the champions picked, not to you.
 
